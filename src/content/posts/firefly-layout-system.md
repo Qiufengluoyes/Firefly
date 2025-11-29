@@ -5,7 +5,7 @@ description: 深入了解 Firefly 的布局系统，包括侧边栏布局（左�
 image: api
 tags: [Firefly, 布局, 博客, 使用指南]
 category: 博客指南
-draft: false
+draft: true
 ---
 
 ## 📖 概述
@@ -318,33 +318,33 @@ export const siteConfig: SiteConfig = {
 <svg width="800" height="200" xmlns="http://www.w3.org/2000/svg">
   <!-- 背景 -->
   <rect width="800" height="200" fill="#f8f9fa"/>
-  
+
   <!-- 左侧边栏 -->
   <rect x="20" y="30" width="140" height="140" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="4"/>
   <text x="90" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#1976d2">左侧边栏</text>
   <text x="90" y="110" text-anchor="middle" font-size="12" fill="#666">280px</text>
-  
+
   <!-- 文章1 -->
   <rect x="180" y="30" width="120" height="140" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="4"/>
   <text x="240" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#f57c00">文章1</text>
   <text x="240" y="110" text-anchor="middle" font-size="12" fill="#666">590px</text>
   <text x="240" y="130" text-anchor="middle" font-size="11" fill="#d84315">过窄！</text>
-  
+
   <!-- 文章2 -->
   <rect x="320" y="30" width="120" height="140" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="4"/>
   <text x="380" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#f57c00">文章2</text>
   <text x="380" y="110" text-anchor="middle" font-size="12" fill="#666">590px</text>
   <text x="380" y="130" text-anchor="middle" font-size="11" fill="#d84315">过窄！</text>
-  
+
   <!-- 右侧边栏 -->
   <rect x="460" y="30" width="140" height="140" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="4"/>
   <text x="530" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#1976d2">右侧边栏</text>
   <text x="530" y="110" text-anchor="middle" font-size="12" fill="#666">280px</text>
-  
+
   <!-- 箭头指示 -->
   <path d="M 240 180 L 240 195" stroke="#d32f2f" stroke-width="2" marker-end="url(#arrowred)"/>
   <path d="M 380 180 L 380 195" stroke="#d32f2f" stroke-width="2" marker-end="url(#arrowred)"/>
-  
+
   <defs>
     <marker id="arrowred" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 Z" fill="#d32f2f"/>
@@ -359,26 +359,26 @@ export const siteConfig: SiteConfig = {
 <svg width="800" height="200" xmlns="http://www.w3.org/2000/svg">
   <!-- 背景 -->
   <rect width="800" height="200" fill="#f8f9fa"/>
-  
+
   <!-- 左侧边栏 -->
   <rect x="20" y="30" width="140" height="140" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="4"/>
   <text x="90" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#1976d2">左侧边栏</text>
   <text x="90" y="110" text-anchor="middle" font-size="12" fill="#666">280px</text>
-  
+
   <!-- 文章列表区域 -->
   <rect x="180" y="30" width="320" height="140" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" rx="4"/>
   <text x="340" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">文章列表</text>
   <text x="340" y="105" text-anchor="middle" font-size="12" fill="#666">1240px</text>
   <text x="340" y="125" text-anchor="middle" font-size="11" fill="#388e3c">单列，空间充足</text>
-  
+
   <!-- 右侧边栏 -->
   <rect x="520" y="30" width="140" height="140" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="4"/>
   <text x="590" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#1976d2">右侧边栏</text>
   <text x="590" y="110" text-anchor="middle" font-size="12" fill="#666">280px</text>
-  
+
   <!-- 箭头指示 -->
   <path d="M 340 180 L 340 195" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowgreen)"/>
-  
+
   <defs>
     <marker id="arrowgreen" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 Z" fill="#4caf50"/>
@@ -393,29 +393,29 @@ export const siteConfig: SiteConfig = {
 <svg width="800" height="200" xmlns="http://www.w3.org/2000/svg">
   <!-- 背景 -->
   <rect width="800" height="200" fill="#f8f9fa"/>
-  
+
   <!-- 左侧边栏 -->
   <rect x="20" y="30" width="140" height="140" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="4"/>
   <text x="90" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#1976d2">左侧边栏</text>
   <text x="90" y="110" text-anchor="middle" font-size="12" fill="#666">280px</text>
-  
+
   <!-- 文章1 -->
   <rect x="180" y="30" width="180" height="140" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" rx="4"/>
   <text x="270" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">文章1</text>
   <text x="270" y="105" text-anchor="middle" font-size="12" fill="#666">750px</text>
   <text x="270" y="125" text-anchor="middle" font-size="11" fill="#388e3c">宽度充足</text>
-  
+
   <!-- 文章2 -->
   <rect x="380" y="30" width="180" height="140" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" rx="4"/>
   <text x="470" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">文章2</text>
   <text x="470" y="105" text-anchor="middle" font-size="12" fill="#666">750px</text>
   <text x="470" y="125" text-anchor="middle" font-size="11" fill="#388e3c">宽度充足</text>
 
-  
+
   <!-- 箭头指示 -->
   <path d="M 270 180 L 270 195" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowgreen2)"/>
   <path d="M 470 180 L 470 195" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowgreen2)"/>
-  
+
   <defs>
     <marker id="arrowgreen2" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 Z" fill="#4caf50"/>
