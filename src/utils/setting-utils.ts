@@ -10,6 +10,10 @@ import {
 import { siteConfig, expressiveCodeConfig } from "../config";
 import type { LIGHT_DARK_MODE, WALLPAPER_MODE } from "@/types/config";
 
+if (typeof window !== 'undefined') {
+  localStorage.removeItem('hue');
+}
+
 // Declare global functions
 declare global {
 	interface Window {

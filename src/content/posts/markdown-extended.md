@@ -1,93 +1,84 @@
 ---
-title: Markdown 扩展功能
-published: 1970-01-01
-updated: 1970-01-01
-description: '了解 Firefly 中的 Markdown 功能'
+title: Markdown Extended Features
+published: 2024-05-01
+updated: 2024-11-29
+description: 'Read more about Markdown features in Fuwari'
 image: ''
-tags: [演示, 示例, Markdown, Firefly]
-category: '文章示例'
-draft: false 
+tags: [Demo, Example, Markdown, Fuwari]
+category: ''
+draft: true
 ---
 
-## GitHub 仓库卡片
-您可以添加链接到 GitHub 仓库的动态卡片，在页面加载时，仓库信息会从 GitHub API 获取。 
+## GitHub Repository Cards
+You can add dynamic cards that link to GitHub repositories, on page load, the repository information is pulled from the GitHub API. 
 
-::github{repo="CuteLeaf/Firefly"}
+::github{repo="Fabrizz/MMM-OnSpotify"}
 
-使用代码 `::github{repo="CuteLeaf/Firefly"}` 创建 GitHub 仓库卡片。
+Create a GitHub repository card with the code `::github{repo="<owner>/<repo>"}`.
 
 ```markdown
-::github{repo="CuteLeaf/Firefly"}
+::github{repo="saicaca/fuwari"}
 ```
 
-## 提醒框
+## Admonitions
 
-支持以下类型的提醒框：`note` `tip` `important` `warning` `caution`
+Following types of admonitions are supported: `note` `tip` `important` `warning` `caution`
 
 :::note
-突出显示用户应该考虑的信息，即使在快速浏览时也是如此。
+Highlights information that users should take into account, even when skimming.
 :::
 
 :::tip
-可选信息，帮助用户更成功。
+Optional information to help a user be more successful.
 :::
 
 :::important
-用户成功所必需的关键信息。
+Crucial information necessary for users to succeed.
 :::
 
 :::warning
-由于潜在风险需要用户立即注意的关键内容。
+Critical content demanding immediate user attention due to potential risks.
 :::
 
 :::caution
-行动的负面潜在后果。
+Negative potential consequences of an action.
 :::
 
-### 基本语法
+### Basic Syntax
 
 ```markdown
 :::note
-突出显示用户应该考虑的信息，即使在快速浏览时也是如此。
+Highlights information that users should take into account, even when skimming.
 :::
 
 :::tip
-可选信息，帮助用户更成功。
+Optional information to help a user be more successful.
 :::
 ```
 
-### 自定义标题
+### Custom Titles
 
-可以自定义提醒框的标题。
+The title of the admonition can be customized.
 
-:::note[我的自定义标题]
-这是一个带有自定义标题的注释。
+:::note[MY CUSTOM TITLE]
+This is a note with a custom title.
 :::
 
 ```markdown
-:::note[我的自定义标题]
-这是一个带有自定义标题的注释。
+:::note[MY CUSTOM TITLE]
+This is a note with a custom title.
 :::
 ```
 
-### GitHub 语法
+### GitHub Syntax
 
 > [!TIP]
-> 也支持 [GitHub 语法](https://github.com/orgs/community/discussions/16925)。
+> [The GitHub syntax](https://github.com/orgs/community/discussions/16925) is also supported.
 
 ```
 > [!NOTE]
-> 也支持 GitHub 语法。
+> The GitHub syntax is also supported.
 
 > [!TIP]
-> 也支持 GitHub 语法。
+> The GitHub syntax is also supported.
 ```
-
-### 剧透
-
-您可以为文本添加剧透。文本也支持 **Markdown** 语法。
-
-内容 :spoiler[被隐藏了 **哈哈**]！
-
-```markdown
-内容 :spoiler[被隐藏了 **哈哈**]！

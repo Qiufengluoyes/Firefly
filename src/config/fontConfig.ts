@@ -2,7 +2,7 @@
 export const fontConfig = {
   enable: true, // 启用自定义字体功能
   preload: true, // 预加载字体文件以提高性能
-  selected: ["system"], // 当前选择的字体，支持多个字体组合
+  selected: ["misans-normal"], // 当前选择的字体，支持多个字体组合
   fonts: {
     // 系统字体
     system: {
@@ -28,20 +28,20 @@ export const fontConfig = {
       family: "Inter",
       display: "swap" as const,
     },
-    // 小米字体 - MiSans Normal
+    // 小米字体 - MiSans Medium
     "misans-normal": {
-      id: "misans-normal",
-      name: "MiSans Normal",
-      src: "https://unpkg.com/misans@4.1.0/lib/Normal/MiSans-Normal.min.css",
+      id: "misans-medium",
+      name: "MiSans Medium",
+      src: "https://unpkg.com/misans@4.1.0/lib/Normal/MiSans-Medium.min.css",
       family: "MiSans",
-      weight: 400,
+      weight: 500,
       display: "swap" as const,
     },
-    // 小米字体 - MiSans Semibold
-    "misans-semibold": {
-      id: "misans-semibold",
-      name: "MiSans Semibold",
-      src: "https://unpkg.com/misans@4.1.0/lib/Normal/MiSans-Semibold.min.css",
+    // 小米字体 - MiSans Demibold
+    "misans-demibold": {
+      id: "misans-demibold",
+      name: "MiSans Demibold",
+      src: "https://unpkg.com/misans@4.1.0/lib/Normal/MiSans-Demibold.min.css",
       family: "MiSans",
       weight: 600,
       display: "swap" as const,

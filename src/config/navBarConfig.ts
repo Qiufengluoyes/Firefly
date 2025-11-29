@@ -15,16 +15,10 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
     icon: "material-symbols:link",
     children: [
       {
-        name: "GitHub",
-        url: "https://github.com/CuteLeaf/Firefly",
+        name: "站点监测",
+        url: "https://status.feng1026.top/",
         external: true,
-        icon: "fa6-brands:github",
-      },
-      {
-        name: "Bilibili",
-        url: "https://space.bilibili.com/38932988",
-        external: true,
-        icon: "fa6-brands:bilibili",
+        icon: "majesticons:status-online",
       },
     ],
   });
