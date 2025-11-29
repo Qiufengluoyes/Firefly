@@ -27,6 +27,9 @@ import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import mdx from "@astrojs/mdx";
 import searchIndexer from "./src/integrations/searchIndex.mts";
+import { LinkCardComponent } from "./src/plugins/rehype-component-link-card.mjs";
+import remarkImageCaption from "./src/plugins/remark-image-caption.ts";
+import remarkImageWidth from './src/plugins/remark-image-width.js';
 // https://astro.build/config
 export default defineConfig({
 	site: siteConfig.site_url,
@@ -131,6 +134,13 @@ export default defineConfig({
 			remarkMath,
 			remarkReadingTime,
 			remarkExcerpt,
+			[
+                remarkImageCaption,
+                {
+                    className: 'image-caption',
+                },
+            ],
+            remarkImageWidth,
 			remarkGithubAdmonitionsToDirectives,
 			remarkDirective,
 			remarkSectionize,
@@ -146,6 +156,7 @@ export default defineConfig({
 				{
 					components: {
 						github: GithubCardComponent,
+						"link-card": LinkCardComponent,
 						note: (x, y) => AdmonitionComponent(x, y, "note"),
 						tip: (x, y) => AdmonitionComponent(x, y, "tip"),
 						important: (x, y) => AdmonitionComponent(x, y, "important"),

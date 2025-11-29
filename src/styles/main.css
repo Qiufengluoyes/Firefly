@@ -526,3 +526,18 @@ html {
 .pagination-info {
   @apply text-sm text-[var(--text-secondary)] text-center mb-2;
 }
+
+/* 仅在 Firefox 中生效的图片居中样式修复 */
+@-moz-document url-prefix() {
+  figure.image-caption img,
+  figure.image-caption > div img,
+  figure.image-caption > a img,
+  figure.image-caption > div > a img,
+  article figure img,
+  .post-content figure img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none !important; /* 清除可能的浮动 */
+  }
+}

@@ -27,6 +27,7 @@
     "@expressive-code/plugin-collapsible-sections": "^0.41.3",
     "@expressive-code/plugin-line-numbers": "^0.41.3",
     "@fancyapps/ui": "^6.1.6",
+    "@fastify/deepmerge": "^3.1.0",
     "@fontsource-variable/jetbrains-mono": "^5.2.6",
     "@fontsource/roboto": "^5.2.9",
     "@iconify-json/fa6-brands": "^1.2.6",
@@ -44,6 +45,7 @@
     "gray-matter": "^4.0.3",
     "hastscript": "^9.0.1",
     "katex": "^0.16.22",
+    "linkedom": "^0.18.12",
     "markdown-it": "^14.1.0",
     "marked": "^16.4.2",
     "mdast-util-to-string": "^4.0.0",
@@ -69,6 +71,7 @@
     "svelte": "^5.43.14",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.9.2",
+    "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
