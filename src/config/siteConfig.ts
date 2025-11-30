@@ -87,7 +87,7 @@ export const siteConfig: SiteConfig = {
 
   backgroundWallpaper: {
     // 壁纸模式："banner" 横幅壁纸，"overlay" 全屏壁纸，"none" 纯色背景无壁纸
-    mode: "overlay",
+    mode: "none",
     // 是否允许用户通过导航栏切换壁纸模式，设为false可提升性能（只渲染当前模式）
     switchable: false,
 
@@ -139,7 +139,7 @@ export const siteConfig: SiteConfig = {
         },
       },
       navbar: {
-        transparentMode: "full", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
+        transparentMode: "semi", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
       },
       // 波浪动画效果配置，开启可能会影响页面性能，请根据实际情况开启
       waves: {
