@@ -26,6 +26,12 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
         		external: true,
         		icon: "majesticons:status-online",
 			},
+			{
+ 				name: "开往",
+     			url: "https://www.travellings.cn/plain.html",
+        		external: true,
+        		icon: "mdi:train",
+			},
 		],
 	});
 
