@@ -10,12 +10,12 @@ export const siteConfig: SiteConfig = {
   subtitle: "和你的日常，就是奇迹",
   site_url: "https://blog.feng1026.top/",
   description:
-    "Firefly 是一款基于 Astro 框架和 Fuwari 模板开发的清新美观且现代化个人博客主题模板，专为技术爱好者和内容创作者设计。该主题融合了现代 Web 技术栈，提供了丰富的功能模块和高度可定制的界面，让您能够轻松打造出专业且美观的个人博客网站。",
+    "和你的日常，就是奇迹 - 枫落丰源的个人技术博客，分享编程、技术和生活点滴，使用Astro构建的静态博客网站。",
   keywords: [
-    "Firefly",
+    "枫落丰源",
+    "qiufengluoye",
     "Fuwari",
     "Astro",
-    "ACGN",
     "博客",
     "技术博客",
     "静态博客",
@@ -44,7 +44,7 @@ export const siteConfig: SiteConfig = {
   navbarLogo: {
     type: "image",
     value: "/assets/images/avatar.png",
-    alt: "🍀",
+    alt: "枫落丰源 Logo",
   },
   navbarTitle: "枫落丰源", // 导航栏标题，可以设置为与 title 不同的值，如果不设置则使用 title
 
@@ -139,7 +139,7 @@ export const siteConfig: SiteConfig = {
         },
       },
       navbar: {
-        transparentMode: "semifull", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
+        transparentMode: "semi", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
       },
       // 波浪动画效果配置，开启可能会影响页面性能，请根据实际情况开启
       waves: {
@@ -164,7 +164,7 @@ export const siteConfig: SiteConfig = {
     overlay: {
       zIndex: -1, // 层级，确保壁纸在背景层
       opacity: 0.8, // 壁纸透明度
-      blur: 4, // 背景模糊程度
+      blur: 2, // 背景模糊程度
     },
   },
 
