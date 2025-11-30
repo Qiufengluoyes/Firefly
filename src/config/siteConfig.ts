@@ -128,8 +128,8 @@ export const siteConfig: SiteConfig = {
       },
       credit: {
         enable: {
-          desktop: false, // 桌面端显示横幅图片来源文本
-          mobile: false, // 移动端显示横幅图片来源文本
+          desktop: true, // 桌面端显示横幅图片来源文本
+          mobile: true, // 移动端显示横幅图片来源文本
         },
         text: {
           desktop: "Steam - 冬季", // 桌面端要显示的来源文本
