@@ -76,7 +76,7 @@ export const siteConfig: SiteConfig = {
     // 如果sidebarConfig.ts中侧边栏配置启用了"both"双侧边栏，则无法使用文章列表"grid"网格（双列）布局
     defaultMode: "list",
     // 是否允许用户切换布局
-    allowSwitch: true,
+    allowSwitch: false,
   },
 
   // 分页配置
@@ -108,7 +108,7 @@ export const siteConfig: SiteConfig = {
       
       homeText: {
         // 主页显示自定义文本（全局开关）
-        enable: true,
+        enable: false,
         // 主页横幅主标题
         title: "枫落丰源",
         // 主页横幅副标题
@@ -126,8 +126,8 @@ export const siteConfig: SiteConfig = {
       },
       credit: {
         enable: {
-          desktop: true, // 桌面端显示横幅图片来源文本
-          mobile: true, // 移动端显示横幅图片来源文本
+          desktop: false, // 桌面端显示横幅图片来源文本
+          mobile: false, // 移动端显示横幅图片来源文本
         },
         text: {
           desktop: "Pixiv - 晚晚喵", // 桌面端要显示的来源文本
@@ -139,13 +139,13 @@ export const siteConfig: SiteConfig = {
         },
       },
       navbar: {
-        transparentMode: "semi", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
+        transparentMode: "full", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
       },
       // 波浪动画效果配置，开启可能会影响页面性能，请根据实际情况开启
       waves: {
         enable: {
-          desktop: true, // 桌面端启用波浪动画效果
-          mobile: true, // 移动端启用波浪动画效果
+          desktop: false, // 桌面端启用波浪动画效果
+          mobile: false, // 移动端启用波浪动画效果
         },
         performance: {
           quality: "high",
