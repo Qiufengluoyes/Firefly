@@ -5,11 +5,6 @@ interface ImportMetaEnv {
   readonly MEILI_MASTER_KEY: string;
 }
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
-
-// TOC 相关的全局类型声明
 declare global {
   interface Window {
     SidebarTOC: {
@@ -23,5 +18,16 @@ declare global {
     };
     toggleFloatingTOC: () => void;
     tocInternalNavigation: boolean;
+    iconifyLoaded: boolean;
+    swup: any;
+    spine: any;
+    closeAnnouncement: () => void;
+    __iconifyLoader: any;
+    __iconifyLoaderInitialized: boolean;
+    loadIconify: () => Promise<void>;
+    preloadIcons: (icons: string | string[]) => void;
+    onIconifyReady: (callback: () => void) => void;
   }
 }
+
+export {};

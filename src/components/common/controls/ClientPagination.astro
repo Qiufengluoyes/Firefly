@@ -16,8 +16,8 @@ const totalPages = Math.ceil(totalItems / itemsPerPage);
 // 生成智能分页页码数组
 function generatePageNumbers(current: number, total: number) {
   const delta = 2; // 当前页左右显示的页码数量
-  const range = [];
-  const rangeWithDots = [];
+  const range: number[] = [];
+  const rangeWithDots: (number | string)[] = [];
 
   // 如果总页数小于等于7，显示所有页码
   if (total <= 7) {
@@ -146,7 +146,7 @@ const pageNumbers = generatePageNumbers(currentPage, totalPages);
   </div>
 )}
 
-<script define:vars={{ itemsPerPage, sectionId }}>
+<script is:inline define:vars={{ itemsPerPage, sectionId }}>
   function initPagination() {
     let currentPage = 1;
 
@@ -184,7 +184,7 @@ const pageNumbers = generatePageNumbers(currentPage, totalPages);
 
     // Listen for filter updates
     if (pagination) {
-      pagination.addEventListener('updatePagination', function(event) {
+      pagination.addEventListener('updatePagination', function(_event) {
         currentPage = 1;
         updatePage();
         updateMobileDisplay();

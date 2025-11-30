@@ -1,5 +1,5 @@
 
-<img src="./docs/images/1131.png" width = "405" height = "511" alt="NapCat" align=right />
+<img src="./images/1131.png" width = "405" height = "511" alt="NapCat" align=right />
 
 <div align="center">
 
@@ -8,7 +8,7 @@
 > 
 > ![Node.js >= 20](https://img.shields.io/badge/node.js-%3E%3D20-brightgreen) 
 ![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
-![Astro](https://img.shields.io/badge/Astro-5.16.0-orange)
+![Astro](https://img.shields.io/badge/Astro-5.16.2-orange)
 </div>
 
 
@@ -19,7 +19,7 @@
 [**🍀我的部落格**](https://blog.cuteleaf.cn) 
 
 📖 README：
-**[简体中文](README.md)** | **[繁體中文](README.zh-TW.md)** | **[English](README.en.md)** | **[日本語](README.ja.md)** | **[Русский](README.ru.md)**
+**[简体中文](../README.md)** | **[English](../README.en.md)** | **[日本語](README.ja.md)** | **[繁體中文](README.zh-TW.md)** | **[Русский](README.ru.md)**
 
 ⚡ 靜態站點生成: 基於Astro的超快載入速度和SEO優化
 
@@ -29,7 +29,7 @@
 
 🔧 高度可配置: 大部分功能模組均可透過配置檔案自訂
 
-<img alt="firefly" src="./docs/images/1.webp" />
+<img alt="firefly" src="./images/1.webp" />
 
 >[!TIP]
 >在重要的版面配置上，Firefly創新性地增加了左右雙側邊欄、文章網格(雙列)版面配置，
@@ -70,7 +70,7 @@
 - [x] **友情連結** - 精美的友鏈展示卡片
 - [x] **廣告元件** - 支援自訂側邊欄廣告內容
 - [x] **番組計畫** - 基於 Bangumi API 的追番和遊戲記錄展示
-- [x] **留言系統** - 整合 Twikoo、Waline、Giscus、Disqus 留言系統
+- [x] **留言系統** - 整合 Twikoo、Waline、Giscus、Disqus、Artalk 留言系統
 - [x] **訪問量統計** - 支援呼叫 Waline、Twikoo 自帶的訪問量追蹤
 - [x] **音樂播放器** - 基於 APlayer，支援本地音樂和 Meting API 線上音樂
 
@@ -137,6 +137,16 @@
 
 ### 平台託管部署
 - **參考[官方指南](https://docs.astro.build/zh-cn/guides/deploy/)將部落格部署至 Vercel, Netlify, GitHub Pages, Cloudflare Pages, EdgeOne Pages 等。**
+
+   框架預設： `Astro`
+
+   根目錄： `./`
+
+   輸出目錄： `dist`
+
+   建置命令： `pnpm run build`
+
+   安裝命令： `pnpm install`
 
 ## 📖 配置說明
 
@@ -224,6 +234,7 @@ lang: zh-CN      # 僅當文章語言與 `siteConfig.ts` 中的網站語言不�
 - 使用了 [MetingJS](https://github.com/metowolf/MetingJS) 和 [APlayer](https://github.com/MoePlayer/APlayer) 音樂播放器
 - 使用了b站up [公公的日常](https://space.bilibili.com/3546750017080050) 提供的Q版 `流螢` 看板娘切片資料模型
 - 圖示來自 [Iconify](https://iconify.design/)
+- 流螢部分相關圖片素材版權歸遊戲 [《崩壞：星穹鐵道》](https://sr.mihoyo.com/) 開發商 [米哈遊](https://www.mihoyo.com/) 所有。
 
 ## 🍀 貢獻者
 
