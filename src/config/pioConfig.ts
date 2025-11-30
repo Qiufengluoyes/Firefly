@@ -1,4 +1,4 @@
-import type { SpineModelConfig, Live2DModelConfig } from "../types/config";
+import type { Live2DModelConfig, SpineModelConfig } from "../types/config";
 
 // Spine 看板娘配置
 export const spineModelConfig: SpineModelConfig = {
@@ -55,36 +55,36 @@ export const spineModelConfig: SpineModelConfig = {
 
 // Live2D 看板娘配置
 export const live2dModelConfig: Live2DModelConfig = {
-  enable: false, // 启用 Live2D 看板娘
-  model: {
-    // Live2D模型文件路径
-    path: "/pio/models/live2d/snow_miku/model.json",
-    // path: "/pio/models/live2d/illyasviel/illyasviel.model.json",
-  },
-  position: {
-    // 显示位置 bottom-left，bottom-right，top-left，top-right，注意：在右下角可能会挡住返回顶部按钮
-    corner: "bottom-left", // 显示位置
-    offsetX: 0, // 距离边缘20px
-    offsetY: 0, // 距离底部20px
-  },
-  size: {
-    width: 135, // 容器宽度
-    height: 165, // 容器高度
-  },
-  interactive: {
-    enabled: true, // 启用交互功能
-    // motions 和 expressions 将从模型 JSON 文件中自动读取
-    clickMessages: [
-      "你好！我是Miku~",
-      "有什么需要帮助的吗？",
-      "今天天气真不错呢！",
-      "要不要一起玩游戏？",
-      "记得按时休息哦！",
-    ], // 点击时随机显示的文字消息
-    messageDisplayTime: 3000, // 文字显示时间（毫秒）
-  },
-  responsive: {
-    hideOnMobile: true, // 在移动端隐藏
-    mobileBreakpoint: 768, // 移动端断点
-  },
+	enable: false, // 启用 Live2D 看板娘
+	model: {
+		// Live2D模型文件路径
+		path: "/pio/models/live2d/snow_miku/model.json",
+		// path: "/pio/models/live2d/illyasviel/illyasviel.model.json",
+	},
+	position: {
+		// 显示位置 bottom-left，bottom-right，top-left，top-right，注意：在右下角可能会挡住返回顶部按钮
+		corner: "bottom-left", // 显示位置
+		offsetX: 0, // 距离边缘20px
+		offsetY: 0, // 距离底部20px
+	},
+	size: {
+		width: 135, // 容器宽度
+		height: 165, // 容器高度
+	},
+	interactive: {
+		enabled: true, // 启用交互功能
+		// motions 和 expressions 将从模型 JSON 文件中自动读取
+		clickMessages: [
+			"你好！我是Miku~",
+			"有什么需要帮助的吗？",
+			"今天天气真不错呢！",
+			"要不要一起玩游戏？",
+			"记得按时休息哦！",
+		], // 点击时随机显示的文字消息
+		messageDisplayTime: 3000, // 文字显示时间（毫秒）
+	},
+	responsive: {
+		hideOnMobile: true, // 在移动端隐藏
+		mobileBreakpoint: 768, // 移动端断点
+	},
 };

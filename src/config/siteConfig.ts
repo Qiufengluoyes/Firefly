@@ -21,7 +21,7 @@ export const siteConfig: SiteConfig = {
     "静态博客",
   ],
 
-  lang: SITE_LANG,
+	lang: SITE_LANG,
 
   themeColor: {
     hue: 290, // 主题色的默认色相，范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345
@@ -56,19 +56,19 @@ export const siteConfig: SiteConfig = {
     userId: "qiufengluoye", // 在此处设置你的Bangumi用户ID
   },
 
-  // 文章页底部的"上次编辑时间"卡片开关
-  showLastModified: true,
+	// 文章页底部的"上次编辑时间"卡片开关
+	showLastModified: true,
 
-  // OpenGraph图片功能,注意开启后要渲染很长时间，不建议本地调试的时候开启
-  generateOgImages: false,
+	// OpenGraph图片功能,注意开启后要渲染很长时间，不建议本地调试的时候开启
+	generateOgImages: false,
 
-  // 页面开关配置 - 控制特定页面的访问权限，设为false会返回404
-  // bangumi的数据为编译时获取的，所以不是实时数据，请配置bangumi.userId
-  pages: {
-    sponsor: true, // 赞助页面开关
-    guestbook: true, // 留言板页面开关，需要配置评论系统
-    bangumi: true, // 番组计划页面开关，含追番和游戏，dev调试时只获取一页数据，build才会获取全部数据
-  },
+	// 页面开关配置 - 控制特定页面的访问权限，设为false会返回404
+	// bangumi的数据为编译时获取的，所以不是实时数据，请配置bangumi.userId
+	pages: {
+		sponsor: true, // 赞助页面开关
+		guestbook: true, // 留言板页面开关，需要配置评论系统
+		bangumi: true, // 番组计划页面开关，含追番和游戏，dev调试时只获取一页数据，build才会获取全部数据
+	},
 
   // 文章列表布局配置
   postListLayout: {
@@ -170,7 +170,7 @@ export const siteConfig: SiteConfig = {
     },
   },
 
-  // 字体配置
-  // 在src/config/fontConfig.ts中配置具体字体
-  font: fontConfig,
+	// 字体配置
+	// 在src/config/fontConfig.ts中配置具体字体
+	font: fontConfig,
 };
