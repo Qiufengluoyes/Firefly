@@ -87,7 +87,7 @@ export const siteConfig: SiteConfig = {
 
   backgroundWallpaper: {
     // 壁纸模式："banner" 横幅壁纸，"overlay" 全屏壁纸，"none" 纯色背景无壁纸
-    mode: "none",
+    mode: "banner",
     // 是否允许用户通过导航栏切换壁纸模式，设为false可提升性能（只渲染当前模式）
     switchable: false,
 
@@ -108,17 +108,19 @@ export const siteConfig: SiteConfig = {
       
       homeText: {
         // 主页显示自定义文本（全局开关）
-        enable: false,
+        enable: true,
         // 主页横幅主标题
         title: "枫落丰源",
         // 主页横幅副标题
         subtitle: [
           "和你的日常，就是奇迹",
+          "一鸣从此始，相望青云端",
+          "人们生而无名，而心亦同",
         ],
         typewriter: {
           //打字机开启 → 循环显示所有副标题
           //打字机关闭 → 每次刷新随机显示一条副标题
-          enable: false, // 启用副标题打字机效果
+          enable: true, // 启用副标题打字机效果
           speed: 100, // 打字速度（毫秒）
           deleteSpeed: 50, // 删除速度（毫秒）
           pauseTime: 2000, // 完全显示后的暂停时间（毫秒）
@@ -130,22 +132,22 @@ export const siteConfig: SiteConfig = {
           mobile: false, // 移动端显示横幅图片来源文本
         },
         text: {
-          desktop: "Pixiv - 晚晚喵", // 桌面端要显示的来源文本
-          mobile: "Pixiv - KiraraShss", // 移动端要显示的来源文本
+          desktop: "Steam - 冬季", // 桌面端要显示的来源文本
+          mobile: "Steam - 冬季", // 移动端要显示的来源文本
         },
         url: {
-          desktop: "https://www.pixiv.net/artworks/135490046", // 桌面端原始艺术品或艺术家页面的 URL 链接
-          mobile: "https://www.pixiv.net/users/42715864", // 移动端原始艺术品或艺术家页面的 URL 链接
+          desktop: "https://store.steampowered.com/", // 桌面端原始艺术品或艺术家页面的 URL 链接
+          mobile: "https://store.steampowered.com/", // 移动端原始艺术品或艺术家页面的 URL 链接
         },
       },
       navbar: {
-        transparentMode: "semi", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
+        transparentMode: "semifull", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
       },
       // 波浪动画效果配置，开启可能会影响页面性能，请根据实际情况开启
       waves: {
         enable: {
-          desktop: false, // 桌面端启用波浪动画效果
-          mobile: false, // 移动端启用波浪动画效果
+          desktop: true, // 桌面端启用波浪动画效果
+          mobile: true, // 移动端启用波浪动画效果
         },
         performance: {
           quality: "high",
