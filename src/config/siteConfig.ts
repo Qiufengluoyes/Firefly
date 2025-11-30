@@ -108,7 +108,7 @@ export const siteConfig: SiteConfig = {
       
       homeText: {
         // 主页显示自定义文本（全局开关）
-        enable: true,
+        enable: false,
         // 主页横幅主标题
         title: "枫落丰源",
         // 主页横幅副标题
