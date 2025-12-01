@@ -20,16 +20,16 @@ draft: false
 
 现在，文章内的链接将以 **「链接卡片」** 的形式呈现。
 
-![](https://image.091026.xyz/20250919-changes-GIF-2.webp "动图展示")
+![动图展示](https://image.091026.xyz/20250919-changes-GIF-2.webp)
 
-![](https://image.091026.xyz/blog-20250919-changes-1.webp "示例文章链接卡片展示")
+![示例文章链接卡片展示](https://image.091026.xyz/blog-20250919-changes-1.webp)
 
-![](https://image.091026.xyz/blog-20250919-changes-2.webp "博主文章链接卡片展示")
+![博主文章链接卡片展示](https://image.091026.xyz/blog-20250919-changes-2.webp)
 
 ### 友链页面
 
 现在，友链页面添加了新的要求，并且优化了网站的信息展示。
 
-![](https://image.091026.xyz/blog-20250919-changes-3.webp "新的友链页面")
+![新的友链页面](https://image.091026.xyz/blog-20250919-changes-3.webp)
 
 
