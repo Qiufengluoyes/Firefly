@@ -28,7 +28,6 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import mdx from "@astrojs/mdx";
 import searchIndexer from "./src/integrations/searchIndex.mts";
 import { LinkCardComponent } from "./src/plugins/rehype-component-link-card.mjs";
-import remarkImageCaption from "./src/plugins/remark-image-caption.ts";
 import remarkImageWidth from './src/plugins/remark-image-width.js';
 import rehypeEmailProtection from "./src/plugins/rehype-email-protection.mjs";
 import rehypeFigure from "./src/plugins/rehype-figure.mjs";
@@ -136,12 +135,6 @@ export default defineConfig({
 			remarkMath,
 			remarkReadingTime,
 			remarkExcerpt,
-			[
-                remarkImageCaption,
-                {
-                    className: 'image-caption',
-                },
-            ],
             remarkImageWidth,
 			remarkGithubAdmonitionsToDirectives,
 			remarkDirective,
