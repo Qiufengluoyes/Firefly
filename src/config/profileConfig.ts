@@ -4,12 +4,16 @@ export const profileConfig: ProfileConfig = {
   avatar: "/assets/images/avatar.jpg",
   name: "枫落丰源",
   bio: "和你的日常，就是奇迹",
+  	// 链接配置
+	// 已经预装的图标集：fa6-brands，fa6-regular，fa6-solid，material-symbols，simple-icons
+	// 访问https://icones.js.org/ 获取图标代码，
+	// 如果想使用尚未包含相应的图标集，则需要安装它
+	// `pnpm add @iconify-json/<icon-set-name>`
+	// showName: true 时显示图标和名称，false 时只显示图标
   links: [
     {
 			name: "哔哩哔哩",
-			icon: "mingcute:bilibili-line", // Visit https://icones.js.org/ for icon codes
-			// You will need to install the corresponding icon set if it's not already included
-			// `pnpm add @iconify-json/<icon-set-name>`
+			icon: "mingcute:bilibili-line",
 			url: "https://space.bilibili.com/1735270180/",
 		},
 		{
