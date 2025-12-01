@@ -31,7 +31,6 @@ import { LinkCardComponent } from "./src/plugins/rehype-component-link-card.mjs"
 import remarkImageCaption from "./src/plugins/remark-image-caption.ts";
 import remarkImageWidth from './src/plugins/remark-image-width.js';
 import rehypeEmailProtection from "./src/plugins/rehype-email-protection.mjs";
-import rehypeFigure from "./src/plugins/rehype-figure.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -153,7 +152,6 @@ export default defineConfig({
 			rehypeKatex,
 			rehypeSlug,
 			rehypeMermaid,
-			rehypeFigure,
 			[rehypeEmailProtection, { method: "base64" }], // 邮箱保护插件，支持 'base64' 或 'rot13'
 			[
 				rehypeComponents,
