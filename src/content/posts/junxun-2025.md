@@ -122,7 +122,7 @@ pinned: false
 
 ![军训汇演：二等奖 w-75%](https://image.091026.xyz/junxun-2025-24.webp "军训汇演：二等奖")
 
-![军训汇演：优秀指挥员 w-75%](https://image.091026.xyz/junxun-2025-25.webp "军训汇演：优秀指挥员")
+![军训汇演：优秀指挥员 w-75%](https://image.091026.xyz/junxun-2025-25.webp)
 
 在军训最后的时光中，有同学说：
 
