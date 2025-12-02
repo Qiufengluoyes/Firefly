@@ -87,7 +87,7 @@ export const siteConfig: SiteConfig = {
 
   backgroundWallpaper: {
     // 壁纸模式："banner" 横幅壁纸，"overlay" 全屏壁纸，"none" 纯色背景无壁纸
-    mode: "overlay",
+    mode: "banner",
     // 是否允许用户通过导航栏切换壁纸模式，设为false可提升性能（只渲染当前模式）
     switchable: false,
 
@@ -96,7 +96,7 @@ export const siteConfig: SiteConfig = {
       // 桌面背景图片
       desktop: "https://img.091026.xyz/blog/home-winter-blog.webp",
       // 移动背景图片
-      mobile: "https://img.091026.xyz/blog/home-winter-blog.webp",
+      mobile: "https://img.091026.xyz/blog/home-winter-mobile.webp",
     },
 
     // Banner模式特有配置
@@ -104,11 +104,11 @@ export const siteConfig: SiteConfig = {
       // 图片位置
       // 支持所有CSS object-position值，如: 'top', 'center', 'bottom', 'left top', 'right bottom', '25% 75%', '10px 20px'..
       // 如果不知道怎么配置百分百之类的配置，推荐直接使用：'center'居中，'top'顶部居中，'bottom' 底部居中，'left'左侧居中，'right'右侧居中
-      position: "0% 20%",
+      position: "center",
       
       homeText: {
         // 主页显示自定义文本（全局开关）
-        enable: false,
+        enable: true,
         // 主页横幅主标题
         title: "枫落丰源",
         // 主页横幅副标题
@@ -129,7 +129,7 @@ export const siteConfig: SiteConfig = {
       credit: {
         enable: {
           desktop: true, // 桌面端显示横幅图片来源文本
-          mobile: false, // 移动端显示横幅图片来源文本
+          mobile: true, // 移动端显示横幅图片来源文本
         },
         text: {
           desktop: "Steam - 冬季", // 桌面端要显示的来源文本
@@ -141,7 +141,7 @@ export const siteConfig: SiteConfig = {
         },
       },
       navbar: {
-        transparentMode: "semi", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
+        transparentMode: "semifull", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
       },
       // 波浪动画效果配置，开启可能会影响页面性能，请根据实际情况开启
       waves: {

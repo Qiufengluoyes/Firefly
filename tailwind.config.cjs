@@ -7,7 +7,8 @@ module.exports = {
 		extend: {
 			fontFamily: {
 				sans: [
-					"MiSans Medium",
+          "FZLanTingYuanS Bold",
+          "FZLanTingYuanS DemiBold",
 					...defaultTheme.fontFamily.sans,
 				],
 			},
