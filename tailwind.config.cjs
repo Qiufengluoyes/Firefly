@@ -9,15 +9,17 @@ module.exports = {
 				sans: [
 					"FZLanTingYuanS DemiBold",
 					"FZLanTingYuanS Bold",
+          "MiSans Medium",
+          "MiSans Demibold",
 					...defaultTheme.fontFamily.sans,
 				],
 			},
-            codeFontFamily: {
-                sans: [
-                    "JetBrains Mono Variable",
-                    ...defaultTheme.fontFamily.sans,
-                ]
-            },
+      codeFontFamily: {
+        sans: [
+          "JetBrains Mono Variable",
+          ...defaultTheme.fontFamily.sans,
+        ]
+      },
 		},
 	},
 	plugins: [require("@tailwindcss/typography")],
