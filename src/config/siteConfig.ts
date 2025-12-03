@@ -47,6 +47,7 @@ export const siteConfig: SiteConfig = {
     alt: "枫落丰源 Logo",
   },
   navbarTitle: "枫落丰源", // 导航栏标题，可以设置为与 title 不同的值，如果不设置则使用 title
+	navbarWidthFull: false, // 全宽导航栏，导航栏是否占满屏幕宽度，true：占满，false：不占满
 
   // 站点开始日期，用于统计运行天数
   siteStartDate: "2024-10-20", // 请修改为你的站点实际开始日期，格式：YYYY-MM-DD
