@@ -59,7 +59,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
                                 {siteConfig.navbarLogo?.type === "icon" ? (
                                     <Icon name={siteConfig.navbarLogo.value || "material-symbols:home-pin-outline"} class="text-[1.75rem] mb-1 mr-2" />
                                 ) : siteConfig.navbarLogo?.type === "image" ? (
-                                    <img src={url(siteConfig.navbarLogo.value)} alt={siteConfig.navbarLogo.alt || siteConfig.title} class="h-[1.75rem] w-[1.75rem] mb-1 mr-2 object-contain" loading="lazy" />
+                                    <img src={url(siteConfig.navbarLogo.value)} alt={siteConfig.navbarLogo.alt || siteConfig.title} class="h-[1.75rem] w-[1.75rem] mb-0.5 mr-2 object-contain" loading="lazy" />
                                 ) : (
                                     <Icon name="material-symbols:home-pin-outline" class="text-[1.75rem] mb-1 mr-2" />
                                 )}
