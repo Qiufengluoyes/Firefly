@@ -96,7 +96,7 @@ export const zh_TW: Translation = {
 	[Key.bangumiCategoryReal]: "三次元",
 
 	// 番組數據更新
-	[Key.bangumiLastUpdated]: "數據更新於",
+	[Key.bangumiLastUpdated]: "數據更新於（北京時間）",
 	[Key.bangumiUpdatedAt]: "構建時間",
 	[Key.bangumiDataStatic]: "靜態數據",
 
