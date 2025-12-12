@@ -58,7 +58,10 @@ export function resolveTheme(theme: LIGHT_DARK_MODE): LIGHT_DARK_MODE {
 
 export function getHue(): number {
 	// 检查是否在浏览器环境中
-	if (typeof localStorage === "undefined") {
+	if (
+		typeof localStorage === "undefined" ||
+		typeof localStorage.getItem !== "function"
+	) {
 		return getDefaultHue();
 	}
 	const stored = localStorage.getItem("hue");
@@ -67,7 +70,11 @@ export function getHue(): number {
 
 export function setHue(hue: number): void {
 	// 检查是否在浏览器环境中
-	if (typeof localStorage === "undefined" || typeof document === "undefined") {
+	if (
+		typeof localStorage === "undefined" ||
+		typeof localStorage.setItem !== "function" ||
+		typeof document === "undefined"
+	) {
 		return;
 	}
 	localStorage.setItem("hue", String(hue));
@@ -146,7 +153,10 @@ let systemThemeListener:
 
 export function setTheme(theme: LIGHT_DARK_MODE): void {
 	// 检查是否在浏览器环境中
-	if (typeof localStorage === "undefined") {
+	if (
+		typeof localStorage === "undefined" ||
+		typeof localStorage.setItem !== "function"
+	) {
 		return;
 	}
 
@@ -237,7 +247,10 @@ function cleanupSystemThemeListener() {
 
 export function getStoredTheme(): LIGHT_DARK_MODE {
 	// 检查是否在浏览器环境中
-	if (typeof localStorage === "undefined") {
+	if (
+		typeof localStorage === "undefined" ||
+		typeof localStorage.getItem !== "function"
+	) {
 		return getDefaultTheme();
 	}
 	return (
@@ -247,7 +260,10 @@ export function getStoredTheme(): LIGHT_DARK_MODE {
 
 // 初始化主题监听器（用于页面加载后）
 export function initThemeListener() {
-	if (typeof localStorage === "undefined") {
+	if (
+		typeof localStorage === "undefined" ||
+		typeof localStorage.getItem !== "function"
+	) {
 		return;
 	}
 
@@ -625,7 +641,10 @@ function adjustMainContentTransparency(enable: boolean) {
 
 export function setWallpaperMode(mode: WALLPAPER_MODE): void {
 	// 检查是否在浏览器环境中
-	if (typeof localStorage === "undefined") {
+	if (
+		typeof localStorage === "undefined" ||
+		typeof localStorage.setItem !== "function"
+	) {
 		return;
 	}
 	localStorage.setItem("wallpaperMode", mode);
@@ -639,7 +658,10 @@ export function initWallpaperMode(): void {
 
 export function getStoredWallpaperMode(): WALLPAPER_MODE {
 	// 检查是否在浏览器环境中
-	if (typeof localStorage === "undefined") {
+	if (
+		typeof localStorage === "undefined" ||
+		typeof localStorage.getItem !== "function"
+	) {
 		return siteConfig.backgroundWallpaper.mode;
 	}
 	return (
