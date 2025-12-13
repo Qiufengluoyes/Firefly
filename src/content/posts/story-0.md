@@ -7,7 +7,7 @@ tags: [小说, 校园, 温暖, 爱]
 category: '「惜」'
 draft: false
 lang: ''
-pinned: true
+pinned: false
 ---
 
 :::note[协议声明]
