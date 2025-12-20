@@ -101,7 +101,7 @@ export const siteConfig: SiteConfig = {
     // 背景图片配置
     src: {
       // 桌面背景图片
-      desktop: "https://img.091026.xyz/blog/home-winter-blog.webp",
+      desktop: "https://fengblog.s3.bitiful.net/fast-image/christmas-gif.webp",
       // 移动背景图片
       mobile: "https://img.091026.xyz/blog/home-winter-mobile.webp",
     },
