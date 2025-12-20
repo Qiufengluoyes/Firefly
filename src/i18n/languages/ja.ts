@@ -66,6 +66,12 @@ export const ja: Translation = {
 	[Key.bangumiFilterGamePlayed]: "プレイ済み",
 	[Key.bangumiFilterGamePlaying]: "プレイ中",
 	[Key.bangumiFilterGameWish]: "プレイしたい",
+	[Key.bangumiFilterBookRead]: "読んだ",
+	[Key.bangumiFilterBookReading]: "読んでいる",
+	[Key.bangumiFilterBookWish]: "読みたい",
+	[Key.bangumiFilterMusicListened]: "聴いた",
+	[Key.bangumiFilterMusicListening]: "聴いている",
+	[Key.bangumiFilterMusicWish]: "聴きたい",
 	[Key.bangumiStatusWish]: "見たい",
 	[Key.bangumiStatusWatched]: "見た",
 	[Key.bangumiStatusWatching]: "視聴中",
@@ -74,6 +80,12 @@ export const ja: Translation = {
 	[Key.bangumiStatusGameWish]: "プレイしたい",
 	[Key.bangumiStatusGamePlayed]: "プレイ済み",
 	[Key.bangumiStatusGamePlaying]: "プレイ中",
+	[Key.bangumiStatusBookWish]: "読みたい",
+	[Key.bangumiStatusBookRead]: "読んだ",
+	[Key.bangumiStatusBookReading]: "読んでいる",
+	[Key.bangumiStatusMusicWish]: "聴きたい",
+	[Key.bangumiStatusMusicListened]: "聴いた",
+	[Key.bangumiStatusMusicListening]: "聴いている",
 	[Key.bangumiStatusUnknown]: "不明",
 	[Key.bangumiNoData]: "データなし",
 	[Key.bangumiNoDataDescription]: "このカテゴリに項目がありません",
@@ -162,7 +174,7 @@ export const ja: Translation = {
 	// 壁紙モード
 	[Key.wallpaperMode]: "壁紙モード",
 	[Key.wallpaperBannerMode]: "バナー壁紙",
-	[Key.wallpaperOverlayMode]: "全画面壁紙",
+	[Key.wallpaperOverlayMode]: "透明",
 	[Key.wallpaperNoneMode]: "単色背景",
 
 	// スポンサーページ
@@ -179,8 +191,13 @@ export const ja: Translation = {
 	[Key.sponsorAnonymous]: "匿名",
 	[Key.scanToSponsor]: "スキャンしてスポンサー",
 	[Key.sponsorGoTo]: "スポンサーへ",
-	[Key.sponsorButton]: "サポート",
-	[Key.sponsorButtonText]: "この記事が役に立ったなら、サポートをお願いします！",
+	[Key.sponsorButton]: "サポートと共有",
+	[Key.sponsorButtonText]:
+		"この記事が役に立ったなら、共有またはサポートをお願いします！",
+
+	[Key.shareOnSocial]: "共有",
+	[Key.shareOnSocialDescription]:
+		"この記事が役に立ったなら、ぜひ他の人と共有してください！",
 
 	// サイト統計
 	[Key.siteStats]: "サイト統計",
@@ -213,4 +230,11 @@ export const ja: Translation = {
 	[Key.calendarOctober]: "10月",
 	[Key.calendarNovember]: "11月",
 	[Key.calendarDecember]: "12月",
+
+	[Key.shareArticle]: "共有",
+	[Key.generatingPoster]: "ポスター生成中...",
+	[Key.copied]: "コピーしました",
+	[Key.copyLink]: "リンクをコピー",
+	[Key.savePoster]: "ポスターを保存",
+	[Key.scanToRead]: "QRコードで読む",
 };

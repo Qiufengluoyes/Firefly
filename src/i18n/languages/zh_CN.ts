@@ -64,6 +64,12 @@ export const zh_CN: Translation = {
 	[Key.bangumiFilterGamePlayed]: "玩过",
 	[Key.bangumiFilterGamePlaying]: "在玩",
 	[Key.bangumiFilterGameWish]: "想玩",
+	[Key.bangumiFilterBookRead]: "读过",
+	[Key.bangumiFilterBookReading]: "在读",
+	[Key.bangumiFilterBookWish]: "想读",
+	[Key.bangumiFilterMusicListened]: "听过",
+	[Key.bangumiFilterMusicListening]: "在听",
+	[Key.bangumiFilterMusicWish]: "想听",
 	[Key.bangumiStatusWish]: "想看",
 	[Key.bangumiStatusWatched]: "看过",
 	[Key.bangumiStatusWatching]: "在看",
@@ -72,6 +78,12 @@ export const zh_CN: Translation = {
 	[Key.bangumiStatusGameWish]: "想玩",
 	[Key.bangumiStatusGamePlayed]: "玩过",
 	[Key.bangumiStatusGamePlaying]: "在玩",
+	[Key.bangumiStatusBookWish]: "想读",
+	[Key.bangumiStatusBookRead]: "读过",
+	[Key.bangumiStatusBookReading]: "在读",
+	[Key.bangumiStatusMusicWish]: "想听",
+	[Key.bangumiStatusMusicListened]: "听过",
+	[Key.bangumiStatusMusicListening]: "在听",
 	[Key.bangumiStatusUnknown]: "未知",
 	[Key.bangumiNoData]: "暂无数据",
 	[Key.bangumiNoDataDescription]: "该分类下还没有任何条目",
@@ -155,7 +167,7 @@ export const zh_CN: Translation = {
 	// 壁纸模式
 	[Key.wallpaperMode]: "壁纸模式",
 	[Key.wallpaperBannerMode]: "横幅壁纸",
-	[Key.wallpaperOverlayMode]: "全屏壁纸",
+	[Key.wallpaperOverlayMode]: "全屏透明",
 	[Key.wallpaperNoneMode]: "纯色背景",
 
 	// 赞助页面
@@ -172,8 +184,12 @@ export const zh_CN: Translation = {
 	[Key.sponsorAnonymous]: "匿名",
 	[Key.scanToSponsor]: "扫码赞助",
 	[Key.sponsorGoTo]: "前往赞助",
-	[Key.sponsorButton]: "赞助支持",
-	[Key.sponsorButtonText]: "如果这篇文章对你有帮助，欢迎赞助支持！",
+	[Key.sponsorButton]: "支持与分享",
+	[Key.sponsorButtonText]:
+		"如果这篇文章对你有帮助，欢迎分享给更多人或赞助支持！",
+
+	[Key.shareOnSocial]: "分享",
+	[Key.shareOnSocialDescription]: "如果这篇文章对你有帮助，欢迎分享给更多人！",
 
 	// 站点统计
 	[Key.siteStats]: "站点统计",
@@ -206,4 +222,11 @@ export const zh_CN: Translation = {
 	[Key.calendarOctober]: "10月",
 	[Key.calendarNovember]: "11月",
 	[Key.calendarDecember]: "12月",
+
+	[Key.shareArticle]: "分享",
+	[Key.generatingPoster]: "海报生成中...",
+	[Key.copied]: "已复制",
+	[Key.copyLink]: "复制链接",
+	[Key.savePoster]: "保存海报",
+	[Key.scanToRead]: "扫码阅读文章",
 };

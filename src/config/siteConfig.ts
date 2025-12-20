@@ -71,14 +71,20 @@ export const siteConfig: SiteConfig = {
 		bangumi: true, // 番组计划页面开关，含追番和游戏，dev调试时只获取一页数据，build才会获取全部数据
 	},
 
-  // 文章列表布局配置
-  postListLayout: {
-    // 默认布局模式："list" 列表模式（单列布局），"grid" 网格模式（双列布局）
-    // 如果sidebarConfig.ts中侧边栏配置启用了"both"双侧边栏，则无法使用文章列表"grid"网格（双列）布局
-    defaultMode: "list",
-    // 是否允许用户切换布局
-    allowSwitch: false,
-  },
+	// 文章列表布局配置
+	postListLayout: {
+		// 默认布局模式："list" 列表模式（单列布局），"grid" 网格模式（双列布局）
+		// 如果sidebarConfig.ts中侧边栏配置启用了"both"双侧边栏，则无法使用文章列表"grid"网格（双列）布局
+		defaultMode: "list",
+		// 是否允许用户切换布局
+		allowSwitch: false,
+
+		// 网格布局配置，仅在 defaultMode 为 "grid" 或允许切换布局时生效
+		grid: {
+			// 是否开启瀑布流布局，同时有封面图和无封面图的混合文章推荐开启
+			masonry: true,
+		},
+	},
 
   // 分页配置
   pagination: {

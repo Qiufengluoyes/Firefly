@@ -1,5 +1,6 @@
 ---
 import BackToTop from "@components/common/controls/BackToTop.astro";
+import OverlayWallpaper from "@components/interactive/OverlayWallpaper.astro";
 import Footer from "@components/layout/Footer.astro";
 import LeftSideBar from "@components/layout/LeftSideBar.astro";
 import Navbar from "@components/layout/Navbar.astro";
@@ -11,7 +12,6 @@ import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
 import TypewriterText from "@/components/content/TypewriterText.astro";
 import FloatingTOC from "@/components/interactive/FloatingTOC.astro";
-import FullscreenWallpaper from "@/components/misc/FullscreenWallpaper.astro";
 import IconifyLoader from "@/components/misc/IconifyLoader.astro";
 import ImageWrapper from "@/components/misc/ImageWrapper.astro";
 import { live2dModelConfig, siteConfig } from "@/config";
@@ -164,7 +164,7 @@ const navbarWidthFull = siteConfig.navbarWidthFull ?? false;
 
 <!-- 全屏透明覆盖壁纸 - 如果允许切换则始终渲染，否则只渲染当前模式 -->
 {(isWallpaperSwitchable || isOverlayMode) && (
-	<FullscreenWallpaper config={{
+	<OverlayWallpaper config={{
 		src: {
 			desktop: typeof backgroundImages.desktop === 'string' ? backgroundImages.desktop : '',
 			mobile: typeof backgroundImages.mobile === 'string' ? backgroundImages.mobile : ''
@@ -227,7 +227,7 @@ const navbarWidthFull = siteConfig.navbarWidthFull ?? false;
                         </h1>
                     )}
                     {siteConfig.backgroundWallpaper.banner?.homeText?.subtitle && (
-                        <h2 class="banner-subtitle text-xl lg:text-3xl text-white/90 drop-shadow-md">
+                        <h2 id="banner-subtitle" class="banner-subtitle text-xl lg:text-3xl text-white/90 drop-shadow-md" data-subtitles={JSON.stringify(siteConfig.backgroundWallpaper.banner.homeText.subtitle)}>
                             {siteConfig.backgroundWallpaper.banner.homeText.typewriter?.enable ? (
                                 <TypewriterText 
                                     text={siteConfig.backgroundWallpaper.banner.homeText.subtitle}
@@ -244,6 +244,35 @@ const navbarWidthFull = siteConfig.navbarWidthFull ?? false;
             </div>
         </div>
     )}
+    
+    <script is:inline>
+        function setRandomSubtitle() {
+            const subtitleElement = document.getElementById('banner-subtitle');
+            if (!subtitleElement) return;
+            
+            const subtitlesData = subtitleElement.dataset.subtitles;
+            if (!subtitlesData) return;
+            
+            try {
+                const subtitles = JSON.parse(subtitlesData);
+                // Only randomize if it's an array and typewriter is NOT enabled (check for typewriter class)
+                if (Array.isArray(subtitles) && subtitles.length > 0 && !subtitleElement.querySelector('.typewriter')) {
+                    // Use a global variable to persist the subtitle across Swup navigations
+                    // This variable will be reset on full page reload (F5), meeting the requirement
+                    if (!window.fireflyCachedSubtitle) {
+                        const randomIndex = Math.floor(Math.random() * subtitles.length);
+                        window.fireflyCachedSubtitle = subtitles[randomIndex];
+                    }
+                    subtitleElement.textContent = window.fireflyCachedSubtitle;
+                }
+            } catch (e) {
+                console.error("Failed to parse subtitles", e);
+            }
+        }
+
+        // Run on initial load
+        setRandomSubtitle();
+    </script>
     
     <!-- Water waves effect - 始终渲染以便动态切换 -->
     {(wavesEnabledOnDesktop || wavesEnabledOnMobile) ? (

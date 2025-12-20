@@ -66,6 +66,12 @@ export const zh_TW: Translation = {
 	[Key.bangumiFilterGamePlayed]: "玩過",
 	[Key.bangumiFilterGamePlaying]: "在玩",
 	[Key.bangumiFilterGameWish]: "想玩",
+	[Key.bangumiFilterBookRead]: "讀過",
+	[Key.bangumiFilterBookReading]: "在讀",
+	[Key.bangumiFilterBookWish]: "想讀",
+	[Key.bangumiFilterMusicListened]: "聽過",
+	[Key.bangumiFilterMusicListening]: "在聽",
+	[Key.bangumiFilterMusicWish]: "想聽",
 	[Key.bangumiStatusWish]: "想看",
 	[Key.bangumiStatusWatched]: "看過",
 	[Key.bangumiStatusWatching]: "在看",
@@ -74,6 +80,12 @@ export const zh_TW: Translation = {
 	[Key.bangumiStatusGameWish]: "想玩",
 	[Key.bangumiStatusGamePlayed]: "玩過",
 	[Key.bangumiStatusGamePlaying]: "在玩",
+	[Key.bangumiStatusBookWish]: "想讀",
+	[Key.bangumiStatusBookRead]: "讀過",
+	[Key.bangumiStatusBookReading]: "在讀",
+	[Key.bangumiStatusMusicWish]: "想聽",
+	[Key.bangumiStatusMusicListened]: "聽過",
+	[Key.bangumiStatusMusicListening]: "在聽",
 	[Key.bangumiStatusUnknown]: "未知",
 	[Key.bangumiNoData]: "暫無數據",
 	[Key.bangumiNoDataDescription]: "該分類下還沒有任何條目",
@@ -157,7 +169,7 @@ export const zh_TW: Translation = {
 	// 壁紙模式
 	[Key.wallpaperMode]: "壁紙模式",
 	[Key.wallpaperBannerMode]: "橫幅壁紙",
-	[Key.wallpaperOverlayMode]: "全屏壁紙",
+	[Key.wallpaperOverlayMode]: "全屏透明",
 	[Key.wallpaperNoneMode]: "純色背景",
 
 	// 贊助頁面
@@ -174,8 +186,12 @@ export const zh_TW: Translation = {
 	[Key.sponsorAnonymous]: "匿名",
 	[Key.scanToSponsor]: "掃碼贊助",
 	[Key.sponsorGoTo]: "前往贊助",
-	[Key.sponsorButton]: "贊助支持",
-	[Key.sponsorButtonText]: "如果這篇文章對你有幫助，歡迎贊助支持！",
+	[Key.sponsorButton]: "支持與分享",
+	[Key.sponsorButtonText]:
+		"如果這篇文章對你有幫助，歡迎分享給更多人或贊助支持！",
+
+	[Key.shareOnSocial]: "分享",
+	[Key.shareOnSocialDescription]: "如果這篇文章對你有幫助，歡迎分享給更多人！",
 
 	// 站點統計
 	[Key.siteStats]: "站點統計",
@@ -208,4 +224,11 @@ export const zh_TW: Translation = {
 	[Key.calendarOctober]: "10月",
 	[Key.calendarNovember]: "11月",
 	[Key.calendarDecember]: "12月",
+
+	[Key.shareArticle]: "分享",
+	[Key.generatingPoster]: "海報生成中...",
+	[Key.copied]: "已複製",
+	[Key.copyLink]: "複製連結",
+	[Key.savePoster]: "保存海報",
+	[Key.scanToRead]: "掃碼閱讀文章",
 };
