@@ -103,7 +103,7 @@ export const siteConfig: SiteConfig = {
       // 桌面背景图片
       desktop: "https://fengblog.s3.bitiful.net/fast-image/christmas-gif.webp",
       // 移动背景图片
-      mobile: "https://img.091026.xyz/blog/home-winter-mobile.webp",
+      mobile: "https://fengblog.s3.bitiful.net/fast-image/christmas-gif.webp",
     },
 
     // Banner模式特有配置
@@ -139,8 +139,8 @@ export const siteConfig: SiteConfig = {
           mobile: true, // 移动端显示横幅图片来源文本
         },
         text: {
-          desktop: "Steam - 冬季", // 桌面端要显示的来源文本
-          mobile: "Steam - 冬季", // 移动端要显示的来源文本
+          desktop: "Merry Christmas!", // 桌面端要显示的来源文本
+          mobile: "Merry Christmas!", // 移动端要显示的来源文本
         },
         url: {
           desktop: "https://store.steampowered.com/", // 桌面端原始艺术品或艺术家页面的 URL 链接
