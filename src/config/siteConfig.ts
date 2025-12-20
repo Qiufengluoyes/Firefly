@@ -103,7 +103,7 @@ export const siteConfig: SiteConfig = {
       // 桌面背景图片
       desktop: "https://fengblog.s3.bitiful.net/fast-image/christmas-gif.webp",
       // 移动背景图片
-      mobile: "https://fengblog.s3.bitiful.net/fast-image/christmas-gif.webp",
+      mobile: "https://fengblog.s3.bitiful.net/fast-image/christmas-gif-mobile.webp",
     },
 
     // Banner模式特有配置
