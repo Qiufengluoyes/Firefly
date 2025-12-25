@@ -89,11 +89,11 @@ export const siteConfig: SiteConfig = {
 		},
 	},
 
-  // 分页配置
-  pagination: {
-    // 每页显示的文章数量
-    postsPerPage: 10,
-  },
+	// 分页配置
+	pagination: {
+		// 每页显示的文章数量
+		postsPerPage: 10,
+	},
 
   backgroundWallpaper: {
     // 壁纸模式："banner" 横幅壁纸，"overlay" 全屏壁纸，"none" 纯色背景无壁纸
