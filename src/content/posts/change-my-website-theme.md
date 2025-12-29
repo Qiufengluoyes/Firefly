@@ -6,7 +6,7 @@ image: 'https://image.091026.xyz/blog/change-my-website-theme-0.webp'
 tags: [主题更换]
 category: '公告'
 draft: false
-pinned: true
+pinned: false
 ---
 
 得亏你 B 独有的大数据推送，让我发现了个宝藏主题。

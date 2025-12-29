@@ -1,0 +1,330 @@
+---
+title: 2025「年度总结」
+published: 2025-12-30
+description: 这是一个 MDX 格式的示例文章，展示了如何在 Markdown 中使用 JSX。
+tags: [MDX, 文章示例]
+category: 文章示例
+draft: true
+pinned: true
+---
+
+export const ScrollBox = ({ children }) => (
+  <div style={{
+    display: 'flex',
+    overflowX: 'auto',
+    gap: '20px',
+    paddingBottom: '20px',
+    msOverflowStyle: 'none',
+    scrollbarWidth: 'none',
+    WebkitOverflowScrolling: 'touch'
+  }}>
+    <style>{`
+      .hide-scroll::-webkit-scrollbar { display: none; }
+    `}</style>
+    <div className="hide-scroll" style={{ display: 'flex', gap: '20px' }}>
+      {children}
+    </div>
+  </div>
+);
+
+export const MusicCard = ({ cover, title, author, desc, link, width = '180px' }) => {
+  return (
+    <div style={{ flex: `0 0 ${width}`, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ position: 'relative', width: '100%', lineHeight: '0', fontSize: '0' }}>
+        
+        {/* 图片层 */}
+        <img 
+          src={cover} 
+          alt={title}
+          style={{
+            width: '100%', 
+            height: 'auto', 
+            borderRadius: '12px',
+            boxShadow: '0 6px 16px rgba(0,0,0,0.15)',
+            display: 'block',
+            cursor: 'zoom-in'
+          }} 
+        />
+        
+        {/* 修正后的跳转图标 */}
+        <a 
+          href={link}
+          target="_blank" 
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="hover-scale-btn" // 添加一个类名方便控制，或者继续用 inline style
+          style={{
+            position: 'absolute', 
+            bottom: '10px', 
+            right: '10px',
+            background: 'rgba(0,0,0,0.6)', 
+            borderRadius: '50%', 
+            width: '36px', 
+            height: '36px',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            color: 'white',
+            textDecoration: 'none',
+            fontSize: '14px', 
+            backdropFilter: 'blur(6px)', 
+            // 关键修正：添加 transform-origin 和 will-change 提高平滑度
+            transition: 'transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), background 0.2s',
+            transformOrigin: 'center center',
+            willChange: 'transform',
+            cursor: 'pointer',
+            lineHeight: '1',
+            zIndex: '20',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            border: 'none',
+            outline: 'none'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.background = 'rgba(0,0,0,0.8)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.background = 'rgba(0,0,0,0.6)';
+          }}
+        >
+          <span style={{ marginLeft: '2px' }}>▶</span>
+        </a>
+      </div>
+
+      <div style={{ padding: '0 2px', lineHeight: '1.5' }}>
+        <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '0', color: 'inherit' }}>{title}</div>
+        <div style={{ fontSize: '13px', color: '#3b82f6', fontWeight: '600', margin: '2px 0' }}>{author}</div>
+        <div style={{ 
+          fontSize: '12px', 
+          color: '#888', 
+          opacity: '0.8', 
+          overflow: 'hidden', 
+          textOverflow: 'ellipsis', 
+          display: '-webkit-box', 
+          WebkitLineClamp: '2', 
+          WebkitBoxOrient: 'vertical' 
+        }}>
+          {desc}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Card = ({ cover, title, author, desc, link, width, isVideo }) => {
+  // 根据是否为番剧设置默认宽度，也可以被外部传入的 width 覆盖
+  const finalWidth = width || (isVideo ? '280px' : '180px');
+  
+  return (
+    <div style={{ 
+      flex: `0 0 ${finalWidth}`, 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: '12px' 
+    }}>
+      <div style={{ position: 'relative', width: '100%', lineHeight: '0', fontSize: '0' }}>
+        {/* 图片层：移除 aspectRatio，实现高度自适应 */}
+        <img 
+          src={cover} 
+          alt={title}
+          style={{
+            width: '100%', 
+            height: 'auto', 
+            borderRadius: '12px',
+            boxShadow: '0 6px 16px rgba(0,0,0,0.15)',
+            display: 'block',
+            cursor: 'zoom-in'
+          }} 
+        />
+        
+        {/* 跳转图标：如果传入了 link 则显示 */}
+        {link && (
+          <a 
+            href={link}
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'absolute', 
+              bottom: '10px', 
+              right: '10px',
+              background: 'rgba(0,0,0,0.6)', 
+              borderRadius: '50%', 
+              width: '34px', 
+              height: '34px',
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              color: 'white',
+              textDecoration: 'none',
+              fontSize: '14px', 
+              backdropFilter: 'blur(6px)', 
+              transition: 'transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), background 0.2s',
+              transformOrigin: 'center center', // 防止悬浮偏移
+              willChange: 'transform',
+              cursor: 'pointer',
+              lineHeight: '1',
+              zIndex: '20',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.1)';
+              e.currentTarget.style.background = 'rgba(0,0,0,0.8)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.background = 'rgba(0,0,0,0.6)';
+            }}
+          >
+            <span style={{ marginLeft: '2px' }}>▶</span>
+          </a>
+        )}
+      </div>
+
+      <div style={{ padding: '0 2px', lineHeight: '1.5', textAlign: 'left' }}>
+        <div style={{ 
+          fontSize: '16px', 
+          fontWeight: 'bold', 
+          margin: '0', 
+          color: 'inherit',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap' 
+        }}>{title}</div>
+        <div style={{ fontSize: '13px', color: '#3b82f6', fontWeight: '600', margin: '2px 0' }}>{author}</div>
+        <div style={{ 
+          fontSize: '12px', 
+          color: '#888', 
+          opacity: '0.8', 
+          overflow: 'hidden', 
+          textOverflow: 'ellipsis', 
+          display: '-webkit-box', 
+          WebkitLineClamp: '2', 
+          WebkitBoxOrient: 'vertical' 
+        }}>
+          {desc}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+<div style={{ 
+  display: 'flex', 
+  flexDirection: 'column', 
+  alignItems: 'center', 
+  textAlign: 'center',
+  width: '100%',
+  marginTop: '-10px', // 向上拉近与顶部的距离，数值可根据实际情况调整
+  marginBottom: '-40px' // 压缩与下方内容的距离
+}}>
+
+export const GradientText = ({ children, className = "" }) => (
+  <span style={{
+    background: 'linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    fontWeight: '900',
+  }} className={className}>
+    {children}
+  </span>
+);
+
+  <GradientText className="text-5xl md:text-7xl" style={{ lineHeight: '1.1' }}>
+    枫落丰源<br />2025「年度总结」
+  </GradientText>
+</div>
+
+---
+
+## 🎧 <GradientText className="text-2xl">音乐</GradientText>
+
+今年我聆听了超过 **9620 分钟** 的音乐，比去年增加了 **36%**。
+
+<ScrollBox>
+  <MusicCard 
+    cover="https://fengblog.s3.bitiful.net/2025-summary/f1.webp"
+    title="F1 The Album"
+    author="多位艺人"
+    desc="一场音乐与赛车激情碰撞的视听狂潮。"
+    link="https://music.163.com/album?id=276211562"
+  />
+  <MusicCard 
+    cover="https://fengblog.s3.bitiful.net/2025-summary/Minecraft-Pixel-Drift.webp"
+    title="Minecraft: Pixel Drift"
+    author="Minecraft"
+    desc="继 Pixel Genesis 后第二个 Minecraft 官方高质量混音专辑。"
+    link="https://music.163.com/album?id=282968383"
+  />
+  <MusicCard 
+    cover="https://fengblog.s3.bitiful.net/2025-summary/asmi.webp"
+    title="That's The Way It Goes"
+    author="asmi"
+    desc="时光流逝，饭菜依旧美味。"
+    link="https://music.163.com/album?id=268698167"
+  />
+  <MusicCard 
+    cover="https://fengblog.s3.bitiful.net/2025-summary/halca.webp"
+    title="Weekend Roll"
+    author="halca"
+    desc="mono 女孩「一起去旅行吧！」。"
+    link="https://music.163.com/album?id=271355023"
+  />
+  <MusicCard 
+    cover="https://fengblog.s3.bitiful.net/2025-summary/zoo.webp"
+    title="Zoo (From &quot;Zootropolis 2&quot;)"
+    author="Shakira"
+    desc="疯狂动物城「一切皆有可能」。"
+    link="https://music.163.com/album?id=287956278"
+  />
+</ScrollBox>
+
+---
+
+## 📺 <GradientText className="text-2xl">番剧</GradientText>
+
+<ScrollBox>
+  <Card 
+    isVideo
+    cover="https://fengblog.s3.bitiful.net/2025-summary/shiguangliushi.webp"
+    title="时光流逝，饭菜依旧美味"
+    author="P.A.WORKS"
+    desc={<>可爱×美味=最强美食<br />五名刚刚成为大学生的女孩们共同演绎的日常故事。</>}
+    link="https://bgm.tv/subject/531159"
+  />
+  <Card 
+    isVideo
+    cover="https://fengblog.s3.bitiful.net/2025-summary/monogirl.webp"
+    title="mono 女孩"
+    author="Aniplex"
+    desc="这个周末要怎么度过呢？一起去旅行吧！"
+    link="https://bgm.tv/subject/485936"
+  />
+  <Card 
+    isVideo
+    cover="https://fengblog.s3.bitiful.net/2025-summary/abl.webp"
+    title="测不准的阿波连同学 第二季"
+    author="哔哩哔哩"
+    desc="阿波连同学与来堂同学特殊的距离感。"
+    link="https://bgm.tv/subject/506922"
+  />
+</ScrollBox>
+
+---
+
+## ▶️ <GradientText className="text-2xl">B站</GradientText>
+
+今年在B站花费了大量时间，主要集中在科技与设计领域。
+
+- **年度观看时长**：1200+ 小时
+- **投币次数**：350+
+- **最常访问**：知识区、音乐区
+
+---
+
+## 💬 <GradientText className="text-2xl">自己想说的话</GradientText>
+
+2025年，**枫落丰源**这个名字依然代表着对生活的热爱。希望明年的自己能够更加从容，去见更多未见的风景。
+
+> "生活不是你活过的样子，而是你记住的样子。"
