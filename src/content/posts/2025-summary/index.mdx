@@ -139,47 +139,49 @@ export const Card = ({ cover, title, author, desc, link, width, isVideo }) => {
         />
         
         {/* 跳转图标：如果传入了 link 则显示 */}
-        {link && (
-          <a 
-            href={link}
-            target="_blank" 
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: 'absolute', 
-              bottom: '10px', 
-              right: '10px',
-              background: 'rgba(0,0,0,0.6)', 
-              borderRadius: '50%', 
-              width: '34px', 
-              height: '34px',
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              color: 'white',
-              textDecoration: 'none',
-              fontSize: '14px', 
-              backdropFilter: 'blur(6px)', 
-              transition: 'transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), background 0.2s',
-              transformOrigin: 'center center', // 防止悬浮偏移
-              willChange: 'transform',
-              cursor: 'pointer',
-              lineHeight: '1',
-              zIndex: '20',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'scale(1.1)';
-              e.currentTarget.style.background = 'rgba(0,0,0,0.8)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.background = 'rgba(0,0,0,0.6)';
-            }}
-          >
-            <span style={{ marginLeft: '2px' }}>▶</span>
-          </a>
-        )}
+        <a 
+          href={link}
+          target="_blank" 
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="hover-scale-btn" // 添加一个类名方便控制，或者继续用 inline style
+          style={{
+            position: 'absolute', 
+            bottom: '10px', 
+            right: '10px',
+            background: 'rgba(0,0,0,0.6)', 
+            borderRadius: '50%', 
+            width: '36px', 
+            height: '36px',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            color: 'white',
+            textDecoration: 'none',
+            fontSize: '14px', 
+            backdropFilter: 'blur(6px)', 
+            // 关键修正：添加 transform-origin 和 will-change 提高平滑度
+            transition: 'transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), background 0.2s',
+            transformOrigin: 'center center',
+            willChange: 'transform',
+            cursor: 'pointer',
+            lineHeight: '1',
+            zIndex: '20',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            border: 'none',
+            outline: 'none'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.background = 'rgba(0,0,0,0.8)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.background = 'rgba(0,0,0,0.6)';
+          }}
+        >
+          <span style={{ marginLeft: '2px' }}>▶</span>
+        </a>
       </div>
 
       <div style={{ padding: '0 2px', lineHeight: '1.5', textAlign: 'left' }}>
