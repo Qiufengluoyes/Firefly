@@ -1,9 +1,9 @@
 ---
 title: 2025「年度总结」
-published: 2025-12-30
-description: 这是一个 MDX 格式的示例文章，展示了如何在 Markdown 中使用 JSX。
-tags: [MDX, 文章示例]
-category: 文章示例
+published: 2025-12-31
+description: 2025 年度总结：音乐、番剧与 B 站回顾，还有自己想说的话。
+tags: [2025年, 年度总结, 音乐, 番剧, B站]
+category: 年度总结
 draft: true
 pinned: true
 ---
@@ -102,7 +102,7 @@ export const MusicCard = ({ cover, title, author, desc, link, width = '180px' })
           overflow: 'hidden', 
           textOverflow: 'ellipsis', 
           display: '-webkit-box', 
-          WebkitLineClamp: '2', 
+          WebkitLineClamp: '3', 
           WebkitBoxOrient: 'vertical' 
         }}>
           {desc}
@@ -200,7 +200,7 @@ export const Card = ({ cover, title, author, desc, link, width, isVideo }) => {
           overflow: 'hidden', 
           textOverflow: 'ellipsis', 
           display: '-webkit-box', 
-          WebkitLineClamp: '2', 
+          WebkitLineClamp: '3', 
           WebkitBoxOrient: 'vertical' 
         }}>
           {desc}
@@ -226,13 +226,16 @@ export const GradientText = ({ children, className = "" }) => (
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     fontWeight: '900',
+    letterSpacing: '0.02em',     // 增加字间距，让大标题更有呼吸感
+    lineHeight: '1.4',               // 增加行高，提高多行文字的可读性
   }} className={className}>
     {children}
   </span>
+// 渐变文字组件
 );
 
   <GradientText className="text-5xl md:text-7xl" style={{ lineHeight: '1.1' }}>
-    枫落丰源<br />2025「年度总结」
+    2025<br />枫落丰源<br />「年度总结」
   </GradientText>
 </div>
 
@@ -254,14 +257,14 @@ export const GradientText = ({ children, className = "" }) => (
     cover="https://fengblog.s3.bitiful.net/2025-summary/Minecraft-Pixel-Drift.webp"
     title="Minecraft: Pixel Drift"
     author="Minecraft"
-    desc="继 Pixel Genesis 后第二个官方高质量混音专辑。"
+    desc="继 Pixel Genesis 后第二个 Minecraft 官方高质量混音专辑。"
     link="https://music.163.com/album?id=282968383"
   />
   <MusicCard 
     cover="https://fengblog.s3.bitiful.net/2025-summary/asmi.webp"
     title="That's The Way It Goes"
     author="asmi"
-    desc="时光流逝，饭菜依旧美味。"
+    desc="时光流逝，饭菜依旧美味！"
     link="https://music.163.com/album?id=268698167"
   />
   <MusicCard 
@@ -287,7 +290,8 @@ export const GradientText = ({ children, className = "" }) => (
 <ScrollBox>
   <Card 
     isVideo
-    cover="https://fengblog.s3.bitiful.net/2025-summary/shiguangliushi.webp"
+    cover="https://fengblog.s3.bitiful.net/2025-summary/531159_BayD9.webp"
+    width="30%"
     title="时光流逝，饭菜依旧美味"
     author="P.A.WORKS"
     desc={<>可爱×美味=最强美食<br />五名刚刚成为大学生的女孩们共同演绎的日常故事。</>}
@@ -303,9 +307,10 @@ export const GradientText = ({ children, className = "" }) => (
   />
   <Card 
     isVideo
-    cover="https://fengblog.s3.bitiful.net/2025-summary/abl.webp"
+    cover="https://fengblog.s3.bitiful.net/2025-summary/506922_8sn3u.webp"
+    width="30%"
     title="测不准的阿波连同学 第二季"
-    author="哔哩哔哩"
+    author="哔哩哔哩动漫"
     desc="阿波连同学与来堂同学特殊的距离感。"
     link="https://bgm.tv/subject/506922"
   />
@@ -315,15 +320,26 @@ export const GradientText = ({ children, className = "" }) => (
 
 ## ▶️ <GradientText className="text-2xl">B站</GradientText>
 
-今年在B站花费了大量时间，主要集中在科技与设计领域。
+今年在B站花费了大量时间，主要集中在知识、科技与游戏领域。
 
-- **年度观看时长**：1200+ 小时
-- **投币次数**：350+
-- **最常访问**：知识区、音乐区
+- **年度观看时长**：531 小时
+- **上线天数**：364 天，获得「差点全勤奖」
+- **年度 UP 主**：争取最后的自由，观看 **848 分钟**
+- **最常访问**：知识区、科技区、游戏区
 
 ---
 
 ## 💬 <GradientText className="text-2xl">自己想说的话</GradientText>
+
+### 以前
+
+今年，随着紧张的中考考试落幕，我如愿以偿地以 **638.9 分** 的成绩考入了本区的一所高中，开启了全新的高中生活篇章。
+
+### 现在
+
+由于前段时间分班的缘故，我从优生班转入了普通班，这一变化让我感受到了不同的学习氛围和挑战。尽管如此，我依然保持着对学习的热情和对未来的期待。
+
+### 展望未来
 
 2025年，**枫落丰源**这个名字依然代表着对生活的热爱。希望明年的自己能够更加从容，去见更多未见的风景。
 
