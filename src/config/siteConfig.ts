@@ -24,8 +24,8 @@ export const siteConfig: SiteConfig = {
 	lang: SITE_LANG,
 
   themeColor: {
-    hue: 0, // 主题色的默认色相，范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345 紫色：290
-    fixed: true, // 对访问者隐藏主题色选择器
+    hue: 220, // 主题色的默认色相，范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345 紫色：290
+    fixed: false, // 对访问者隐藏主题色选择器
     defaultMode: "system", // 默认模式："light" 亮色，"dark" 暗色，"system" 跟随系统
   },
 
@@ -104,9 +104,9 @@ export const siteConfig: SiteConfig = {
     // 背景图片配置
     src: {
       // 桌面背景图片
-      desktop: "https://fengblog.s3.bitiful.net/fast-image/christmas.webp",
+      desktop: "https://fengblog.s3.bitiful.net/fast-image/1763396689693.webp",
       // 移动背景图片
-      mobile: "https://fengblog.s3.bitiful.net/fast-image/christmas.webp",
+      mobile: "https://fengblog.s3.bitiful.net/fast-image/1763396689693.webp",
     },
 
     // Banner模式特有配置
@@ -114,7 +114,7 @@ export const siteConfig: SiteConfig = {
       // 图片位置
       // 支持所有CSS object-position值，如: 'top', 'center', 'bottom', 'left top', 'right bottom', '25% 75%', '10px 20px'..
       // 如果不知道怎么配置百分百之类的配置，推荐直接使用：'center'居中，'top'顶部居中，'bottom' 底部居中，'left'左侧居中，'right'右侧居中
-      position: "center",
+      position: "75% 0%",
       
       homeText: {
         // 主页显示自定义文本（全局开关）
@@ -142,12 +142,12 @@ export const siteConfig: SiteConfig = {
           mobile: true, // 移动端显示横幅图片来源文本
         },
         text: {
-          desktop: "Merry Christmas!", // 桌面端要显示的来源文本
-          mobile: "Merry Christmas!", // 移动端要显示的来源文本
+          desktop: "2026 新年快乐！", // 桌面端要显示的来源文本
+          mobile: "2026 新年快乐！", // 移动端要显示的来源文本
         },
         url: {
-          desktop: "https://store.steampowered.com/", // 桌面端原始艺术品或艺术家页面的 URL 链接
-          mobile: "https://store.steampowered.com/", // 移动端原始艺术品或艺术家页面的 URL 链接
+          desktop: "", // 桌面端原始艺术品或艺术家页面的 URL 链接
+          mobile: "", // 移动端原始艺术品或艺术家页面的 URL 链接
         },
       },
       navbar: {
