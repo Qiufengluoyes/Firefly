@@ -32,7 +32,7 @@ export const siteConfig: SiteConfig = {
   favicon: [
     // 留空以使用默认 favicon
     {
-      src: "/favicon/christmas-avatar.png", // 图标文件路径
+      src: "/favicon/favicon.png", // 图标文件路径
     },
   ],
 
@@ -43,7 +43,7 @@ export const siteConfig: SiteConfig = {
   // { type: "image", value: "https://example.com/logo.png", alt: "Firefly Logo" }
   navbarLogo: {
     type: "image",
-    value: "/favicon/christmas-avatar.png",
+    value: "/favicon/favicon.png",
     alt: "枫落丰源 Logo",
   },
   navbarTitle: "枫落丰源", // 导航栏标题，可以设置为与 title 不同的值，如果不设置则使用 title
