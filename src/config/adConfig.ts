@@ -5,12 +5,12 @@ import type { AdConfig } from "../types/config";
 // 广告配置1 - 纯图片广告（无边距）
 export const adConfig1: AdConfig = {
 	image: {
-		src: "/assets/images/d1.webp",
-		alt: "广告横幅",
-		link: "#",
+		src: "https://image.091026.xyz/2026-New-Year's-Greetings.avif",
+		alt: "新年贺词",
+		link: "https://www.bilibili.com/video/BV154igBGE2K/",
 		external: true,
 	},
-	closable: true, // 是否可关闭
+	closable: false, // 是否可关闭
 	displayCount: -1,
 	padding: {
 		all: "0", // 零边距，图片占满整个组件
