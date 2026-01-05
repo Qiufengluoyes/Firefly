@@ -1,10 +1,16 @@
 import type { ProfileConfig } from "../types/config";
 
 export const profileConfig: ProfileConfig = {
-  avatar: "/assets/images/avatar.jpg",
-  name: "枫落丰源",
-  bio: "和你的日常，就是奇迹",
-  	// 链接配置
+	// 头像
+	avatar: "/assets/images/avatar.jpg",
+
+	// 名字
+	name: "枫落丰源",
+
+	// 个人签名
+	bio: "和你的日常，就是奇迹",
+
+	// 链接配置
 	// 已经预装的图标集：fa6-brands，fa6-regular，fa6-solid，material-symbols，simple-icons
 	// 访问https://icones.js.org/ 获取图标代码，
 	// 如果想使用尚未包含相应的图标集，则需要安装它

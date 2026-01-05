@@ -8,7 +8,11 @@ import {
 	WALLPAPER_OVERLAY,
 } from "@constants/constants";
 import type { LIGHT_DARK_MODE, WALLPAPER_MODE } from "@/types/config";
-import { expressiveCodeConfig, siteConfig } from "../config";
+import {
+	backgroundWallpaper,
+	expressiveCodeConfig,
+	siteConfig,
+} from "../config";
 import { isHomePage as checkIsHomePage } from "./layout-utils";
 
 if (typeof window !== 'undefined') {
@@ -276,7 +280,7 @@ export function initThemeListener() {
 // Wallpaper mode functions
 export function applyWallpaperModeToDocument(mode: WALLPAPER_MODE) {
 	// 检查是否允许切换壁纸模式
-	const isSwitchable = siteConfig.backgroundWallpaper.switchable ?? true;
+	const isSwitchable = backgroundWallpaper.switchable ?? true;
 	if (!isSwitchable) {
 		// 如果不允许切换，直接返回，不执行任何操作
 		return;
@@ -286,7 +290,7 @@ export function applyWallpaperModeToDocument(mode: WALLPAPER_MODE) {
 	const currentMode =
 		(document.documentElement.getAttribute(
 			"data-wallpaper-mode",
-		) as WALLPAPER_MODE) || siteConfig.backgroundWallpaper.mode;
+		) as WALLPAPER_MODE) || backgroundWallpaper.mode;
 
 	// 如果模式没有变化，直接返回
 	if (currentMode === mode) {
@@ -408,8 +412,7 @@ function showBannerMode() {
 	const bannerTextOverlay = document.querySelector(".banner-text-overlay");
 	if (bannerTextOverlay) {
 		// 检查是否启用 homeText
-		const homeTextEnabled =
-			siteConfig.backgroundWallpaper.banner?.homeText?.enable;
+		const homeTextEnabled = backgroundWallpaper.banner?.homeText?.enable;
 
 		// 检查当前是否为首页
 		const isHomePage = checkIsHomePage(window.location.pathname);
@@ -446,7 +449,7 @@ function showBannerMode() {
 	if (navbar) {
 		// 获取导航栏透明模式配置（banner模式）
 		const transparentMode =
-			siteConfig.backgroundWallpaper.banner?.navbar?.transparentMode || "semi";
+			backgroundWallpaper.banner?.navbar?.transparentMode || "semi";
 		navbar.setAttribute("data-transparent-mode", transparentMode);
 
 		// 重新初始化半透明模式滚动检测（如果需要）
@@ -556,7 +559,7 @@ function updateNavbarTransparency(mode: WALLPAPER_MODE) {
 	} else {
 		// Banner模式：使用配置的透明模式
 		transparentMode =
-			siteConfig.backgroundWallpaper.banner?.navbar?.transparentMode || "semi";
+			backgroundWallpaper.banner?.navbar?.transparentMode || "semi";
 	}
 
 	// 更新导航栏的透明模式属性
@@ -657,10 +660,10 @@ export function getStoredWallpaperMode(): WALLPAPER_MODE {
 		typeof localStorage === "undefined" ||
 		typeof localStorage.getItem !== "function"
 	) {
-		return siteConfig.backgroundWallpaper.mode;
+		return backgroundWallpaper.mode;
 	}
 	return (
 		(localStorage.getItem("wallpaperMode") as WALLPAPER_MODE) ||
-		siteConfig.backgroundWallpaper.mode
+		backgroundWallpaper.mode
 	);
 }

@@ -5,7 +5,13 @@ import SakuraEffect from "@components/effects/SakuraEffect.astro";
 import FontManager from "@components/interactive/FontManager.astro";
 import ConfigCarrier from "@components/layout/ConfigCarrier.astro";
 import MusicPlayer from "@components/widget/MusicPlayer.astro";
-import { expressiveCodeConfig, profileConfig, siteConfig } from "@/config";
+
+import {
+	backgroundWallpaper,
+	expressiveCodeConfig,
+	profileConfig,
+	siteConfig,
+} from "@/config";
 import {
 	BANNER_HEIGHT,
 	BANNER_HEIGHT_EXTEND,
@@ -40,7 +46,7 @@ const isHomePageCheck = isHomePage(Astro.url.pathname);
 const configHue = siteConfig.themeColor.hue;
 // 获取导航栏透明模式配置
 const navbarTransparentMode =
-	siteConfig.backgroundWallpaper?.banner?.navbar?.transparentMode || "semi";
+	backgroundWallpaper.banner?.navbar?.transparentMode || "semi";
 // 判断是否应该显示顶部高光效果（只在full和semifull模式下显示）
 const shouldShowTopHighlight =
 	navbarTransparentMode === "full" || navbarTransparentMode === "semifull";
@@ -51,7 +57,7 @@ if (!banner || typeof banner !== "string" || banner.trim() === "") {
 // TODO don't use post cover as banner for now
 banner = getDefaultBackground();
 
-const enableBanner = siteConfig.backgroundWallpaper.mode === "banner";
+const enableBanner = backgroundWallpaper.mode === "banner";
 let pageTitle: string;
 if (title) {
 	pageTitle = `${title} - ${siteConfig.title}`;
@@ -82,35 +88,33 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 <!doctype html>
 <html lang={siteLang} class="bg-[var(--page-bg)] text-[14px] md:text-[16px]" data-overlayscrollbars-initialize>
   <head>
-    <script is:inline data-swup-ignore-script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-P53R3M9S");
-    </script>
-    <script is:inline data-swup-ignore-script type="text/javascript">
-      (function (c, l, a, r, i, t, y) {
-        c[a] =
-          c[a] ||
-          function () {
-            (c[a].q = c[a].q || []).push(arguments);
-          };
-     
-        t = l.createElement(r);
-        t.async = 1;
-        t.src = "https://www.clarity.ms/tag/" + i;
-        y = l.getElementsByTagName(r)[0];
-        y.parentNode.insertBefore(t, y);
-      })(window, document, "clarity", "script", "tx9equrgr6");
-    </script>
+    {
+      siteConfig.analytics?.clarityId && (
+        <script
+          is:inline
+          data-swup-ignore-script
+          type="text/javascript"
+          define:vars={{ clarityId: siteConfig.analytics.clarityId }}
+        >
+          (function (c, l, a, r, i, t, y) {
+            c[a] =
+              c[a] ||
+              function () {
+                (c[a].q = c[a].q || []).push(arguments);
+              };
+            t = l.createElement(r);
+    
+            t.async = 1;
+            t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0];
+            y.parentNode.insertBefore(t, y);
+          })(window, document, "clarity", "script", clarityId);
+        </script>
+      )
+    }
     <title>{pageTitle}</title>
 
+   
     <meta charset="UTF-8" />
     <meta
       name="description"
@@ -158,6 +162,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
           media={favicon.theme && `(prefers-color-scheme: ${favicon.theme})`}
         />
      
+ 
       ))
     }
 
@@ -168,9 +173,9 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
         PAGE_WIDTH,
         configHue,
         defaultMode: siteConfig.themeColor.defaultMode ?? "light",
-        defaultWallpaperMode: siteConfig.backgroundWallpaper.mode,
+        defaultWallpaperMode: backgroundWallpaper.mode,
         isWallpaperSwitchable:
-          siteConfig.backgroundWallpaper.switchable ?? true,
+          backgroundWallpaper.switchable ?? true,
         darkTheme: expressiveCodeConfig.darkTheme,
         lightTheme: expressiveCodeConfig.lightTheme,
         baseUrl: import.meta.env.BASE_URL,
@@ -243,6 +248,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
         const newValue = parseInt(
           document.documentElement.style.getPropertyValue(
            
+ 
             "--banner-height-extend"
           )
         );
@@ -274,6 +280,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
             wallpaperMode === WALLPAPER_OVERLAY
           ) {
         
+ 
             // 隐藏横幅
             if (document.body) {
               document.body.classList.remove("enable-banner");
@@ -281,7 +288,8 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
             }
           } else {
             if (document.body) {
-              document.body.classList.add("enable-banner");
+       
+               document.body.classList.add("enable-banner");
  
               document.body.classList.remove("no-banner-layout");
             }
@@ -291,7 +299,8 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
           if (wallpaperMode === WALLPAPER_OVERLAY) {
             if (document.body) {
               document.body.classList.add("wallpaper-transparent");
-            
+   
+          
             }
           } else {
             if (document.body) {
@@ -306,10 +315,9 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
           );
           // 检查当前是否为首页
           const isHomePage =
-            window.location.pathname === baseUrl || 
+            window.location.pathname === baseUrl ||
             (baseUrl !== '/' && window.location.pathname === baseUrl.replace(/\/$/, '')) ||
             window.location.pathname === "/";
-
           if (wallpaperMode === WALLPAPER_OVERLAY) {
             // 全屏壁纸透明模式：显示全屏壁纸，隐藏banner
             if (bannerWrapper) {
@@ -385,7 +393,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
           );
           if (bannerTextOverlay) {
             const isHomePage =
-              window.location.pathname === baseUrl || 
+              window.location.pathname === baseUrl ||
               (baseUrl !== '/' && window.location.pathname === baseUrl.replace(/\/$/, '')) ||
               window.location.pathname === "/";
             if (wallpaperMode === WALLPAPER_BANNER && isHomePage) {
@@ -418,6 +426,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
     class="min-h-screen"
     data-overlayscrollbars-initialize
     class:list={[
+    
       { "lg:is-home": isHomePageCheck, "enable-banner": enableBanner },
       ...(siteConfig.font.enable && siteConfig.font.selected
       
@@ -428,17 +437,10 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
         : []),
     ]}
   >
-    <noscript
-      ><iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-KRX3XGVH"
-        height="0"
-        width="0"
-        style="display:none;visibility:hidden"></iframe></noscript
-  
-    >
 
     {shouldShowTopHighlight && <div class="top-gradient-highlight" />}
     <ConfigCarrier />
+  
     <slot />
 
     <MusicPlayer />
@@ -449,7 +451,6 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 
     <FancyboxManager />
 
-    <!-- KaTeX Manager -->
     <KatexManager />
     
     <link rel='stylesheet' href='/fonts/FZLanTYJ_Zhong/result.css' />
@@ -511,7 +512,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
     BANNER_HEIGHT_EXTEND,
     // MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
   } from "@/constants/constants";
-  import { siteConfig, expressiveCodeConfig } from "@/config";
+  import { backgroundWallpaper, expressiveCodeConfig, siteConfig } from "@/config";
   import 'overlayscrollbars/overlayscrollbars.css';
   import {
     OverlayScrollbars,
@@ -546,6 +547,7 @@ function disableAnimation() {
               -o-transition:none!important;
               -ms-transition:none!important;
  
+ 
               transition:none!important
               }`
 		)
@@ -566,19 +568,20 @@ function disableAnimation() {
 
   const bannerEnabled = !!document.getElementById("banner-wrapper");
   function setClickOutsideToClose(panel: string, ignores: string[]) {
-    document.addEventListener("click", (event) => {
-      let panelDom = document.getElementById(panel);
-      let tDom = event.target;
-      if (!(tDom instanceof Node)) return; // Ensure the event target is an HTML Node
-      for (let ig of ignores) {
-        let ie = document.getElementById(ig);
-        if (ie == tDom || ie?.contains(tDom)) {
-          return;
-     
-        }
-      }
-      panelDom!.classList.add("float-panel-closed");
-    });
+      document.addEventListener("click", (event) => {
+          let panelDom = document.getElementById(panel);
+          if (!panelDom) return;
+          let tDom = event.target;
+          if (!(tDom instanceof Node)) return; // Ensure the event target is an HTML Node
+          for (let ig of ignores) {
+          
+            let ie = document.getElementById(ig);
+              if (ie == tDom || ie?.contains(tDom)) {
+                  return;
+              }
+          }
+          panelDom.classList.add("float-panel-closed");
+      });
   }
   setClickOutsideToClose("display-setting", [
     "display-setting",
@@ -601,7 +604,6 @@ function disableAnimation() {
     "theme-mode-panel",
     "scheme-switch",
   ]);
-  
   function initCustomScrollbar() {
     const bodyElement = document.querySelector('body');
     if (!bodyElement) return;
@@ -614,14 +616,14 @@ function disableAnimation() {
           nativeScrollbarsOverlaid: true,    // don't initialize the overlay scrollbar if there is a native one
         }
       }, {
-      scrollbars: {
+ 
+        scrollbars: {
         theme: 'scrollbar-base scrollbar-auto py-1',
         autoHide: 'move',
         autoHideDelay: 500,
         autoHideSuspend: false,
       },
     });
-
     const katexElements = document.querySelectorAll('.katex-display') as NodeListOf<HTMLElement>;
 
     const katexObserverOptions = {
@@ -629,18 +631,15 @@ function disableAnimation() {
       rootMargin: '100px',
       threshold: 0.1
     };
-
     const processKatexElement = (element: HTMLElement) => {
       if (!element.parentNode) return;
       if (element.hasAttribute('data-scrollbar-initialized')) return;
-
       const container = document.createElement('div');
       container.className = 'katex-display-container';
       container.setAttribute('aria-label', 'scrollable container for formulas');
 
       element.parentNode.insertBefore(container, element);
       container.appendChild(element);
-
       OverlayScrollbars(container, {
         scrollbars: {
           theme: 'scrollbar-base scrollbar-auto',
@@ -649,7 +648,6 @@ function disableAnimation() {
           autoHideSuspend: false
         }
       });
-
       element.setAttribute('data-scrollbar-initialized', 'true');
     };
 
@@ -661,14 +659,13 @@ function disableAnimation() {
         }
       });
     }, katexObserverOptions);
-
     katexElements.forEach(element => {
       katexObserver.observe(element);
     });
   }
 
   function showBanner() {
-    const isBannerMode = siteConfig.backgroundWallpaper.mode === "banner";
+    const isBannerMode = backgroundWallpaper.mode === "banner";
     if (!isBannerMode) return;
     // 使用requestAnimationFrame优化DOM操作
     requestAnimationFrame(() => {
@@ -683,6 +680,7 @@ function disableAnimation() {
         '.block.lg\\:hidden[alt="Mobile banner image of the blog"]'
       );
       if (mobileBanner) {
+ 
  
         // 移动端使用与电脑端相同的初始化逻辑
         mobileBanner.classList.remove("opacity-0", "scale-105");
@@ -712,6 +710,7 @@ function disableAnimation() {
       document.documentElement.classList.add("is-page-transitioning");
 
       
+ 
       // 简化navbar处理逻辑
       if (bannerEnabled) {
         const navbar = document.getElementById("navbar-wrapper");
@@ -724,12 +723,30 @@ function disableAnimation() {
       }
     });
     window.swup.hooks.on("content:replace", () => {
+      // 更新主网格布局类名
+      const gridClassCarrier = document.getElementById("grid-class-carrier");
+      if (gridClassCarrier) {
+        const gridClass = gridClassCarrier.getAttribute("data-grid-class");
+        const mainGrid = document.getElementById("main-grid");
+        if (mainGrid && gridClass) {
+
+          const currentClasses = mainGrid.className.split(" ");
+          const newClasses = currentClasses.filter(c => !c.startsWith("lg:grid-cols-") && !c.startsWith("md:grid-cols-") && !c.startsWith("grid-cols-"));
+      
+     
+          // 添加新的网格类
+          const gridClasses = gridClass.split(" ");
+          mainGrid.className = [...newClasses, ...gridClasses].join(" ");
+        }
+      }
+
       // 只处理katex元素的容器，使用浏览器原生滚动条
       initCustomScrollbar();
       
       // 重新初始化图标加载器
       import("@/utils/icon-loader").then(({ initIconLoader }) => {
-        initIconLoader();
+       
+         initIconLoader();
       });
 
       // 检查当前页面是否为文章页面（有TOC元素）
@@ -752,7 +769,6 @@ function disableAnimation() {
       if (navbar) 
       {
         const transparentMode = navbar.getAttribute("data-transparent-mode");
-
         if (transparentMode === "semifull") {
           // 重新调用初始化函数来重新绑定滚动事件
           if (
@@ -763,34 +779,6 @@ function disableAnimation() {
         }
       }
 
-      // 在页面切换后恢复布局状态（支持文章详情页的布局切换）
-      setTimeout(() => {
-        const savedLayout = localStorage.getItem("postListLayout");
-        if (savedLayout) {
-          const rightSidebar = document.getElementById("right-sidebar");
-          const mainGrid = document.getElementById("main-grid");
-          
-          // 根据保存的布局状态调整侧边栏显示
-   
-          if (savedLayout === "grid") {
-            if (rightSidebar) {
-              rightSidebar.style.display = "none";
-            }
-            if (mainGrid) {
-              mainGrid.classList.add("grid-layout-active");
-            }
-       
-          } else {
-            if (rightSidebar) {
-              rightSidebar.style.display = "";
-            }
-            if (mainGrid) {
-              mainGrid.classList.remove("grid-layout-active");
-            }
-          }
-   
-        }
-      }, 50);
     });
     window.swup.hooks.on("visit:start", (visit: { to: { url: string } }) => {
       // change banner height immediately when a link is clicked
@@ -805,6 +793,7 @@ function disableAnimation() {
 
       // Control banner text visibility based on page
      
+ 
       const bannerTextOverlay = document.querySelector(".banner-text-overlay");
       if (bannerTextOverlay) {
         if (isHomePage) {
@@ -816,7 +805,8 @@ function disableAnimation() {
 
       // Control navbar transparency based on page
       const navbar = document.getElementById("navbar");
-      if (navbar) {
+      if (navbar) 
+      {
      
         navbar.setAttribute("data-is-home", isHomePage.toString());
 
@@ -909,6 +899,7 @@ function disableAnimation() {
 
       // 在移动端恢复文章列表容器的过渡动画（在主内容区位置动画完成后）
       
+ 
       const isMobile = window.innerWidth < 1024;
       if (isMobile) {
         setTimeout(() => {
@@ -917,11 +908,12 @@ function disableAnimation() {
             postListContainer.style.transition = "";
           }
         }, 600); // 等待主内容区动画完成（0.4s + 0.1s delay + 100ms buffer）
-      }
+     
+       }
 
      
       // 同步主题状态 - 解决从首页进入文章页面时代码块渲染问题
-      const storedTheme = localStorage.getItem("theme") || "light";
+      const storedTheme = localStorage.getItem("theme") || siteConfig.themeColor.defaultMode || "light";
       let isDark = false;
       
       // 处理 system 模式
@@ -933,7 +925,7 @@ function disableAnimation() {
       
       const expectedTheme = isDark
         ?
-          expressiveCodeConfig.darkTheme
+        expressiveCodeConfig.darkTheme
         : expressiveCodeConfig.lightTheme;
       const currentTheme = document.documentElement.getAttribute("data-theme");
       // 如果主题不匹配，静默更新（不触发事件，避免重新加载效果）
@@ -950,6 +942,7 @@ function disableAnimation() {
               path: window.location.pathname,
               timestamp: Date.now(),
       
+ 
             },
           });
           document.dispatchEvent(pageLoadedEvent);
@@ -971,73 +964,13 @@ function disableAnimation() {
         const toc = document.getElementById("toc-wrapper");
         if (toc) {
        
+ 
           toc.classList.remove("toc-not-ready");
         }
 
         // 移除页面切换保护，恢复过渡动画
         document.documentElement.classList.remove("is-page-transitioning");
       }, 200);
-    });
-    // 全局布局切换监听器 - 支持在任何页面（包括文章详情页）切换布局
-    window.addEventListener("layoutChange", (event: CustomEvent) => {
-      const newLayout = event.detail.layout;
-      const rightSidebar = document.getElementById("right-sidebar");
-      const mainGrid = document.getElementById("main-grid");
-      const postContainer = document.getElementById("post-container");
-      const swupContainer = document.getElementById("swup-container");
-      
-      // 为文章详情页容器添加切换动画
-      if (postContainer) {
-        postContainer.classList.add("layout-switching");
-        setTimeout(() => {
-          postContainer.classList.remove("layout-switching");
-        }, 400);
-      }
-      
-      // 为主内容区添加切换动画
-      if (swupContainer) {
-        swupContainer.classList.add("layout-transitioning");
-        setTimeout(() => {
-          swupContainer.classList.remove("layout-transitioning");
-        }, 500);
-      }
-      
-      // 根据新布局状态调整侧边栏显示
-   
-      if (newLayout === "grid") {
-        if (rightSidebar) {
-          // 简洁的淡出动画
-          rightSidebar.style.transition = "opacity 0.35s ease-in-out, transform 0.35s ease-in-out";
-          rightSidebar.style.opacity = "0";
-          rightSidebar.style.transform = "translateX(15px)";
-          setTimeout(() => {
-            rightSidebar.style.display = "none";
-            rightSidebar.style.opacity = "";
-            rightSidebar.style.transform = "";
-          }, 350);
-        }
-        if (mainGrid) {
-          mainGrid.classList.add("grid-layout-active");
-        }
-      } else {
-        if (rightSidebar) {
-          // 简洁的淡入动画
-          rightSidebar.style.display = "";
-          rightSidebar.style.transition = "opacity 0.35s ease-in-out, transform 0.35s ease-in-out";
-          rightSidebar.style.opacity = "0";
-          rightSidebar.style.transform = "translateX(15px)";
-          setTimeout(() => {
-            rightSidebar.style.opacity = "1";
-            rightSidebar.style.transform = "translateX(0)";
-          }, 50);
-          setTimeout(() => {
-            rightSidebar.style.transition = "";
-          }, 400);
-        }
-        if (mainGrid) {
-          mainGrid.classList.remove("grid-layout-active");
-        }
-      }
     });
   };
   if (window?.swup?.hooks) {
@@ -1049,7 +982,6 @@ function disableAnimation() {
   let backToTopBtn = document.getElementById("back-to-top-btn");
   let toc = document.getElementById("toc-wrapper");
   let navbar = document.getElementById("navbar-wrapper");
-
   // 优化的滚动处理函数
   function scrollFunction() {
     const scrollTop = document.documentElement.scrollTop;
@@ -1087,6 +1019,7 @@ function disableAnimation() {
 
         if (scrollTop >= threshold) {
        
+ 
           navbar.classList.add("navbar-hidden");
         } else {
           navbar.classList.remove("navbar-hidden");
