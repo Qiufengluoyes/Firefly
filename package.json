@@ -1,7 +1,7 @@
 {
   "name": "firefly",
   "type": "module",
-  "version": "6.3.5",
+  "version": "6.3.6",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -13,8 +13,7 @@
     "new-post": "node scripts/new-post.js",
     "format": "biome format --write ./src",
     "lint": "biome check --write ./src",
-    "preinstall": "npx only-allow pnpm",
-    "index:meili": "npx tsx src/scripts/index-to-meilisearch.mts"
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
@@ -34,7 +33,7 @@
     "@iconify-json/fa6-regular": "^1.2.4",
     "@iconify-json/fa6-solid": "^1.2.4",
     "@iconify-json/material-symbols": "^1.2.50",
-    "@iconify-json/simple-icons": "^1.2.64",
+    "@iconify-json/simple-icons": "^1.2.65",
     "@iconify/svelte": "^4.2.0",
     "@swup/astro": "^1.7.0",
     "@tailwindcss/typography": "^0.5.16",
@@ -50,7 +49,6 @@
     "markdown-it": "^14.1.0",
     "marked": "^16.4.2",
     "mdast-util-to-string": "^4.0.0",
-    "meilisearch": "^0.54.0",
     "node-html-parser": "^7.0.1",
     "overlayscrollbars": "^2.13.0",
     "pagefind": "^1.4.0",
@@ -79,7 +77,7 @@
   },
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.6",
-    "@biomejs/biome": "2.3.10",
+    "@biomejs/biome": "2.3.11",
     "@iconify-json/ic": "^1.2.4",
     "@iconify-json/majesticons": "^1.2.4",
     "@iconify-json/mdi": "^1.2.3",
