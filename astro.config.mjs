@@ -129,7 +129,6 @@ export default defineConfig({
 				return true;
 			},
 		}),
-		searchIndexer(),
 		mdx(),
 	],
 	markdown: {
