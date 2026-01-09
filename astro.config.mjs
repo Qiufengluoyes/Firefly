@@ -28,7 +28,6 @@ import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import mdx from "@astrojs/mdx";
-import searchIndexer from "./src/integrations/searchIndex.mts";
 import { LinkCardComponent } from "./src/plugins/rehype-component-link-card.mjs";
 import remarkImageCaption from "./src/plugins/remark-image-caption.ts";
 import remarkImageWidth from './src/plugins/remark-image-width.js';
