@@ -204,7 +204,7 @@ const activeTab = tabs[0]?.id || "anime";
                     {i18n(I18nKey.bangumiSubtitle)}
                 </p>
                 <p class="text-xs text-neutral-500 dark:text-neutral-500 mt-2">
-                    {i18n(I18nKey.bangumiLastUpdated)} {buildTime}
+                    {i18n(I18nKey.bangumiLastUpdated)} {buildTime.toLocaleString()}
                 </p>
             </div>
 

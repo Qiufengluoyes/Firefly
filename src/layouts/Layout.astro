@@ -24,9 +24,9 @@ import { defaultFavicons } from "@/constants/icon";
 import type { Favicon } from "@/types/config";
 import { getDefaultBackground, isHomePage } from "@/utils/layout-utils";
 import { url } from "@/utils/url-utils";
-import "@/styles/navbar.css";
-import "@/styles/layout-styles.css";
-import "@/styles/waves.css";
+
+import "@/styles/main.css";
+import "@rehype-callouts-theme";
 
 interface Props {
 	title?: string;
@@ -411,8 +411,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
     class="min-h-screen"
     data-overlayscrollbars-initialize
     class:list={[
-    
-      { "lg:is-home": isHomePageCheck, "enable-banner": enableBanner },
+      { "lg:is-home": isHomePageCheck, "enable-banner": enableBanner, "enable-card-border": siteConfig.card?.border },
       ...(siteConfig.font.enable && siteConfig.font.selected
       
           ? (Array.isArray(siteConfig.font.selected)
