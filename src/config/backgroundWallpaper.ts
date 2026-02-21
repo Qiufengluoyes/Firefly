@@ -8,21 +8,21 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 背景图片配置
 	src: {
 		// 桌面背景图片
-		desktop: "https://image.091026.xyz/blog/home_arona.jpg",
+		desktop: "https://fengblog.s3.bitiful.net/fast-image/home_wallpaper.webp",
 		// 移动背景图片
-		mobile: "https://image.091026.xyz/blog/home_arona.jpg",
+		mobile: "https://fengblog.s3.bitiful.net/fast-image/home_wallpaper.webp",
 	},
 	// Banner模式特有配置
 	banner: {
 		// 图片位置
 		// 支持所有CSS object-position值，如: 'top', 'center', 'bottom', 'left top', 'right bottom', '25% 75%', '10px 20px'..
 		// 如果不知道怎么配置百分百之类的配置，推荐直接使用：'center'居中，'top'顶部居中，'bottom' 底部居中，'left'左侧居中，'right'右侧居中
-		position: "center",
+		position: "75% 50%",
 
 		// 主页横幅文字
 		homeText: {
 			// 是否启用主页横幅文字
-			enable: true,
+			enable: false,
 			// 主页横幅主标题
 			title: "枫落丰源",
 			// 主页横幅主标题字体大小
