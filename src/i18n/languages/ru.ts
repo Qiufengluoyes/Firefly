@@ -117,7 +117,7 @@ export const ru: Translation = {
 	[Key.bangumiCategoryReal]: "Реальный",
 
 	// Обновление данных Бангуми
-	[Key.bangumiLastUpdated]: "Данные обновлены",
+	[Key.bangumiLastUpdated]: "Данные обновлены по местному времени",
 	[Key.bangumiUpdatedAt]: "Время сборки",
 	[Key.bangumiDataStatic]: "Статические данные",
 

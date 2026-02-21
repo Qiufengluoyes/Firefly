@@ -117,7 +117,7 @@ export const en: Translation = {
 	[Key.bangumiCategoryReal]: "Real",
 
 	// Bangumi Data Update
-	[Key.bangumiLastUpdated]: "Data updated at (Beijing Time)",
+	[Key.bangumiLastUpdated]: "Data updated at local time",
 	[Key.bangumiUpdatedAt]: "Build time",
 	[Key.bangumiDataStatic]: "Static data",
 

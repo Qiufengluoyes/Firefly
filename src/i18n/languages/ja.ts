@@ -117,7 +117,7 @@ export const ja: Translation = {
 	[Key.bangumiCategoryReal]: "実写",
 
 	// バングミデータ更新
-	[Key.bangumiLastUpdated]: "データ更新日時（北京時間）",
+	[Key.bangumiLastUpdated]: "データは現地時間で更新されます",
 	[Key.bangumiUpdatedAt]: "ビルド時間",
 	[Key.bangumiDataStatic]: "静的データ",
 
