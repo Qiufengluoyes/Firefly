@@ -224,12 +224,10 @@ export const Card = ({ cover, title, author, desc, link, width, isVideo }) => {
 
 export const GradientText = ({ children, className = "" }) => (
   <span style={{
-    background: 'linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
+    color: 'var(--primary)', // 变更为由 CSS 变量控制纯色
     fontWeight: '900',
     letterSpacing: '0.02em',     // 增加字间距，让大标题更有呼吸感
-    lineHeight: '1.4',               // 增加行高，提高多行文字的可读性
+    lineHeight: '1.4',           // 增加行高，提高多行文字的可读性
   }} className={className}>
     {children}
   </span>
