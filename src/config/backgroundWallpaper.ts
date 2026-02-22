@@ -8,9 +8,9 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 背景图片配置
 	src: {
 		// 桌面背景图片
-		desktop: "https://fengblog.s3.bitiful.net/fast-image/home_wallpaper.webp",
+		desktop: "https://fengblog.s3.bitiful.net/fast-image/home-wallpaper-2.webp",
 		// 移动背景图片
-		mobile: "https://fengblog.s3.bitiful.net/fast-image/home_wallpaper.webp",
+		mobile: "https://fengblog.s3.bitiful.net/fast-image/home-wallpaper-2.webp",
 	},
 	// Banner模式特有配置
 	banner: {
