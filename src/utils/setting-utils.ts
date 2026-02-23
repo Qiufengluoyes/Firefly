@@ -15,8 +15,8 @@ import {
 } from "../config";
 import { isHomePage as checkIsHomePage } from "./layout-utils";
 
-if (typeof window !== 'undefined') {
-  localStorage.removeItem('hue');
+if (typeof window !== "undefined") {
+	localStorage.removeItem("hue");
 }
 
 // Declare global functions

@@ -7,6 +7,7 @@ import KatexManager from "@components/features/KatexManager.astro";
 import MusicPlayer from "@components/features/MusicPlayer.astro";
 import SakuraEffect from "@components/features/SakuraEffect.astro";
 import ConfigCarrier from "@components/layout/ConfigCarrier.astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
 
 import {
 	backgroundWallpaper,
@@ -439,6 +440,8 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 		<link rel='stylesheet' href='/fonts/FZLanTYJ_Cu/result.css' />
     <link rel='stylesheet' href='/fonts/medium/result.css' />
 		<link rel='stylesheet' href='/fonts/demibold/result.css' />
+    
+    <SpeedInsights />
   </body>
 </html>
 
@@ -688,7 +691,7 @@ function disableAnimation() {
       // Remove the delay for the first time page load
       document.documentElement.style.setProperty("--content-delay", "0ms");
 
-      // 添加页面切换保护，防止导航栏闪烁
+      // 添加页面切换保���，防止导航栏闪烁
       document.documentElement.classList.add("is-page-transitioning");
 
       

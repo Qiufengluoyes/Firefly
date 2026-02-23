@@ -27,16 +27,16 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		// 子菜单
 		children: [
 			{
- 				name: "站点监测",
-     			url: "https://status.feng1026.top/",
-        		external: true,
-        		icon: "majesticons:status-online",
+				name: "站点监测",
+				url: "https://status.feng1026.top/",
+				external: true,
+				icon: "majesticons:status-online",
 			},
 			{
- 				name: "开往",
-     			url: "https://www.travellings.cn/plain.html",
-        		external: true,
-        		icon: "mdi:train",
+				name: "开往",
+				url: "https://www.travellings.cn/plain.html",
+				external: true,
+				icon: "mdi:train",
 			},
 		],
 	});

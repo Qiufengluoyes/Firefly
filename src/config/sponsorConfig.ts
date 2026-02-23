@@ -55,7 +55,5 @@ export const sponsorConfig: SponsorConfig = {
 	],
 
 	// 赞助者列表（可选）
-	sponsors: [
-
-	],
+	sponsors: [],
 };

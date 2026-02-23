@@ -30,8 +30,8 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			// 主页横幅副标题
 			subtitle: [
 				"和你的日常，就是奇迹",
-          		"一鸣从此始，相望青云端",
-          		"人们生而无名，而心亦同",
+				"一鸣从此始，相望青云端",
+				"人们生而无名，而心亦同",
 			],
 			// 主页横幅副标题字体大小
 			subtitleSize: "2.0rem",

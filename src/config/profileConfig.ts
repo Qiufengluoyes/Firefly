@@ -16,8 +16,8 @@ export const profileConfig: ProfileConfig = {
 	// 如果想使用尚未包含相应的图标集，则需要安装它
 	// `pnpm add @iconify-json/<icon-set-name>`
 	// showName: true 时显示图标和名称，false 时只显示图标
-  links: [
-    {
+	links: [
+		{
 			name: "哔哩哔哩",
 			icon: "mingcute:bilibili-line",
 			url: "https://space.bilibili.com/1735270180/",
@@ -37,5 +37,5 @@ export const profileConfig: ProfileConfig = {
 			icon: "mdi:steam",
 			url: "https://steamcommunity.com/id/qiufengluoye44/",
 		},
-  ],
+	],
 };

@@ -22,9 +22,9 @@ export const siteConfig: SiteConfig = {
 	// 站点关键词
 	keywords: [
 		"枫落丰源",
-    	"qiufengluoye",
-    	"Fuwari",
-    	"Astro",
+		"qiufengluoye",
+		"Fuwari",
+		"Astro",
 		"博客",
 		"技术博客",
 		"静态博客",
