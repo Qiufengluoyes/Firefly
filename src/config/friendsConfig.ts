@@ -13,7 +13,7 @@ export const friendsConfig: FriendLink[] = [
     {
     title: "枫落丰源 Center",
     imgurl: "https://image.091026.xyz/blog/icons/iz_by_hyper_os.webp",
-    desc: "个人主页 & 说说",
+    desc: "个人主页",
     siteurl: "https://www.feng1026.top/",
     tags: ["个人主页"],
     weight: 8,
