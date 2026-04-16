@@ -9,6 +9,10 @@ draft: false
 pinned: true
 ---
 
+> [!NOTE]
+>
+> 本文章由 DeepSeek API V3.2 进行翻译，AI 工具的翻译未必准确无误，请仔细甄别。
+
 我们很高兴地宣布，《欧洲卡车模拟 2》的 1.59 版本更新现已开放公测，欢迎各位玩家前来体验与测试。如果您决定参与此次公测，请务必在[官方论坛的相应板块](https://forum.scssoft.com/viewforum.php?f=356)报告您遇到的任何问题或漏洞，这将对我们有极大的帮助。
 
 ![img](https://clan.akamai.steamstatic.com/images//4036972/ed6b837254ba380b849d26b054c9819bf9fa5ff8.jpg)您的反馈和报告对我们的团队至关重要，我们衷心感谢您抽出时间帮助我们改进游戏。话不多说，让我们一起来看看1.59公测版带来了哪些新内容。
