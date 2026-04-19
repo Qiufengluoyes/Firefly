@@ -4,6 +4,16 @@
 declare global {
 	interface ImportMetaEnv {
 		readonly MEILI_MASTER_KEY: string;
+		readonly EDITOR_PASSWORD?: string;
+		readonly EDITOR_SESSION_SECRET?: string;
+		readonly EDITOR_SESSION_TTL_SECONDS?: string;
+		readonly EDITOR_GITHUB_TOKEN?: string;
+		readonly EDITOR_GITHUB_OWNER?: string;
+		readonly EDITOR_GITHUB_REPO?: string;
+		readonly EDITOR_GITHUB_BRANCH?: string;
+		readonly EDITOR_POSTS_DIR?: string;
+		readonly EDITOR_GITHUB_COMMITTER_NAME?: string;
+		readonly EDITOR_GITHUB_COMMITTER_EMAIL?: string;
 	}
 
 	interface ITOCManager {

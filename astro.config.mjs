@@ -1,6 +1,7 @@
 import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
 import tailwind from "@astrojs/tailwind";
+import vercel from "@astrojs/vercel";
 import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import swup from "@swup/astro";
@@ -35,6 +36,7 @@ import rehypeEmailProtection from "./src/plugins/rehype-email-protection.mjs";
 // https://astro.build/config
 export default defineConfig({
 	site: siteConfig.site_url,
+	adapter: vercel(),
 
 	base: "/",
 	trailingSlash: "always",
@@ -192,6 +194,17 @@ export default defineConfig({
 		],
 	},
 	vite: {
+		server: {
+			watch: {
+				ignored: [
+					"**/.git/**",
+					"**/dist/**",
+					"**/.vercel/**",
+					"**/node_modules/**",
+					"**/.pnpm/**",
+				],
+			},
+		},
 		resolve: {
 			alias: {
 				"@rehype-callouts-theme": `rehype-callouts/theme/${siteConfig.rehypeCallouts.theme}`,

@@ -1,0 +1,1919 @@
+---
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+
+const today = new Date().toISOString().slice(0, 10);
+---
+
+<MainGridLayout
+	title="Firefly 在线编辑器"
+	description="在线编辑、预览并发布 Markdown / MDX 文章。"
+>
+	<div id="editor-root" class="space-y-4">
+		<section class="card-base p-5 md:p-6">
+			<h1 class="text-2xl md:text-3xl font-bold text-black/85 dark:text-white/85 mb-2">
+				Firefly 在线编辑器
+			</h1>
+			<p class="text-black/65 dark:text-white/65 leading-7">
+				支持实时预览、Markdown 主题组件插入、已发布文章回载编辑，以及网页端一键发布到 GitHub。
+			</p>
+			<div class="mt-4 flex flex-wrap gap-2 text-sm">
+				<span
+					id="editor-session-badge"
+					class="editor-badge"
+				>
+					会话状态：检查中...
+				</span>
+				<span
+					id="editor-publish-badge"
+					class="editor-badge"
+				>
+					发布配置：检查中...
+				</span>
+			</div>
+		</section>
+
+		<section id="editor-auth-card" class="card-base p-5 md:p-6">
+			<p id="editor-auth-notice" class="text-sm text-black/65 dark:text-white/65 mb-4">
+				正在检查编辑器会话...
+			</p>
+
+			<form id="editor-login-form" class="flex flex-wrap items-center gap-3">
+				<input
+					id="editor-password"
+					type="password"
+					autocomplete="current-password"
+					placeholder="输入编辑器密码"
+					class="editor-input w-full sm:w-80 rounded-xl px-4 py-3"
+				/>
+				<button id="editor-login-btn" type="submit" class="editor-btn editor-btn-primary px-4 py-3 rounded-xl">
+					登录
+				</button>
+			</form>
+
+			<div class="mt-4 flex flex-wrap items-center gap-3">
+				<button id="editor-logout-btn" type="button" class="editor-btn px-4 py-2 rounded-lg hidden">
+					退出登录
+				</button>
+				<button id="editor-refresh-session-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+					刷新会话
+				</button>
+			</div>
+		</section>
+
+		<div id="editor-protected" class="hidden space-y-4">
+			<section class="card-base p-5 md:p-6">
+				<h2 class="text-lg font-semibold text-black/85 dark:text-white/85 mb-3">文章列表</h2>
+				<div class="grid gap-3">
+					<input
+						id="editor-search"
+						type="text"
+						placeholder="输入标题、slug、日期关键字进行筛选"
+						class="editor-input rounded-xl px-4 py-3"
+					/>
+					<div
+						id="editor-post-list"
+						class="editor-post-list rounded-xl"
+						role="listbox"
+						aria-label="文章列表"
+					></div>
+					<div class="flex flex-wrap items-center gap-2">
+						<button id="editor-load-post-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+							载入选中文章
+						</button>
+						<button id="editor-refresh-posts-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+							刷新列表
+						</button>
+						<span id="editor-post-count" class="text-sm text-black/60 dark:text-white/60"></span>
+					</div>
+				</div>
+			</section>
+
+			<section class="card-base p-5 md:p-6">
+				<div class="flex flex-wrap items-center gap-2 mb-4">
+					<button id="editor-new-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+						新建文章
+					</button>
+					<button id="editor-save-local-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+						保存到浏览器草稿
+					</button>
+					<button id="editor-load-local-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+						读取浏览器草稿
+					</button>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<label class="flex flex-col gap-2">
+						<span class="text-sm text-black/70 dark:text-white/70">标题</span>
+						<input id="editor-title" type="text" class="editor-input rounded-xl px-4 py-3" />
+					</label>
+					<label class="flex flex-col gap-2">
+						<span class="text-sm text-black/70 dark:text-white/70">Slug</span>
+						<input id="editor-slug" type="text" placeholder="my-post" class="editor-input rounded-xl px-4 py-3" />
+					</label>
+
+					<label class="flex flex-col gap-2 md:col-span-2">
+						<span class="text-sm text-black/70 dark:text-white/70">摘要</span>
+						<textarea id="editor-description" rows="3" class="editor-input rounded-xl px-4 py-3"></textarea>
+					</label>
+
+					<label class="flex flex-col gap-2">
+						<span class="text-sm text-black/70 dark:text-white/70">发布日期</span>
+						<input id="editor-published" type="date" value={today} class="editor-input rounded-xl px-4 py-3" />
+					</label>
+					<label class="flex flex-col gap-2">
+						<span class="text-sm text-black/70 dark:text-white/70">更新日期</span>
+						<input id="editor-updated" type="date" class="editor-input rounded-xl px-4 py-3" />
+					</label>
+
+					<label class="flex flex-col gap-2">
+						<span class="text-sm text-black/70 dark:text-white/70">标签（逗号分隔）</span>
+						<input id="editor-tags" type="text" placeholder="Astro, Firefly" class="editor-input rounded-xl px-4 py-3" />
+					</label>
+					<label class="flex flex-col gap-2">
+						<span class="text-sm text-black/70 dark:text-white/70">分类</span>
+						<input id="editor-category" type="text" placeholder="文章示例" class="editor-input rounded-xl px-4 py-3" />
+					</label>
+
+					<label class="flex flex-col gap-2">
+						<span class="text-sm text-black/70 dark:text-white/70">封面图</span>
+						<input id="editor-image" type="text" placeholder="./cover.webp 或 https://..." class="editor-input rounded-xl px-4 py-3" />
+					</label>
+					<label class="flex flex-col gap-2">
+						<span class="text-sm text-black/70 dark:text-white/70">语言</span>
+						<input id="editor-lang" type="text" placeholder="zh_CN" class="editor-input rounded-xl px-4 py-3" />
+					</label>
+
+					<label class="flex flex-col gap-2">
+						<span class="text-sm text-black/70 dark:text-white/70">格式</span>
+						<select id="editor-format" class="editor-input editor-format-select rounded-xl px-4 py-3">
+							<option value="md">Markdown (.md)</option>
+							<option value="mdx">MDX (.mdx)</option>
+						</select>
+					</label>
+				</div>
+
+				<div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-black/70 dark:text-white/70">
+					<label class="inline-flex items-center gap-2">
+						<input id="editor-draft" type="checkbox" class="h-4 w-4 accent-[var(--primary)]" checked />
+						草稿
+					</label>
+					<label class="inline-flex items-center gap-2">
+						<input id="editor-pinned" type="checkbox" class="h-4 w-4 accent-[var(--primary)]" />
+						置顶
+					</label>
+					<label class="inline-flex items-center gap-2">
+						<input id="editor-comment" type="checkbox" class="h-4 w-4 accent-[var(--primary)]" checked />
+						开启评论
+					</label>
+				</div>
+			</section>
+
+			<section class="card-base p-5 md:p-6">
+				<div class="flex flex-wrap items-center gap-2 mb-4">
+					<button type="button" data-snippet="note" class="editor-btn px-3 py-2 rounded-lg">插入 Note</button>
+					<button type="button" data-snippet="tip" class="editor-btn px-3 py-2 rounded-lg">插入 Tip</button>
+					<button type="button" data-snippet="github" class="editor-btn px-3 py-2 rounded-lg">插入 GitHub 卡片</button>
+					<button type="button" data-snippet="link-card" class="editor-btn px-3 py-2 rounded-lg">插入 Link Card</button>
+					<button type="button" data-snippet="mermaid" class="editor-btn px-3 py-2 rounded-lg">插入 Mermaid</button>
+					<button type="button" data-snippet="math" class="editor-btn px-3 py-2 rounded-lg">插入 KaTeX</button>
+				</div>
+
+				<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+					<div class="editor-mode-switch inline-flex rounded-xl bg-[var(--btn-regular-bg)] p-1">
+						<button type="button" class="editor-mode-btn" data-mode="edit">仅编辑</button>
+						<button type="button" class="editor-mode-btn" data-mode="preview">仅预览</button>
+						<button type="button" class="editor-mode-btn" data-mode="split">分栏</button>
+					</div>
+
+					<div class="flex flex-wrap items-center gap-2">
+						<button id="editor-preview-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">渲染预览</button>
+						<button id="editor-publish-btn" type="button" class="editor-btn editor-btn-primary px-4 py-2 rounded-lg">发布到 GitHub</button>
+					</div>
+				</div>
+
+				<div id="editor-workspace" class="grid gap-4 xl:grid-cols-2">
+					<section id="editor-edit-panel" class="editor-pane">
+						<div class="flex items-center justify-between mb-3">
+							<h3 class="text-base font-semibold text-black/80 dark:text-white/80 whitespace-nowrap">编辑区</h3>
+							<span class="text-xs text-black/55 dark:text-white/55">快捷键：Ctrl/Cmd + S 渲染预览</span>
+						</div>
+						<div class="editor-scroll-shell">
+							<textarea
+								id="editor-body"
+								class="editor-textarea"
+								placeholder="在这里开始写作..."
+							></textarea>
+						</div>
+					</section>
+
+					<section id="editor-preview-panel" class="editor-pane">
+						<div class="flex items-center justify-between mb-3 gap-2">
+							<h3 class="text-base font-semibold text-black/80 dark:text-white/80">实时预览</h3>
+							<span id="editor-preview-meta" class="text-xs text-black/55 dark:text-white/55"></span>
+						</div>
+						<div class="editor-scroll-shell editor-preview-shell">
+							<div id="editor-preview-headings" class="mb-4 flex flex-wrap gap-2"></div>
+							<div class="border-[var(--line-divider)] border-dashed border-b mb-5"></div>
+							<article
+								id="editor-preview-content"
+								class="prose dark:prose-invert prose-base !max-w-none custom-md markdown-content"
+							>
+								<p class="text-black/60 dark:text-white/60">输入后将自动实时预览。</p>
+							</article>
+						</div>
+					</section>
+				</div>
+			</section>
+		</div>
+
+		<section id="editor-status-card" class="card-base p-4 md:p-5">
+			<p id="editor-feedback" class="editor-status-text text-black/70 dark:text-white/70">准备就绪。</p>
+			<div id="editor-publish-result" class="editor-status-result mt-1.5"></div>
+		</section>
+	</div>
+</MainGridLayout>
+
+<script is:inline>
+(() => {
+	function bootEditor() {
+		const root = document.getElementById("editor-root");
+		if (!root || root.dataset.editorBooted === "1") return;
+		root.dataset.editorBooted = "1";
+
+		const DEFAULT_BODY = `# 新文章标题\n\n在这里开始写作。\n\n:::note[提示]\n这是一段提醒块示例。\n:::\n`;
+
+		const SNIPPETS = {
+			note: `\n:::note[提示]\n请在这里填写内容。\n:::\n`,
+			tip: `\n:::tip[技巧]\n请在这里填写内容。\n:::\n`,
+			github: `\n::github{repo="saicaca/fuwari"}\n`,
+			"link-card": `\n::link-card{title="Astro" href="https://astro.build"}\n`,
+			mermaid: `\n\`\`\`mermaid\ngraph TD\n  A[Start] --> B[Write]\n  B --> C[Publish]\n\`\`\`\n`,
+			math: `\n行内公式：$E = mc^2$\n\n块级公式：\n$$\n\\int_0^1 x^2\\,dx = \\frac{1}{3}\n$$\n`,
+		};
+
+		const STORAGE_KEY = "firefly_editor_local_draft_v2";
+
+		const state = {
+			posts: [],
+			filteredPosts: [],
+			selectedSlug: "",
+			mode: "split",
+			authenticated: false,
+			isLoadingPost: false,
+			previewTimer: null,
+			previewInFlight: false,
+			queuedPreview: null,
+			lastPreviewFingerprint: "",
+		};
+
+		const elements = {
+			sessionBadge: document.getElementById("editor-session-badge"),
+			publishBadge: document.getElementById("editor-publish-badge"),
+			authNotice: document.getElementById("editor-auth-notice"),
+			loginForm: document.getElementById("editor-login-form"),
+			password: document.getElementById("editor-password"),
+			loginButton: document.getElementById("editor-login-btn"),
+			logoutButton: document.getElementById("editor-logout-btn"),
+			refreshSessionButton: document.getElementById("editor-refresh-session-btn"),
+			protectedArea: document.getElementById("editor-protected"),
+			search: document.getElementById("editor-search"),
+			postList: document.getElementById("editor-post-list"),
+			loadPostButton: document.getElementById("editor-load-post-btn"),
+			refreshPostsButton: document.getElementById("editor-refresh-posts-btn"),
+			postCount: document.getElementById("editor-post-count"),
+			newButton: document.getElementById("editor-new-btn"),
+			saveLocalButton: document.getElementById("editor-save-local-btn"),
+			loadLocalButton: document.getElementById("editor-load-local-btn"),
+			title: document.getElementById("editor-title"),
+			slug: document.getElementById("editor-slug"),
+			description: document.getElementById("editor-description"),
+			published: document.getElementById("editor-published"),
+			updated: document.getElementById("editor-updated"),
+			tags: document.getElementById("editor-tags"),
+			category: document.getElementById("editor-category"),
+			image: document.getElementById("editor-image"),
+			lang: document.getElementById("editor-lang"),
+			format: document.getElementById("editor-format"),
+			draft: document.getElementById("editor-draft"),
+			pinned: document.getElementById("editor-pinned"),
+			comment: document.getElementById("editor-comment"),
+			body: document.getElementById("editor-body"),
+			previewButton: document.getElementById("editor-preview-btn"),
+			publishButton: document.getElementById("editor-publish-btn"),
+			workspace: document.getElementById("editor-workspace"),
+			editPanel: document.getElementById("editor-edit-panel"),
+			previewPanel: document.getElementById("editor-preview-panel"),
+			previewMeta: document.getElementById("editor-preview-meta"),
+			previewHeadings: document.getElementById("editor-preview-headings"),
+			previewContent: document.getElementById("editor-preview-content"),
+			feedback: document.getElementById("editor-feedback"),
+			publishResult: document.getElementById("editor-publish-result"),
+			snippetButtons: Array.from(root.querySelectorAll("[data-snippet]")),
+			modeButtons: Array.from(root.querySelectorAll(".editor-mode-btn")),
+		};
+
+		function apiUrl(path) {
+			const clean = String(path || "").replace(/^\/+|\/+$/g, "");
+			return clean ? `/api/editor/${clean}/` : "/api/editor/";
+		}
+
+		function encodeSlugPath(slug) {
+			return String(slug || "")
+				.split("/")
+				.filter(Boolean)
+				.map((segment) => encodeURIComponent(segment))
+				.join("/");
+		}
+
+		function setFeedback(message, type) {
+			if (!elements.feedback) return;
+			const tone = type || "info";
+			elements.feedback.className = "editor-status-text";
+			if (tone === "success") {
+				elements.feedback.classList.add("text-emerald-600", "dark:text-emerald-400");
+			} else if (tone === "error") {
+				elements.feedback.classList.add("text-red-600", "dark:text-red-400");
+			} else {
+				elements.feedback.classList.add("text-black/70", "dark:text-white/70");
+			}
+			elements.feedback.textContent = message;
+		}
+
+		function clearPublishResult() {
+			if (elements.publishResult) elements.publishResult.innerHTML = "";
+		}
+
+		function setBusy(button, busy, busyText) {
+			if (!button) return;
+			if (!button.dataset.normalText) {
+				button.dataset.normalText = button.textContent || "";
+			}
+			button.disabled = busy;
+			button.textContent = busy ? busyText : button.dataset.normalText;
+		}
+
+		async function requestJson(path, init) {
+			const finalInit = { ...(init || {}) };
+			const method = String(finalInit.method || "GET").toUpperCase();
+			const headers = new Headers(finalInit.headers || {});
+			if (method !== "GET" && !headers.has("content-type")) {
+				headers.set("content-type", "application/json");
+			}
+			finalInit.headers = headers;
+			finalInit.credentials = "same-origin";
+
+			const response = await fetch(apiUrl(path), finalInit);
+			const raw = await response.text();
+
+			let data = null;
+			try {
+				data = raw ? JSON.parse(raw) : null;
+			} catch {
+				data = null;
+			}
+
+			if (!data || typeof data !== "object") {
+				const nonJsonError = new Error(
+					`接口 ${apiUrl(path)} 返回了非 JSON 响应（HTTP ${response.status}）。`,
+				);
+				nonJsonError.status = response.status;
+				throw nonJsonError;
+			}
+
+			if (!response.ok || data.ok === false) {
+				const message =
+					typeof data.message === "string" && data.message.trim()
+						? data.message.trim()
+						: `请求失败（HTTP ${response.status}）`;
+				const apiError = new Error(message);
+				apiError.status = response.status;
+				apiError.payload = data;
+				throw apiError;
+			}
+
+			return data;
+		}
+
+		function getToday() {
+			return new Date().toISOString().slice(0, 10);
+		}
+
+		function getPostPayload() {
+			return {
+				title: (elements.title?.value || "").trim(),
+				slug: (elements.slug?.value || "").trim(),
+				format: (elements.format?.value || "md").trim() === "mdx" ? "mdx" : "md",
+				description: (elements.description?.value || "").trim(),
+				body: (elements.body?.value || "").replace(/\r\n/g, "\n"),
+				published: (elements.published?.value || "").trim(),
+				updated: (elements.updated?.value || "").trim(),
+				tags: (elements.tags?.value || "").trim(),
+				category: (elements.category?.value || "").trim(),
+				image: (elements.image?.value || "").trim(),
+				lang: (elements.lang?.value || "").trim(),
+				draft: Boolean(elements.draft?.checked),
+				pinned: Boolean(elements.pinned?.checked),
+				comment: Boolean(elements.comment?.checked),
+			};
+		}
+
+		function fillPost(post) {
+			const payload = post || {};
+			if (elements.title) elements.title.value = payload.title || "";
+			if (elements.slug) elements.slug.value = payload.slug || "";
+			if (elements.format) elements.format.value = payload.format === "mdx" ? "mdx" : "md";
+			if (elements.description) elements.description.value = payload.description || "";
+			if (elements.body) elements.body.value = payload.body || DEFAULT_BODY;
+			if (elements.published) elements.published.value = payload.published || getToday();
+			if (elements.updated) elements.updated.value = payload.updated || "";
+			if (elements.tags) elements.tags.value = payload.tags || "";
+			if (elements.category) elements.category.value = payload.category || "";
+			if (elements.image) elements.image.value = payload.image || "";
+			if (elements.lang) elements.lang.value = payload.lang || "zh_CN";
+			if (elements.draft) elements.draft.checked = Boolean(payload.draft ?? true);
+			if (elements.pinned) elements.pinned.checked = Boolean(payload.pinned);
+			if (elements.comment) elements.comment.checked = Boolean(payload.comment ?? true);
+		}
+
+		function resetToNewPost() {
+			state.selectedSlug = "";
+			state.lastPreviewFingerprint = "";
+			updatePostListSelection();
+			fillPost({
+				title: "",
+				slug: "",
+				format: "md",
+				description: "",
+				body: DEFAULT_BODY,
+				published: getToday(),
+				updated: "",
+				tags: "",
+				category: "",
+				image: "",
+				lang: "zh_CN",
+				draft: true,
+				pinned: false,
+				comment: true,
+			});
+			if (elements.previewMeta) elements.previewMeta.textContent = "";
+			if (elements.previewHeadings) elements.previewHeadings.innerHTML = "";
+			if (elements.previewContent) {
+				elements.previewContent.innerHTML = "<p class='text-black/60 dark:text-white/60'>输入后将自动实时预览。</p>";
+			}
+			setFeedback("已切换到新建模式。", "info");
+			clearPublishResult();
+			scheduleAutoPreview(180);
+		}
+
+		function updatePostListSelection() {
+			if (!elements.postList) return;
+			const nodes = Array.from(elements.postList.querySelectorAll(".editor-post-item"));
+			for (const node of nodes) {
+				const slug = node.dataset.slug || "";
+				node.dataset.active = slug && slug === state.selectedSlug ? "true" : "false";
+			}
+		}
+
+		function normalizeSearchText(value) {
+			return String(value || "")
+				.normalize("NFKC")
+				.toLowerCase()
+				.replace(
+					/[\s\-_./\\|,，。:：;；!！?？"'“”‘’（）()【】\[\]{}<>《》`~@#$%^&*+=]+/g,
+					"",
+				);
+		}
+
+		function isSubsequenceMatch(needle, haystack) {
+			if (!needle) return true;
+			let i = 0;
+			for (const char of haystack) {
+				if (char === needle[i]) {
+					i += 1;
+					if (i >= needle.length) return true;
+				}
+			}
+			return false;
+		}
+
+		function getSubsequenceSpan(needle, haystack) {
+			let start = -1;
+			let end = -1;
+			let i = 0;
+			for (let p = 0; p < haystack.length && i < needle.length; p += 1) {
+				if (haystack[p] !== needle[i]) continue;
+				if (start < 0) start = p;
+				if (i === needle.length - 1) end = p;
+				i += 1;
+			}
+			if (start < 0 || end < 0) return Number.POSITIVE_INFINITY;
+			return end - start + 1;
+		}
+
+		function scoreTokenToField(token, field) {
+			if (!token || !field) return 0;
+			const directIndex = field.indexOf(token);
+			if (directIndex >= 0) {
+				return 120 - Math.min(directIndex, 80);
+			}
+
+			if (!isSubsequenceMatch(token, field)) return 0;
+
+			const span = getSubsequenceSpan(token, field);
+			const gapPenalty = Math.max(0, span - token.length);
+			return Math.max(35, 92 - gapPenalty);
+		}
+
+		function scorePostForKeyword(post, keywordRaw) {
+			const rawTokens = String(keywordRaw || "")
+				.normalize("NFKC")
+				.toLowerCase()
+				.split(/\s+/)
+				.map((token) => normalizeSearchText(token))
+				.filter(Boolean);
+			if (rawTokens.length === 0) return 1;
+
+			const title = normalizeSearchText(post.title || "");
+			const slug = normalizeSearchText(post.slug || "");
+			const published = normalizeSearchText(post.published || "");
+			const updated = normalizeSearchText(post.updated || "");
+			const fields = [title, slug, `${title}${slug}`, `${slug}${title}`, published, updated];
+
+			let totalScore = 0;
+			for (const token of rawTokens) {
+				let best = 0;
+				for (const field of fields) {
+					const score = scoreTokenToField(token, field);
+					if (score > best) best = score;
+				}
+				if (best <= 0) return 0;
+				totalScore += best;
+			}
+
+			return totalScore;
+		}
+
+		function renderPostSelect() {
+			if (!elements.postList) return;
+
+			const keyword = (elements.search?.value || "").trim();
+			if (!keyword) {
+				state.filteredPosts = state.posts.slice();
+			} else {
+				const ranked = state.posts
+					.map((post, index) => ({
+						post,
+						index,
+						score: scorePostForKeyword(post, keyword),
+					}))
+					.filter((item) => item.score > 0)
+					.sort((a, b) => b.score - a.score || a.index - b.index);
+				state.filteredPosts = ranked.map((item) => item.post);
+			}
+
+			elements.postList.innerHTML = "";
+
+			if (state.filteredPosts.length === 0) {
+				const empty = document.createElement("div");
+				empty.className = "editor-post-list-empty";
+				empty.textContent = "未找到匹配文章";
+				elements.postList.appendChild(empty);
+				if (elements.postCount) elements.postCount.textContent = "0 篇";
+				state.selectedSlug = "";
+				return;
+			}
+
+			if (!state.filteredPosts.some((post) => post.slug === state.selectedSlug)) {
+				state.selectedSlug = state.filteredPosts[0]?.slug || "";
+			}
+
+			for (const post of state.filteredPosts) {
+				const item = document.createElement("button");
+				item.type = "button";
+				item.className = "editor-post-item";
+				item.dataset.slug = post.slug;
+
+				const title = document.createElement("div");
+				title.className = "editor-post-item-title";
+				title.textContent = post.title || post.slug;
+
+				const divider = document.createElement("div");
+				divider.className = "editor-post-item-divider";
+
+				const meta = document.createElement("div");
+				meta.className = "editor-post-item-meta";
+				const dateMeta = [
+					post.published ? `发布 ${post.published}` : "",
+					post.updated ? `更新 ${post.updated}` : "",
+				]
+					.filter(Boolean)
+					.join(" · ");
+				meta.textContent = dateMeta ? `${post.slug} · ${dateMeta}` : post.slug;
+
+				item.appendChild(title);
+				item.appendChild(divider);
+				item.appendChild(meta);
+
+				const flags = [];
+				if (post.format === "mdx") {
+					flags.push("MDX");
+				} else {
+					flags.push("Markdown");
+				}
+				if (post.draft) flags.push("草稿");
+				if (post.pinned) flags.push("置顶");
+
+				if (flags.length > 0) {
+					const badgeWrap = document.createElement("div");
+					badgeWrap.className = "editor-post-item-flags";
+					for (const flag of flags) {
+						const badge = document.createElement("span");
+						badge.className = "editor-post-flag";
+						badge.textContent = flag;
+						badgeWrap.appendChild(badge);
+					}
+					item.appendChild(badgeWrap);
+				}
+
+				item.addEventListener("click", () => {
+					state.selectedSlug = post.slug;
+					updatePostListSelection();
+				});
+				item.addEventListener("dblclick", () => {
+					state.selectedSlug = post.slug;
+					updatePostListSelection();
+					void loadSelectedPost();
+				});
+
+				elements.postList.appendChild(item);
+			}
+
+			updatePostListSelection();
+
+			if (elements.postCount) {
+				elements.postCount.textContent = `${state.filteredPosts.length} / ${state.posts.length} 篇`;
+			}
+		}
+
+		function applyMode(mode) {
+			const normalized = mode === "edit" || mode === "preview" ? mode : "split";
+			state.mode = normalized;
+
+			if (elements.editPanel) {
+				elements.editPanel.classList.toggle("hidden", normalized === "preview");
+			}
+			if (elements.previewPanel) {
+				elements.previewPanel.classList.toggle("hidden", normalized === "edit");
+			}
+			if (elements.workspace) {
+				elements.workspace.classList.toggle("xl:grid-cols-2", normalized === "split");
+				elements.workspace.classList.toggle("xl:grid-cols-1", normalized !== "split");
+			}
+
+			for (const button of elements.modeButtons) {
+				const isActive = button.dataset.mode === normalized;
+				button.dataset.active = isActive ? "true" : "false";
+			}
+		}
+
+		function insertSnippet(content) {
+			if (!elements.body || typeof content !== "string") return;
+			const textarea = elements.body;
+			const start = textarea.selectionStart || 0;
+			const end = textarea.selectionEnd || 0;
+			const before = textarea.value.slice(0, start);
+			const after = textarea.value.slice(end);
+			textarea.value = `${before}${content}${after}`;
+			const nextPos = start + content.length;
+			textarea.focus();
+			textarea.setSelectionRange(nextPos, nextPos);
+		}
+
+		function escapeCssId(id) {
+			const raw = String(id || "");
+			if (!raw) return "";
+			if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+				return CSS.escape(raw);
+			}
+			return raw.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, "\\$1");
+		}
+
+		function resolveHeadingTargetId(heading, index) {
+			const previewRoot = elements.previewContent;
+			if (!previewRoot) return "";
+
+			const slug = String(heading?.slug || "").trim();
+			if (slug) {
+				const bySlug = previewRoot.querySelector(`#${escapeCssId(slug)}`);
+				if (bySlug) return slug;
+			}
+
+			const headingNodes = previewRoot.querySelectorAll("h1,h2,h3,h4,h5,h6");
+			const node = headingNodes[index];
+			if (node && node.id) return String(node.id);
+			return "";
+		}
+
+		function scrollToPreviewHeading(targetId) {
+			const previewRoot = elements.previewContent;
+			if (!previewRoot || !targetId) return;
+			const target = previewRoot.querySelector(`#${escapeCssId(targetId)}`);
+			if (!target) return;
+			target.scrollIntoView({
+				behavior: "smooth",
+				block: "start",
+				inline: "nearest",
+			});
+		}
+
+		function enhancePreviewMediaLayout() {
+			const previewRoot = elements.previewContent;
+			if (!previewRoot) return;
+			const wrappers = previewRoot.querySelectorAll("figure.image-caption > a, figure.image-caption > div");
+			for (const wrapper of wrappers) {
+				let topLevelImageCount = 0;
+				for (const child of Array.from(wrapper.children)) {
+					const tag = child.tagName;
+					if (tag === "IMG" || tag === "FIGURE") {
+						topLevelImageCount += 1;
+					}
+				}
+				wrapper.classList.remove("editor-image-group", "editor-image-single");
+				if (topLevelImageCount >= 2) {
+					wrapper.classList.add("editor-image-group");
+				} else if (topLevelImageCount === 1) {
+					wrapper.classList.add("editor-image-single");
+				}
+			}
+		}
+
+		function renderHeadings(headings) {
+			if (!elements.previewHeadings) return;
+			elements.previewHeadings.innerHTML = "";
+
+			if (!Array.isArray(headings) || headings.length === 0) return;
+
+			for (let i = 0; i < headings.length; i += 1) {
+				const heading = headings[i];
+				const badge = document.createElement("button");
+				badge.type = "button";
+				badge.className = "editor-heading-badge";
+				const depth = Number(heading.depth || 0);
+				const text = String(heading.text || "").trim() || "(无标题)";
+				badge.textContent = `H${depth > 0 ? depth : 1} · ${text}`;
+				const targetId = resolveHeadingTargetId(heading, i);
+				if (targetId) {
+					badge.dataset.targetId = targetId;
+					badge.title = "点击跳转到该标题";
+					badge.addEventListener("click", () => {
+						scrollToPreviewHeading(targetId);
+					});
+				} else {
+					badge.disabled = true;
+				}
+				elements.previewHeadings.appendChild(badge);
+			}
+		}
+
+		function renderPreview(preview) {
+			const words = Number(preview?.words || 0);
+			const minutes = Number(preview?.minutes || 0);
+			const excerpt = String(preview?.excerpt || "").trim();
+			if (elements.previewMeta) {
+				elements.previewMeta.textContent = `字数 ${words} · 阅读约 ${minutes} 分钟${excerpt ? " · 已生成摘要" : ""}`;
+			}
+			if (elements.previewContent) {
+				elements.previewContent.innerHTML = typeof preview?.html === "string" ? preview.html : "<p>预览为空。</p>";
+				const icons = elements.previewContent.querySelectorAll(".anchor-icon");
+				for (const icon of icons) {
+					if (icon.textContent === "#") {
+						icon.textContent = "";
+					}
+				}
+				enhancePreviewMediaLayout();
+			}
+			renderHeadings(preview?.headings || []);
+		}
+
+		function buildPreviewFingerprint(payload) {
+			return JSON.stringify({
+				title: payload.title,
+				slug: payload.slug,
+				format: payload.format,
+				description: payload.description,
+				body: payload.body,
+				published: payload.published,
+				updated: payload.updated,
+				tags: payload.tags,
+				category: payload.category,
+				image: payload.image,
+				lang: payload.lang,
+				draft: payload.draft,
+				pinned: payload.pinned,
+				comment: payload.comment,
+			});
+		}
+
+		function scheduleAutoPreview(delay) {
+			if (!state.authenticated) return;
+			const wait = Number.isFinite(delay) ? Math.max(150, Number(delay)) : 900;
+			if (state.previewTimer) {
+				clearTimeout(state.previewTimer);
+			}
+			state.previewTimer = setTimeout(() => {
+				state.previewTimer = null;
+				void queuePreview({ silent: true, force: false });
+			}, wait);
+		}
+
+		function cancelAutoPreview() {
+			if (state.previewTimer) {
+				clearTimeout(state.previewTimer);
+				state.previewTimer = null;
+			}
+			state.queuedPreview = null;
+		}
+
+		function mergePreviewOptions(current, incoming) {
+			if (!current) return incoming;
+			return {
+				silent: current.silent && incoming.silent,
+				force: current.force || incoming.force,
+			};
+		}
+
+		function queuePreview(options) {
+			const incoming = {
+				silent: options?.silent !== false,
+				force: Boolean(options?.force),
+			};
+			state.queuedPreview = mergePreviewOptions(state.queuedPreview, incoming);
+			if (!state.previewInFlight) {
+				void runQueuedPreview();
+			}
+		}
+
+		async function runQueuedPreview() {
+			if (state.previewInFlight || !state.queuedPreview) return;
+			const options = state.queuedPreview;
+			state.queuedPreview = null;
+			state.previewInFlight = true;
+			try {
+				await handlePreview(options);
+			} finally {
+				state.previewInFlight = false;
+				if (state.queuedPreview) {
+					void runQueuedPreview();
+				}
+			}
+		}
+
+		function showPublishResult(result) {
+			if (!elements.publishResult) return;
+			elements.publishResult.innerHTML = "";
+			if (!result || typeof result !== "object") return;
+
+			const links = [
+				{ label: "查看 Commit", url: result.commitUrl || "" },
+				{ label: "查看文件", url: result.fileUrl || "" },
+				{ label: "访问文章", url: result.postUrl || "" },
+			].filter((item) => typeof item.url === "string" && item.url.trim());
+
+			if (links.length === 0) return;
+
+			for (const link of links) {
+				const a = document.createElement("a");
+				a.className = "mr-4 text-[var(--primary)] hover:underline";
+				a.href = link.url;
+				a.target = link.url.startsWith("/") ? "_self" : "_blank";
+				a.rel = "noopener noreferrer";
+				a.textContent = link.label;
+				elements.publishResult.appendChild(a);
+			}
+		}
+
+		async function refreshPosts() {
+			setBusy(elements.refreshPostsButton, true, "刷新中...");
+			try {
+				const data = await requestJson("posts");
+				state.posts = Array.isArray(data.posts) ? data.posts : [];
+				renderPostSelect();
+				setFeedback(`文章列表已刷新，共 ${state.posts.length} 篇。`, "success");
+			} catch (error) {
+				setFeedback(error instanceof Error ? error.message : "刷新文章列表失败。", "error");
+			} finally {
+				setBusy(elements.refreshPostsButton, false, "刷新中...");
+			}
+		}
+
+		async function loadSelectedPost() {
+			if (state.isLoadingPost) return;
+			const selected = state.selectedSlug || "";
+			if (!selected) {
+				setFeedback("请先在列表中选择一篇文章。", "error");
+				return;
+			}
+
+			let shouldAutoRender = false;
+			state.isLoadingPost = true;
+			setBusy(elements.loadPostButton, true, "载入中...");
+			try {
+				const slugPath = encodeSlugPath(selected);
+				const data = await requestJson(`posts/${slugPath}`);
+				if (!data.post) throw new Error("接口未返回文章内容。");
+				state.selectedSlug = data.post.slug || selected;
+				updatePostListSelection();
+				fillPost(data.post);
+				state.lastPreviewFingerprint = "";
+				setFeedback(`已载入文章：${data.post.title || data.post.slug}`, "success");
+				clearPublishResult();
+				shouldAutoRender = true;
+			} catch (error) {
+				const status = error && typeof error === "object" ? error.status : 0;
+				if (status === 401) {
+					await refreshSession();
+				}
+				setFeedback(error instanceof Error ? error.message : "载入文章失败。", "error");
+			} finally {
+				state.isLoadingPost = false;
+				setBusy(elements.loadPostButton, false, "载入中...");
+				if (shouldAutoRender) {
+					queuePreview({ silent: false, force: true });
+				}
+			}
+		}
+
+		async function handlePreview(options) {
+			if (!state.authenticated || state.isLoadingPost) return;
+			const silent = options?.silent !== false;
+			const force = Boolean(options?.force);
+			const payload = getPostPayload();
+			if (!payload.title.trim() || !payload.body.trim()) {
+				if (!silent) {
+					setFeedback("请先填写标题和正文，再进行预览。", "error");
+				}
+				return;
+			}
+
+			const fingerprint = buildPreviewFingerprint(payload);
+			if (!force && fingerprint === state.lastPreviewFingerprint) {
+				return;
+			}
+
+			setBusy(elements.previewButton, true, "渲染中...");
+			try {
+				const data = await requestJson("render", {
+					method: "POST",
+					body: JSON.stringify(payload),
+				});
+				renderPreview(data.preview || {});
+				state.lastPreviewFingerprint = fingerprint;
+				if (!silent) {
+					setFeedback("预览已更新。", "success");
+				}
+			} catch (error) {
+				const status = error && typeof error === "object" ? error.status : 0;
+				if (status === 401) {
+					await refreshSession();
+					return;
+				}
+				if (!silent) {
+					setFeedback(error instanceof Error ? error.message : "预览渲染失败。", "error");
+				}
+			} finally {
+				setBusy(elements.previewButton, false, "渲染中...");
+			}
+		}
+
+		async function handlePublish() {
+			const payload = getPostPayload();
+			if (!payload.title || !payload.body.trim()) {
+				setFeedback("发布前请先填写标题与正文。", "error");
+				return;
+			}
+
+			const confirmed = window.confirm(
+				`确认发布到 GitHub 吗？\n标题：${payload.title}\nSlug：${payload.slug || "(自动生成)"}`,
+			);
+			if (!confirmed) return;
+
+			setBusy(elements.publishButton, true, "发布中...");
+			try {
+				const data = await requestJson("publish", {
+					method: "POST",
+					body: JSON.stringify(payload),
+				});
+				setFeedback(data.message || "发布成功。", "success");
+				showPublishResult(data.result || {});
+				await refreshPosts();
+			} catch (error) {
+				const status = error && typeof error === "object" ? error.status : 0;
+				if (status === 401) {
+					await refreshSession();
+				}
+				setFeedback(error instanceof Error ? error.message : "发布失败。", "error");
+			} finally {
+				setBusy(elements.publishButton, false, "发布中...");
+			}
+		}
+
+		function saveLocalDraft() {
+			try {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(getPostPayload()));
+				setFeedback("已保存到浏览器草稿。", "success");
+			} catch {
+				setFeedback("保存浏览器草稿失败。", "error");
+			}
+		}
+
+		function loadLocalDraft() {
+			try {
+				const raw = localStorage.getItem(STORAGE_KEY);
+				if (!raw) {
+					setFeedback("浏览器草稿为空。", "error");
+					return;
+				}
+				const data = JSON.parse(raw);
+				fillPost(data);
+				state.lastPreviewFingerprint = "";
+				setFeedback("已载入浏览器草稿。", "success");
+				clearPublishResult();
+				scheduleAutoPreview(180);
+			} catch {
+				setFeedback("读取浏览器草稿失败。", "error");
+			}
+		}
+
+		function updateSessionUI(data) {
+			const authConfigured = Boolean(data?.authConfigured);
+			const authenticated = Boolean(data?.authenticated);
+			state.authenticated = authConfigured && authenticated;
+			const publishConfigured = Boolean(data?.publishConfigured);
+			const missingPublishEnv = Array.isArray(data?.missingPublishEnv) ? data.missingPublishEnv : [];
+
+			if (elements.sessionBadge) {
+				elements.sessionBadge.textContent = authConfigured
+					? authenticated
+						? "会话状态：已登录"
+						: "会话状态：未登录"
+					: "会话状态：未配置";
+			}
+
+			if (elements.publishBadge) {
+				elements.publishBadge.textContent = publishConfigured
+					? "发布配置：已完成"
+					: `发布配置：缺少 ${missingPublishEnv.join(", ") || "环境变量"}`;
+			}
+
+			if (!authConfigured) {
+				cancelAutoPreview();
+				if (elements.authNotice) {
+					elements.authNotice.textContent =
+						"编辑器尚未配置。请先设置 EDITOR_PASSWORD 与 EDITOR_SESSION_SECRET。";
+				}
+				if (elements.loginForm) elements.loginForm.classList.add("hidden");
+				if (elements.logoutButton) elements.logoutButton.classList.add("hidden");
+				if (elements.protectedArea) elements.protectedArea.classList.add("hidden");
+				return;
+			}
+
+			if (!authenticated) {
+				cancelAutoPreview();
+				if (elements.authNotice) {
+					elements.authNotice.textContent = "请输入编辑器密码登录后使用。";
+				}
+				if (elements.loginForm) elements.loginForm.classList.remove("hidden");
+				if (elements.logoutButton) elements.logoutButton.classList.add("hidden");
+				if (elements.protectedArea) elements.protectedArea.classList.add("hidden");
+				return;
+			}
+
+			const publishMessage = publishConfigured
+				? "发布配置完整，可直接发布到 GitHub。"
+				: `可编辑和预览，但发布前还需配置：${missingPublishEnv.join(", ")}`;
+			if (elements.authNotice) {
+				elements.authNotice.textContent = publishMessage;
+			}
+			if (elements.loginForm) elements.loginForm.classList.add("hidden");
+			if (elements.logoutButton) elements.logoutButton.classList.remove("hidden");
+			if (elements.protectedArea) elements.protectedArea.classList.remove("hidden");
+		}
+
+		async function refreshSession() {
+			setBusy(elements.refreshSessionButton, true, "刷新中...");
+			try {
+				const data = await requestJson("session");
+				updateSessionUI(data);
+				if (data.authConfigured && data.authenticated) {
+					await refreshPosts();
+				}
+				setFeedback("会话状态已更新。", "info");
+			} catch (error) {
+				updateSessionUI({});
+				setFeedback(error instanceof Error ? error.message : "会话检查失败。", "error");
+			} finally {
+				setBusy(elements.refreshSessionButton, false, "刷新中...");
+			}
+		}
+
+		async function handleLogin(event) {
+			event.preventDefault();
+			const password = elements.password?.value || "";
+			if (!password.trim()) {
+				setFeedback("请输入密码。", "error");
+				return;
+			}
+
+			setBusy(elements.loginButton, true, "登录中...");
+			try {
+				await requestJson("auth/login", {
+					method: "POST",
+					body: JSON.stringify({ password }),
+				});
+				if (elements.password) elements.password.value = "";
+				setFeedback("登录成功。", "success");
+				await refreshSession();
+			} catch (error) {
+				setFeedback(error instanceof Error ? error.message : "登录失败。", "error");
+			} finally {
+				setBusy(elements.loginButton, false, "登录中...");
+			}
+		}
+
+		async function handleLogout() {
+			setBusy(elements.logoutButton, true, "退出中...");
+			try {
+				await requestJson("auth/logout", { method: "POST", body: JSON.stringify({}) });
+				setFeedback("已退出登录。", "success");
+				updateSessionUI({ authConfigured: true, authenticated: false, publishConfigured: false });
+			} catch (error) {
+				setFeedback(error instanceof Error ? error.message : "退出失败。", "error");
+			} finally {
+				setBusy(elements.logoutButton, false, "退出中...");
+				await refreshSession();
+			}
+		}
+
+		function bindEvents() {
+			elements.loginForm?.addEventListener("submit", handleLogin);
+			elements.logoutButton?.addEventListener("click", handleLogout);
+			elements.refreshSessionButton?.addEventListener("click", refreshSession);
+			elements.refreshPostsButton?.addEventListener("click", refreshPosts);
+			elements.loadPostButton?.addEventListener("click", loadSelectedPost);
+			elements.previewButton?.addEventListener("click", () => {
+				queuePreview({ silent: false, force: true });
+			});
+			elements.publishButton?.addEventListener("click", handlePublish);
+			elements.newButton?.addEventListener("click", resetToNewPost);
+			elements.saveLocalButton?.addEventListener("click", saveLocalDraft);
+			elements.loadLocalButton?.addEventListener("click", loadLocalDraft);
+
+			elements.search?.addEventListener("input", renderPostSelect);
+
+			const autoPreviewInputs = [
+				elements.title,
+				elements.slug,
+				elements.description,
+				elements.published,
+				elements.updated,
+				elements.tags,
+				elements.category,
+				elements.image,
+				elements.lang,
+				elements.format,
+				elements.body,
+			];
+			for (const input of autoPreviewInputs) {
+				input?.addEventListener("input", () => scheduleAutoPreview(360));
+				input?.addEventListener("change", () => scheduleAutoPreview(180));
+			}
+			elements.draft?.addEventListener("change", () => scheduleAutoPreview(220));
+			elements.pinned?.addEventListener("change", () => scheduleAutoPreview(220));
+			elements.comment?.addEventListener("change", () => scheduleAutoPreview(220));
+
+			for (const button of elements.snippetButtons) {
+				button.addEventListener("click", () => {
+					const key = button.dataset.snippet || "";
+					const snippet = SNIPPETS[key];
+					if (snippet) {
+						insertSnippet(snippet);
+						setFeedback(`已插入 ${key} 片段。`, "info");
+						scheduleAutoPreview(140);
+					}
+				});
+			}
+
+			for (const button of elements.modeButtons) {
+				button.addEventListener("click", () => {
+					applyMode(button.dataset.mode || "split");
+				});
+			}
+
+			document.addEventListener("keydown", (event) => {
+				const isSave = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s";
+				if (!isSave) return;
+				const active = document.activeElement;
+				if (active !== elements.body && active !== elements.description) return;
+				event.preventDefault();
+				queuePreview({ silent: false, force: true });
+			});
+		}
+
+		fillPost({
+			title: "",
+			slug: "",
+			format: "md",
+			description: "",
+			body: DEFAULT_BODY,
+			published: getToday(),
+			updated: "",
+			tags: "",
+			category: "",
+			image: "",
+			lang: "zh_CN",
+			draft: true,
+			pinned: false,
+			comment: true,
+		});
+		applyMode("split");
+		bindEvents();
+		void refreshSession();
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", bootEditor, { once: true });
+	} else {
+		bootEditor();
+	}
+	document.addEventListener("astro:page-load", bootEditor);
+	document.addEventListener("swup:contentReplaced", bootEditor);
+})();
+</script>
+
+<style is:global>
+#editor-root .editor-input,
+#editor-root .editor-select,
+#editor-root .editor-textarea {
+	background: var(--btn-regular-bg);
+	border: 1px solid var(--line-divider);
+	color: var(--btn-content);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+	caret-color: var(--primary);
+}
+
+#editor-root .editor-input,
+#editor-root .editor-select {
+	min-height: 2.75rem;
+}
+
+#editor-root select.editor-input {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	padding-right: 2.45rem;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%235b6675' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-size: 1rem 1rem;
+	background-position: right 0.85rem center;
+}
+
+#editor-root input[type="date"].editor-input {
+	padding-right: 2.45rem;
+	color-scheme: light dark;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Crect x='3.75' y='4.5' width='12.5' height='11.75' rx='2' stroke='%235b6675' stroke-width='1.5'/%3E%3Cpath d='M3.75 7.5H16.25' stroke='%235b6675' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M6.5 3.5V5.8M13.5 3.5V5.8' stroke='%235b6675' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-size: 1rem 1rem;
+	background-position: right 0.85rem center;
+}
+
+#editor-root input[type="date"].editor-input::-webkit-datetime-edit,
+#editor-root input[type="date"].editor-input::-webkit-datetime-edit-fields-wrapper,
+#editor-root input[type="date"].editor-input::-webkit-datetime-edit-text,
+#editor-root input[type="date"].editor-input::-webkit-datetime-edit-month-field,
+#editor-root input[type="date"].editor-input::-webkit-datetime-edit-day-field,
+#editor-root input[type="date"].editor-input::-webkit-datetime-edit-year-field {
+	color: inherit;
+}
+
+#editor-root input[type="date"].editor-input::-webkit-calendar-picker-indicator {
+	margin: 0;
+	padding: 0;
+	width: 1rem;
+	height: 1rem;
+	opacity: 0;
+	cursor: pointer;
+	filter: none;
+}
+
+#editor-root .editor-input::placeholder,
+#editor-root .editor-textarea::placeholder {
+	color: var(--btn-content);
+	opacity: 0.58;
+}
+
+html.dark #editor-root select.editor-input {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23d6dfeb' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+body.dark #editor-root select.editor-input,
+[data-theme="dark"] #editor-root select.editor-input {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23d6dfeb' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+html.dark #editor-root input[type="date"].editor-input::-webkit-calendar-picker-indicator {
+	background-image: none;
+}
+
+body.dark #editor-root input[type="date"].editor-input::-webkit-calendar-picker-indicator,
+[data-theme="dark"] #editor-root input[type="date"].editor-input::-webkit-calendar-picker-indicator {
+	background-image: none;
+}
+
+html.dark #editor-root input[type="date"].editor-input {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Crect x='3.75' y='4.5' width='12.5' height='11.75' rx='2' stroke='%23e7edf7' stroke-width='1.5'/%3E%3Cpath d='M3.75 7.5H16.25' stroke='%23e7edf7' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M6.5 3.5V5.8M13.5 3.5V5.8' stroke='%23e7edf7' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+body.dark #editor-root input[type="date"].editor-input,
+[data-theme="dark"] #editor-root input[type="date"].editor-input {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Crect x='3.75' y='4.5' width='12.5' height='11.75' rx='2' stroke='%23e7edf7' stroke-width='1.5'/%3E%3Cpath d='M3.75 7.5H16.25' stroke='%23e7edf7' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M6.5 3.5V5.8M13.5 3.5V5.8' stroke='%23e7edf7' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+#editor-root .editor-input:focus,
+#editor-root .editor-select:focus,
+#editor-root .editor-textarea:focus {
+	outline: none;
+	border-color: var(--primary);
+	box-shadow: 0 0 0 2px var(--btn-regular-bg-active);
+}
+
+#editor-root .editor-select option {
+	background: var(--card-bg);
+	color: var(--btn-content);
+}
+
+#editor-root .editor-select option:checked,
+#editor-root .editor-select option:hover {
+	background: var(--primary);
+	color: var(--deep-text);
+}
+
+#editor-root .editor-btn {
+	background: var(--btn-regular-bg);
+	border: 1px solid var(--line-divider);
+	color: var(--btn-content);
+	transition: transform 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
+}
+
+#editor-root .editor-btn:hover:not(:disabled) {
+	background: var(--btn-regular-bg-hover);
+}
+
+#editor-root .editor-btn:active:not(:disabled) {
+	transform: scale(0.98);
+}
+
+#editor-root .editor-btn:disabled {
+	opacity: 0.65;
+	cursor: not-allowed;
+}
+
+#editor-root .editor-btn-primary {
+	background: var(--primary);
+	border-color: transparent;
+	color: #ffffff;
+	font-weight: 600;
+}
+
+#editor-root .editor-mode-btn {
+	border: 1px solid transparent;
+	background: transparent;
+	color: var(--btn-content);
+	padding: 0.5rem 0.9rem;
+	border-radius: 0.65rem;
+	font-size: 0.9rem;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	transition: all 0.15s ease;
+}
+
+#editor-root .editor-mode-btn:hover {
+	background: var(--btn-regular-bg-hover);
+}
+
+#editor-root .editor-mode-btn[data-active="true"] {
+	background: var(--primary);
+	color: #ffffff;
+	border-color: transparent;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+#editor-root .editor-mode-switch {
+	border: 1px solid var(--line-divider);
+	background: var(--btn-regular-bg);
+	gap: 0.2rem;
+}
+
+#editor-root .editor-pane {
+	border: 1px solid var(--line-divider);
+	border-radius: var(--radius-large);
+	padding: 0.95rem;
+	background: var(--btn-regular-bg);
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+#editor-root .editor-pane.hidden {
+	display: none !important;
+}
+
+#editor-root .editor-scroll-shell {
+	height: 42rem;
+	max-height: 42rem;
+	overflow: auto;
+	border-radius: 0.85rem;
+	border: 1px solid var(--line-divider);
+	background: var(--card-bg);
+	flex: 1 1 auto;
+	scrollbar-width: thin;
+}
+
+#editor-root .editor-textarea {
+	width: 100%;
+	min-height: 100%;
+	height: 100%;
+	border: none;
+	border-radius: 0.85rem;
+	padding: 1rem 1.05rem;
+	line-height: 1.72;
+	resize: vertical;
+	background: transparent;
+	color: var(--btn-content);
+	font-family:
+		"JetBrains Mono Variable",
+		ui-monospace,
+		SFMono-Regular,
+		Menlo,
+		Monaco,
+		Consolas,
+		"Liberation Mono",
+		"Courier New",
+		monospace;
+}
+
+#editor-root .editor-preview-shell {
+	padding: 0.95rem 1.05rem;
+}
+
+#editor-root #editor-preview-content {
+	color: var(--tw-prose-body);
+	margin: 0;
+	max-width: none;
+}
+
+#editor-root #editor-preview-content > :first-child {
+	margin-top: 0;
+}
+
+#editor-root #editor-preview-content > :last-child {
+	margin-bottom: 0;
+}
+
+#editor-root #editor-preview-content img,
+#editor-root #editor-preview-content video,
+#editor-root #editor-preview-content iframe,
+#editor-root #editor-preview-content table,
+#editor-root #editor-preview-content pre {
+	max-width: 100%;
+}
+
+#editor-root #editor-preview-content img,
+#editor-root #editor-preview-content video,
+#editor-root #editor-preview-content iframe {
+	height: auto;
+}
+
+#editor-root #editor-preview-content table {
+	display: block;
+	overflow-x: auto;
+}
+
+#editor-root #editor-preview-content figure.image-caption {
+	display: block;
+	inline-size: fit-content;
+	max-width: 100%;
+	margin-inline: auto;
+}
+
+#editor-root #editor-preview-content figure.image-caption > a,
+#editor-root #editor-preview-content figure.image-caption > div {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem;
+	width: auto;
+	max-width: 100%;
+	margin-inline: auto;
+}
+
+#editor-root #editor-preview-content figure.image-caption > a > figure,
+#editor-root #editor-preview-content figure.image-caption > div > figure {
+	margin: 0;
+	inline-size: fit-content;
+}
+
+#editor-root #editor-preview-content figure.image-caption > a > img,
+#editor-root #editor-preview-content figure.image-caption > div > img,
+#editor-root #editor-preview-content figure.image-caption > a > figure > img,
+#editor-root #editor-preview-content figure.image-caption > div > figure > img {
+	width: auto !important;
+	min-width: min(150px, 100%) !important;
+	max-width: min(150px, 100%) !important;
+	margin: 0;
+}
+
+#editor-root #editor-preview-content figure.image-caption > a > img:only-of-type,
+#editor-root #editor-preview-content figure.image-caption > div > img:only-of-type,
+#editor-root #editor-preview-content figure.image-caption > a > figure:only-of-type > img,
+#editor-root #editor-preview-content figure.image-caption > div > figure:only-of-type > img,
+#editor-root #editor-preview-content figure.image-caption > a.editor-image-single > img,
+#editor-root #editor-preview-content figure.image-caption > div.editor-image-single > img,
+#editor-root #editor-preview-content figure.image-caption > a.editor-image-single > figure > img,
+#editor-root #editor-preview-content figure.image-caption > div.editor-image-single > figure > img {
+	min-width: min(300px, 100%) !important;
+	max-width: min(300px, 100%) !important;
+}
+
+#editor-root #editor-preview-content figure.image-caption > a:has(> img:nth-of-type(2)),
+#editor-root #editor-preview-content figure.image-caption > a:has(> figure:nth-of-type(2)),
+#editor-root #editor-preview-content figure.image-caption > a.editor-image-group,
+#editor-root #editor-preview-content figure.image-caption > div:has(> img:nth-of-type(2)),
+#editor-root #editor-preview-content figure.image-caption > div:has(> figure:nth-of-type(2)),
+#editor-root #editor-preview-content figure.image-caption > div.editor-image-group {
+	gap: 0.5rem 0.75rem;
+}
+
+#editor-root #editor-preview-content figure.image-caption > a:has(> img:nth-of-type(2)),
+#editor-root #editor-preview-content figure.image-caption > a:has(> figure:nth-of-type(2)),
+#editor-root #editor-preview-content figure.image-caption > a.editor-image-group {
+	max-width: min(316px, 100%);
+}
+
+#editor-root #editor-preview-content figure.image-caption > div:has(> img:nth-of-type(2)),
+#editor-root #editor-preview-content figure.image-caption > div:has(> figure:nth-of-type(2)),
+#editor-root #editor-preview-content figure.image-caption > div.editor-image-group {
+	max-width: min(308px, 100%);
+}
+
+#editor-root #editor-preview-content figure.image-caption > a img {
+	pointer-events: none;
+}
+
+#editor-root #editor-preview-content figure.image-caption figcaption {
+	word-break: break-word;
+	inline-size: 0;
+	min-inline-size: fit-content;
+	margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+	#editor-root #editor-preview-content figure.image-caption > a > img,
+	#editor-root #editor-preview-content figure.image-caption > div > img,
+	#editor-root #editor-preview-content figure.image-caption > a > figure > img,
+	#editor-root #editor-preview-content figure.image-caption > div > figure > img {
+		min-width: 300px !important;
+		max-width: 300px !important;
+	}
+
+	#editor-root #editor-preview-content figure.image-caption > a > img:only-of-type,
+	#editor-root #editor-preview-content figure.image-caption > div > img:only-of-type,
+	#editor-root #editor-preview-content figure.image-caption > a > figure:only-of-type > img,
+	#editor-root #editor-preview-content figure.image-caption > div > figure:only-of-type > img,
+	#editor-root #editor-preview-content figure.image-caption > a.editor-image-single > img,
+	#editor-root #editor-preview-content figure.image-caption > div.editor-image-single > img,
+	#editor-root #editor-preview-content figure.image-caption > a.editor-image-single > figure > img,
+	#editor-root #editor-preview-content figure.image-caption > div.editor-image-single > figure > img {
+		min-width: min(600px, 100%) !important;
+		max-width: min(600px, 100%) !important;
+	}
+
+	#editor-root #editor-preview-content figure.image-caption > a:has(> img:nth-of-type(2)),
+	#editor-root #editor-preview-content figure.image-caption > a:has(> figure:nth-of-type(2)),
+	#editor-root #editor-preview-content figure.image-caption > a.editor-image-group {
+		max-width: min(624px, 100%);
+	}
+
+	#editor-root #editor-preview-content figure.image-caption > div:has(> img:nth-of-type(2)),
+	#editor-root #editor-preview-content figure.image-caption > div:has(> figure:nth-of-type(2)),
+	#editor-root #editor-preview-content figure.image-caption > div.editor-image-group {
+		max-width: min(616px, 100%);
+	}
+
+	#editor-root #editor-preview-content figure.image-caption > a:has(> img:nth-of-type(2)),
+	#editor-root #editor-preview-content figure.image-caption > a:has(> figure:nth-of-type(2)),
+	#editor-root #editor-preview-content figure.image-caption > a.editor-image-group,
+	#editor-root #editor-preview-content figure.image-caption > div:has(> img:nth-of-type(2)),
+	#editor-root #editor-preview-content figure.image-caption > div:has(> figure:nth-of-type(2)),
+	#editor-root #editor-preview-content figure.image-caption > div.editor-image-group {
+		gap: 0.5rem 1rem;
+	}
+}
+
+#editor-root #editor-preview-content .anchor-icon {
+	display: none !important;
+}
+
+#editor-root #editor-preview-content .anchor {
+	margin-left: 0 !important;
+	padding: 0 !important;
+}
+
+#editor-root .editor-status-text,
+#editor-root .editor-status-result {
+	font-size: 1rem;
+	line-height: 1.75rem;
+}
+
+#editor-root #editor-status-card {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+#editor-root .editor-status-text {
+	margin: 0;
+	min-height: 2rem;
+	display: flex;
+	align-items: center;
+}
+
+#editor-root .editor-status-result:empty {
+	display: none;
+}
+
+#editor-root .editor-format-select {
+	min-height: 2.75rem;
+}
+
+#editor-root .editor-post-list {
+	height: 17rem;
+	max-height: 17rem;
+	overflow: auto;
+	padding: 0.55rem;
+	border: 1px solid var(--line-divider);
+	background: var(--card-bg);
+	display: grid;
+	gap: 0.55rem;
+}
+
+#editor-root .editor-post-list-empty {
+	border-radius: 0.75rem;
+	border: 1px dashed var(--line-divider);
+	background: var(--btn-regular-bg);
+	color: var(--btn-content);
+	padding: 0.85rem 0.7rem;
+	font-size: 0.92rem;
+}
+
+#editor-root .editor-post-item {
+	border: 1px solid var(--line-divider);
+	background: var(--btn-regular-bg);
+	border-radius: 0.8rem;
+	padding: 0.62rem 0.72rem;
+	text-align: left;
+	color: var(--btn-content);
+	transition: all 0.15s ease;
+	height: 6.4rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	gap: 0;
+}
+
+#editor-root .editor-post-item:hover {
+	background: var(--btn-regular-bg-hover);
+}
+
+#editor-root .editor-post-item[data-active="true"] {
+	border-color: color-mix(in srgb, var(--primary) 55%, var(--line-divider));
+	background: color-mix(in srgb, var(--primary) 16%, var(--btn-regular-bg));
+}
+
+#editor-root .editor-post-item-title {
+	font-size: 0.94rem;
+	font-weight: 600;
+	line-height: 1.35;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	min-height: 0;
+	margin-bottom: 0;
+}
+
+#editor-root .editor-post-item-divider {
+	height: 1px;
+	margin: 0.28rem 0 0.24rem;
+	background: color-mix(in srgb, var(--line-divider) 82%, transparent);
+	border-radius: 999px;
+	flex: 0 0 auto;
+}
+
+#editor-root .editor-post-item-meta {
+	font-size: 0.8rem;
+	opacity: 0.85;
+	margin-top: 0;
+	line-height: 1.28;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	min-height: 1.02rem;
+}
+
+#editor-root .editor-post-item-flags {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 0.35rem;
+	margin-top: auto;
+	min-height: 1.2rem;
+	overflow: hidden;
+}
+
+#editor-root .editor-post-flag {
+	font-size: 0.72rem;
+	line-height: 1;
+	height: 1.25rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 0.42rem;
+	border-radius: 999px;
+	border: 1px solid var(--line-divider);
+	background: var(--card-bg);
+	color: var(--btn-content);
+	white-space: nowrap;
+}
+
+#editor-root .editor-heading-badge,
+#editor-root .editor-badge {
+	background: var(--btn-regular-bg);
+	border: 1px solid var(--line-divider);
+	color: var(--btn-content);
+}
+
+#editor-root .editor-heading-badge {
+	padding: 0.25rem 0.65rem;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	cursor: pointer;
+	transition: background-color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+
+#editor-root .editor-heading-badge:hover:not(:disabled) {
+	background: var(--btn-regular-bg-hover);
+}
+
+#editor-root .editor-heading-badge:active:not(:disabled) {
+	transform: scale(0.98);
+}
+
+#editor-root .editor-heading-badge:disabled {
+	cursor: not-allowed;
+	opacity: 0.55;
+}
+
+#editor-root .editor-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.3rem 0.65rem;
+	border-radius: 999px;
+}
+
+:root:not(.dark) #editor-root,
+[data-theme="light"] #editor-root {
+	--editor-light-card: #ffffff;
+	--editor-light-surface: color-mix(in srgb, var(--primary) 4%, white);
+	--editor-light-surface-strong: color-mix(in srgb, var(--primary) 8%, white);
+	--editor-light-border: color-mix(in srgb, var(--primary) 16%, #d7dee9);
+	--editor-light-border-strong: color-mix(in srgb, var(--primary) 24%, #c7d2e2);
+	--editor-light-text: #253244;
+	--editor-light-text-soft: #4e5f76;
+	--editor-light-active: color-mix(in srgb, var(--primary) 16%, white);
+}
+
+:root:not(.dark) #editor-root .card-base,
+[data-theme="light"] #editor-root .card-base {
+	background: var(--editor-light-card);
+	border-color: var(--editor-light-border);
+	box-shadow: 0 6px 18px rgba(30, 52, 84, 0.06);
+}
+
+:root:not(.dark) #editor-root .editor-input,
+:root:not(.dark) #editor-root .editor-textarea,
+[data-theme="light"] #editor-root .editor-input,
+[data-theme="light"] #editor-root .editor-textarea {
+	background: var(--editor-light-surface);
+	border-color: var(--editor-light-border);
+	color: var(--editor-light-text);
+}
+
+:root:not(.dark) #editor-root .editor-input::placeholder,
+:root:not(.dark) #editor-root .editor-textarea::placeholder,
+[data-theme="light"] #editor-root .editor-input::placeholder,
+[data-theme="light"] #editor-root .editor-textarea::placeholder {
+	color: var(--editor-light-text-soft);
+	opacity: 0.72;
+}
+
+:root:not(.dark) #editor-root .editor-input:focus,
+:root:not(.dark) #editor-root .editor-textarea:focus,
+[data-theme="light"] #editor-root .editor-input:focus,
+[data-theme="light"] #editor-root .editor-textarea:focus {
+	border-color: var(--editor-light-border-strong);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 22%, white);
+}
+
+:root:not(.dark) #editor-root .editor-btn,
+[data-theme="light"] #editor-root .editor-btn {
+	background: var(--editor-light-surface);
+	border-color: var(--editor-light-border);
+	color: var(--editor-light-text);
+}
+
+:root:not(.dark) #editor-root .editor-btn.editor-btn-primary,
+[data-theme="light"] #editor-root .editor-btn.editor-btn-primary,
+#editor-root #editor-publish-btn {
+	background: var(--primary);
+	border-color: transparent;
+	color: #ffffff;
+}
+
+:root:not(.dark) #editor-root .editor-btn:hover:not(:disabled),
+[data-theme="light"] #editor-root .editor-btn:hover:not(:disabled) {
+	background: var(--editor-light-surface-strong);
+	border-color: var(--editor-light-border-strong);
+}
+
+:root:not(.dark) #editor-root .editor-mode-switch,
+[data-theme="light"] #editor-root .editor-mode-switch {
+	background: var(--editor-light-surface);
+	border-color: var(--editor-light-border);
+}
+
+:root:not(.dark) #editor-root .editor-pane,
+:root:not(.dark) #editor-root .editor-post-item,
+[data-theme="light"] #editor-root .editor-pane,
+[data-theme="light"] #editor-root .editor-post-item {
+	background: var(--editor-light-surface);
+	border-color: var(--editor-light-border);
+}
+
+:root:not(.dark) #editor-root .editor-scroll-shell,
+:root:not(.dark) #editor-root .editor-post-list,
+[data-theme="light"] #editor-root .editor-scroll-shell,
+[data-theme="light"] #editor-root .editor-post-list {
+	background: var(--editor-light-card);
+	border-color: var(--editor-light-border);
+}
+
+:root:not(.dark) #editor-root .editor-post-item:hover,
+[data-theme="light"] #editor-root .editor-post-item:hover {
+	background: var(--editor-light-surface-strong);
+}
+
+:root:not(.dark) #editor-root .editor-post-item[data-active="true"],
+[data-theme="light"] #editor-root .editor-post-item[data-active="true"] {
+	background: var(--editor-light-active);
+	border-color: color-mix(in srgb, var(--primary) 50%, var(--editor-light-border-strong));
+}
+
+:root:not(.dark) #editor-root .editor-mode-btn[data-active="true"],
+[data-theme="light"] #editor-root .editor-mode-btn[data-active="true"] {
+	color: #ffffff;
+	box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 32%, transparent);
+}
+
+:root:not(.dark) #editor-root .editor-heading-badge,
+:root:not(.dark) #editor-root .editor-badge,
+:root:not(.dark) #editor-root .editor-post-flag,
+[data-theme="light"] #editor-root .editor-heading-badge,
+[data-theme="light"] #editor-root .editor-badge,
+[data-theme="light"] #editor-root .editor-post-flag {
+	background: var(--editor-light-card);
+	border-color: var(--editor-light-border);
+	color: var(--editor-light-text-soft);
+}
+
+@media (max-width: 1024px) {
+	#editor-root .editor-scroll-shell {
+		height: 34rem;
+		max-height: 34rem;
+	}
+
+	#editor-root .editor-textarea {
+		min-height: 100%;
+	}
+}
+</style>
