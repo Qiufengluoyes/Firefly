@@ -533,6 +533,10 @@ const today = new Date().toISOString().slice(0, 10);
 				);
 		}
 
+		function shouldTapLoadPost() {
+			return window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+		}
+
 		function isSubsequenceMatch(needle, haystack) {
 			if (!needle) return true;
 			let i = 0;
@@ -687,6 +691,9 @@ const today = new Date().toISOString().slice(0, 10);
 				item.addEventListener("click", () => {
 					state.selectedSlug = post.slug;
 					updatePostListSelection();
+					if (shouldTapLoadPost()) {
+						void loadSelectedPost();
+					}
 				});
 				item.addEventListener("dblclick", () => {
 					state.selectedSlug = post.slug;
@@ -1518,12 +1525,15 @@ const today = new Date().toISOString().slice(0, 10);
 	min-height: inherit;
 	width: 100%;
 	inline-size: 100%;
-	padding-right: 2.45rem;
+	padding-right: 1rem;
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: textfield;
 	color-scheme: light dark;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Crect x='3.75' y='4.5' width='12.5' height='11.75' rx='2' stroke='%235b6675' stroke-width='1.5'/%3E%3Cpath d='M3.75 7.5H16.25' stroke='%235b6675' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M6.5 3.5V5.8M13.5 3.5V5.8' stroke='%235b6675' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-size: 1rem 1rem;
-	background-position: right 0.85rem center;
+	background-position: right 0.72rem center;
 }
 
 #editor-root input[type="date"].editor-input::-webkit-datetime-edit,
@@ -1538,11 +1548,13 @@ const today = new Date().toISOString().slice(0, 10);
 #editor-root input[type="date"].editor-input::-webkit-calendar-picker-indicator {
 	margin: 0;
 	padding: 0;
-	width: 1rem;
-	height: 1rem;
+	width: 0;
+	height: 0;
 	opacity: 0;
-	cursor: pointer;
+	display: none;
+	pointer-events: none;
 	filter: none;
+	-webkit-appearance: none;
 }
 
 #editor-root .editor-input::placeholder,
@@ -2258,16 +2270,15 @@ body.dark #editor-root input[type="date"].editor-input,
 		font-size: 0.95rem;
 	}
 
-	#editor-root select.editor-input,
-	#editor-root input[type="date"].editor-input {
+	#editor-root select.editor-input {
 		padding-right: 2.55rem;
 		background-position: right 0.78rem center;
 		background-size: 1.05rem 1.05rem;
 	}
 
 	#editor-root input[type="date"].editor-input::-webkit-calendar-picker-indicator {
-		width: 1.2rem;
-		height: 1.2rem;
+		width: 0;
+		height: 0;
 	}
 
 	#editor-root input[type="date"].editor-input::-webkit-datetime-edit {
@@ -2316,8 +2327,7 @@ body.dark #editor-root input[type="date"].editor-input,
 }
 
 @media (max-width: 480px) {
-	#editor-root select.editor-input,
-	#editor-root input[type="date"].editor-input {
+	#editor-root select.editor-input {
 		padding-right: 2.45rem;
 		background-position: right 0.72rem center;
 		background-size: 1rem 1rem;
