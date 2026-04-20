@@ -1,8 +1,11 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import type { APIContext } from "astro";
 
-const COOKIE_NAME = "firefly_editor_session";
-const DEFAULT_TTL = 60 * 60 * 12; // 12h
+const COOKIE_NAME = import.meta.env.PROD
+	? "__Host-firefly_editor_session"
+	: "firefly_editor_session";
+const DEFAULT_TTL = 60 * 60 * 24; // 24h
+const MAX_PASSWORD_LENGTH = 1024;
 
 type MinimalContext = Pick<APIContext, "cookies">;
 
@@ -26,10 +29,13 @@ function sign(payload: string, secret: string) {
 	return createHmac("sha256", secret).update(payload).digest("base64url");
 }
 
+function digest(value: string) {
+	return createHash("sha256").update(value, "utf8").digest();
+}
+
 function safeEqual(a: string, b: string) {
-	const aBuf = Buffer.from(a);
-	const bBuf = Buffer.from(b);
-	if (aBuf.length !== bBuf.length) return false;
+	const aBuf = digest(a);
+	const bBuf = digest(b);
 	return timingSafeEqual(aBuf, bBuf);
 }
 
@@ -73,7 +79,8 @@ export function getEditorStatus(context: MinimalContext) {
 
 export function verifyEditorPassword(password: string) {
 	const expected = getEditorPassword();
-	if (!expected) return false;
+	if (!expected || typeof password !== "string") return false;
+	if (password.length === 0 || password.length > MAX_PASSWORD_LENGTH) return false;
 	return safeEqual(password, expected);
 }
 
@@ -86,7 +93,7 @@ export function createEditorSession(context: MinimalContext) {
 	context.cookies.set(COOKIE_NAME, token, {
 		path: "/",
 		httpOnly: true,
-		sameSite: "lax",
+		sameSite: "strict",
 		secure: import.meta.env.PROD,
 		maxAge: ttl,
 	});
@@ -96,7 +103,7 @@ export function destroyEditorSession(context: MinimalContext) {
 	context.cookies.delete(COOKIE_NAME, {
 		path: "/",
 		httpOnly: true,
-		sameSite: "lax",
+		sameSite: "strict",
 		secure: import.meta.env.PROD,
 	});
 }
