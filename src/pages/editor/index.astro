@@ -2243,4 +2243,88 @@ body.dark #editor-root input[type="date"].editor-input,
 		min-height: 100%;
 	}
 }
+
+@media (max-width: 768px) {
+	#editor-root .editor-input,
+	#editor-root .editor-select {
+		min-height: 2.9rem;
+		font-size: 0.95rem;
+	}
+
+	#editor-root select.editor-input,
+	#editor-root input[type="date"].editor-input {
+		padding-right: 2.55rem;
+		background-position: right 0.78rem center;
+		background-size: 1.05rem 1.05rem;
+	}
+
+	#editor-root input[type="date"].editor-input::-webkit-calendar-picker-indicator {
+		width: 1.2rem;
+		height: 1.2rem;
+	}
+
+	#editor-root input[type="date"].editor-input::-webkit-datetime-edit {
+		line-height: 1.2;
+	}
+
+	#editor-root .editor-post-list {
+		height: clamp(14rem, 38vh, 20rem);
+		max-height: clamp(14rem, 38vh, 20rem);
+		padding: 0.48rem;
+		gap: 0.48rem;
+	}
+
+	#editor-root .editor-post-item {
+		height: auto;
+		min-height: 6.4rem;
+		padding: 0.6rem 0.66rem;
+	}
+
+	#editor-root .editor-post-item-title {
+		font-size: 0.9rem;
+		line-height: 1.32;
+		-webkit-line-clamp: 2;
+	}
+
+	#editor-root .editor-post-item-divider {
+		margin: 0.24rem 0 0.22rem;
+	}
+
+	#editor-root .editor-post-item-meta {
+		font-size: 0.78rem;
+		line-height: 1.3;
+		white-space: normal;
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		min-height: 0;
+	}
+
+	#editor-root .editor-post-item-flags {
+		flex-wrap: wrap;
+		row-gap: 0.26rem;
+		column-gap: 0.3rem;
+	}
+}
+
+@media (max-width: 480px) {
+	#editor-root select.editor-input,
+	#editor-root input[type="date"].editor-input {
+		padding-right: 2.45rem;
+		background-position: right 0.72rem center;
+		background-size: 1rem 1rem;
+	}
+
+	#editor-root .editor-post-list {
+		height: clamp(13rem, 34vh, 18rem);
+		max-height: clamp(13rem, 34vh, 18rem);
+	}
+
+	#editor-root .editor-post-flag {
+		font-size: 0.7rem;
+		height: 1.18rem;
+		padding: 0 0.38rem;
+	}
+}
 </style>
