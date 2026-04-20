@@ -112,12 +112,10 @@ export function normalizeEditorPostInput(input: unknown): NormalizedEditorPost {
 }
 
 export function buildFrontmatterData(post: NormalizedEditorPost): EditorPostInput {
-	return {
+	const frontmatter: EditorPostInput = {
 		title: post.title,
 		published: post.published,
-		updated: post.updated || undefined,
 		description: post.description,
-		image: post.image || undefined,
 		tags: post.tags,
 		category: post.category || "",
 		lang: post.lang || "",
@@ -125,6 +123,15 @@ export function buildFrontmatterData(post: NormalizedEditorPost): EditorPostInpu
 		draft: post.draft,
 		comment: post.comment,
 	};
+
+	if (post.updated) {
+		frontmatter.updated = post.updated;
+	}
+	if (post.image) {
+		frontmatter.image = post.image;
+	}
+
+	return frontmatter;
 }
 
 export function buildMarkdownDocument(post: NormalizedEditorPost): string {
