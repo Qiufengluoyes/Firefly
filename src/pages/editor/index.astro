@@ -1497,6 +1497,10 @@ const today = new Date().toISOString().slice(0, 10);
 #editor-root .editor-input,
 #editor-root .editor-select {
 	min-height: 2.75rem;
+	width: 100%;
+	inline-size: 100%;
+	box-sizing: border-box;
+	display: block;
 }
 
 #editor-root select.editor-input {
@@ -1511,6 +1515,9 @@ const today = new Date().toISOString().slice(0, 10);
 }
 
 #editor-root input[type="date"].editor-input {
+	min-height: inherit;
+	width: 100%;
+	inline-size: 100%;
 	padding-right: 2.45rem;
 	color-scheme: light dark;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Crect x='3.75' y='4.5' width='12.5' height='11.75' rx='2' stroke='%235b6675' stroke-width='1.5'/%3E%3Cpath d='M3.75 7.5H16.25' stroke='%235b6675' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M6.5 3.5V5.8M13.5 3.5V5.8' stroke='%235b6675' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
