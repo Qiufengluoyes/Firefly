@@ -161,8 +161,8 @@ const createFigureFromImages = (
     }
 
     return {
-        type: "text",
-        value: "",
+        type: "paragraph",
+        children: imageNodes,
         data: {
             hName: "figure",
             hProperties: {
@@ -207,8 +207,13 @@ const createFigureFromLink = (
     }
 
     return {
-        type: "text",
-        value: "",
+        type: "paragraph",
+        children: [
+            {
+                ...linkNode,
+                children: imageNodes,
+            },
+        ],
         data: {
             hName: "figure",
             hProperties: {

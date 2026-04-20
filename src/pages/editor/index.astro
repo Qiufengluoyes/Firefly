@@ -237,8 +237,11 @@ const today = new Date().toISOString().slice(0, 10);
 							<span id="editor-preview-meta" class="text-xs text-black/55 dark:text-white/55"></span>
 						</div>
 						<div class="editor-scroll-shell editor-preview-shell">
-							<div id="editor-preview-headings" class="mb-4 flex flex-wrap gap-2"></div>
-							<div class="border-[var(--line-divider)] border-dashed border-b mb-5"></div>
+							<div id="editor-preview-headings" class="flex flex-wrap gap-2"></div>
+							<div
+								id="editor-preview-divider"
+								class="border-[var(--line-divider)] border-dashed border-b"
+							></div>
 							<article
 								id="editor-preview-content"
 								class="prose dark:prose-invert prose-base !max-w-none custom-md markdown-content"
@@ -262,7 +265,15 @@ const today = new Date().toISOString().slice(0, 10);
 (() => {
 	function bootEditor() {
 		const root = document.getElementById("editor-root");
-		if (!root || root.dataset.editorBooted === "1") return;
+		if (!root) return;
+		const existingRefresh = root.__fireflyEditorRefreshSession;
+		if (root.dataset.editorBooted === "1") {
+			if (typeof existingRefresh === "function") {
+				void existingRefresh();
+				return;
+			}
+			root.dataset.editorBooted = "0";
+		}
 		root.dataset.editorBooted = "1";
 
 		const DEFAULT_BODY = `# 新文章标题\n\n在这里开始写作。\n\n:::note[提示]\n这是一段提醒块示例。\n:::\n`;
@@ -685,6 +696,7 @@ const today = new Date().toISOString().slice(0, 10);
 		function applyMode(mode) {
 			const normalized = mode === "edit" || mode === "preview" ? mode : "split";
 			state.mode = normalized;
+			root.dataset.editorMode = normalized;
 
 			if (elements.editPanel) {
 				elements.editPanel.classList.toggle("hidden", normalized === "preview");
@@ -1435,6 +1447,7 @@ const today = new Date().toISOString().slice(0, 10);
 		});
 		applyMode("split");
 		bindEvents();
+		root.__fireflyEditorRefreshSession = () => refreshSession();
 		void refreshSession();
 	}
 
@@ -1445,6 +1458,7 @@ const today = new Date().toISOString().slice(0, 10);
 	}
 	document.addEventListener("astro:page-load", bootEditor);
 	document.addEventListener("swup:contentReplaced", bootEditor);
+	window.addEventListener("pageshow", bootEditor);
 })();
 </script>
 
@@ -1658,13 +1672,17 @@ body.dark #editor-root input[type="date"].editor-input,
 	min-height: 0;
 }
 
+#editor-root {
+	--editor-panel-height: 42rem;
+}
+
 #editor-root .editor-pane.hidden {
 	display: none !important;
 }
 
 #editor-root .editor-scroll-shell {
-	height: 42rem;
-	max-height: 42rem;
+	height: var(--editor-panel-height);
+	max-height: var(--editor-panel-height);
 	overflow: auto;
 	border-radius: 0.85rem;
 	border: 1px solid var(--line-divider);
@@ -1697,7 +1715,50 @@ body.dark #editor-root input[type="date"].editor-input,
 }
 
 #editor-root .editor-preview-shell {
-	padding: 0.95rem 1.05rem;
+	padding: 0;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+}
+
+#editor-root[data-editor-mode="split"] #editor-workspace {
+	align-items: stretch;
+}
+
+#editor-root[data-editor-mode="split"] .editor-pane {
+	height: 100%;
+	min-height: 0;
+}
+
+#editor-root[data-editor-mode="split"] .editor-scroll-shell {
+	height: var(--editor-panel-height);
+	max-height: var(--editor-panel-height);
+	min-height: var(--editor-panel-height);
+	flex: 1 1 auto;
+}
+
+#editor-root #editor-preview-panel .editor-scroll-shell {
+	overflow: hidden;
+}
+
+#editor-root #editor-preview-panel #editor-preview-headings {
+	flex: 0 0 auto;
+	margin: 0.95rem 1.05rem 0.7rem;
+}
+
+#editor-root #editor-preview-divider {
+	flex: 0 0 auto;
+	margin: 0 1.05rem 0.85rem;
+}
+
+#editor-root #editor-preview-panel #editor-preview-content {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+	padding: 0 1.05rem 1rem;
+	box-sizing: border-box;
 }
 
 #editor-root #editor-preview-content {
@@ -2142,9 +2203,17 @@ body.dark #editor-root input[type="date"].editor-input,
 }
 
 @media (max-width: 1024px) {
+	#editor-root {
+		--editor-panel-height: 34rem;
+	}
+
 	#editor-root .editor-scroll-shell {
-		height: 34rem;
-		max-height: 34rem;
+		height: var(--editor-panel-height);
+		max-height: var(--editor-panel-height);
+	}
+
+	#editor-root[data-editor-mode="split"] .editor-scroll-shell {
+		min-height: var(--editor-panel-height);
 	}
 
 	#editor-root .editor-textarea {

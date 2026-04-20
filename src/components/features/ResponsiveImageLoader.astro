@@ -33,7 +33,8 @@ function getOrCreateLoader(img: HTMLImageElement) {
 	loader.className = "ff-md3-image-loader";
 	loader.dataset.ffMd3LoaderFor = img.dataset.ffMd3LoaderId;
 	loader.setAttribute("aria-hidden", "true");
-	loader.innerHTML = '<span class="ff-md3-image-loader__indicator"></span>';
+	loader.innerHTML =
+		'<span class="ff-md3-image-loader__indicator ff-md3-image-loader__indicator--primary"></span><span class="ff-md3-image-loader__indicator ff-md3-image-loader__indicator--secondary"></span>';
 	parent.append(loader);
 	return loader;
 }
@@ -51,16 +52,21 @@ function syncLoaderPosition(img: HTMLImageElement) {
 		return;
 	}
 
-	const width = img.offsetWidth;
-	const height = img.offsetHeight;
+	const imageWidth = img.offsetWidth;
+	const imageHeight = img.offsetHeight;
+	const parentWidth = parent.clientWidth;
+	const parentHeight = parent.clientHeight;
 
-	if (width <= 0 || height <= 0) {
-		loader.classList.remove("ff-md3-image-loader--active");
+	const width = imageWidth > 0 ? imageWidth : parentWidth;
+	const left = imageWidth > 0 ? img.offsetLeft : 0;
+	const top = imageHeight > 0 ? img.offsetTop + imageHeight - 3 : Math.max(parentHeight - 3, 0);
+
+	if (width <= 0) {
 		return;
 	}
 
-	loader.style.left = `${img.offsetLeft}px`;
-	loader.style.top = `${img.offsetTop + height - 3}px`;
+	loader.style.left = `${left}px`;
+	loader.style.top = `${top}px`;
 	loader.style.width = `${width}px`;
 }
 
@@ -83,6 +89,15 @@ function hideLoader(img: HTMLImageElement) {
 
 function bindImageLoader(img: HTMLImageElement) {
 	if (img.dataset.ffMd3LoaderBound === "true") {
+		const parent = img.parentElement as HTMLElement | null;
+		if (parent && img.dataset.ffMd3LoaderId) {
+			const loader = parent.querySelector<HTMLSpanElement>(
+				`:scope > span[data-ff-md3-loader-for="${img.dataset.ffMd3LoaderId}"]`,
+			);
+			if (loader && !(img.complete && img.naturalWidth > 0)) {
+				loader.classList.add("ff-md3-image-loader--active");
+			}
+		}
 		syncLoaderPosition(img);
 		return;
 	}
@@ -212,21 +227,46 @@ if (document.readyState === "loading") {
 .ff-md3-image-loader__indicator {
 	position: absolute;
 	inset: 0 auto 0 0;
-	width: 42%;
+	width: 58%;
+	transform-origin: left center;
 	background: linear-gradient(
 		90deg,
 		var(--ff-md3-loader-indicator-start) 0%,
 		var(--ff-md3-loader-indicator-end) 100%
 	);
-	animation: ff-md3-loader-slide 1.15s cubic-bezier(0.2, 0, 0, 1) infinite;
 }
 
-@keyframes ff-md3-loader-slide {
+.ff-md3-image-loader__indicator--primary {
+	animation: ff-md3-loader-primary 1.75s cubic-bezier(0.2, 0, 0, 1) infinite;
+}
+
+.ff-md3-image-loader__indicator--secondary {
+	opacity: 0.92;
+	animation: ff-md3-loader-secondary 1.75s cubic-bezier(0.2, 0, 0, 1) infinite;
+	animation-delay: -0.85s;
+}
+
+@keyframes ff-md3-loader-primary {
 	0% {
-		transform: translateX(-130%);
+		transform: translateX(-130%) scaleX(0.3);
+	}
+	45% {
+		transform: translateX(8%) scaleX(0.95);
 	}
 	100% {
-		transform: translateX(320%);
+		transform: translateX(185%) scaleX(0.42);
+	}
+}
+
+@keyframes ff-md3-loader-secondary {
+	0% {
+		transform: translateX(-155%) scaleX(0.18);
+	}
+	55% {
+		transform: translateX(28%) scaleX(0.74);
+	}
+	100% {
+		transform: translateX(208%) scaleX(0.28);
 	}
 }
 

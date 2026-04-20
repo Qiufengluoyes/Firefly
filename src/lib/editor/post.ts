@@ -4,6 +4,21 @@ import type { EditorPostInput, NormalizedEditorPost } from "./types";
 const SLUG_UNSAFE_RE = /[^\p{Letter}\p{Number}\-_./]+/gu;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+function toYamlSingleQuoted(value: string): string {
+	return `'${value.replace(/'/g, "''")}'`;
+}
+
+function unquoteYamlScalar(raw: string): string {
+	const value = raw.trim();
+	if (value.length < 2) return value;
+	const first = value[0];
+	const last = value[value.length - 1];
+	if ((first === "'" && last === "'") || (first === '"' && last === '"')) {
+		return value.slice(1, -1);
+	}
+	return value;
+}
+
 function ensureObject(value: unknown): Record<string, unknown> {
 	if (!value || typeof value !== "object" || Array.isArray(value)) {
 		throw new Error("请求体必须是对象。");
@@ -152,7 +167,11 @@ export function buildMarkdownDocument(post: NormalizedEditorPost): string {
 		lineWidth: -1,
 		sortKeys: false,
 	});
-	return file
+	const normalized = file
 		.replace(/\r\n/g, "\n")
 		.replace(/^(published|updated):\s'(\d{4}-\d{2}-\d{2})'$/gm, "$1: $2");
+	return normalized.replace(/^category:\s*(.+)$/gm, (_match, rawValue: string) => {
+		const category = unquoteYamlScalar(rawValue);
+		return `category: ${toYamlSingleQuoted(category)}`;
+	});
 }

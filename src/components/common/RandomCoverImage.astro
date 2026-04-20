@@ -100,6 +100,8 @@ const getFallbackUrl = (src: string): string => {
 // 图片样式
 const imageClass = "w-full h-full object-cover";
 const imageStyle = `object-position: ${position || "center"}; image-rendering: -webkit-optimize-contrast;`;
+const previewSizes = "(max-width: 768px) 100vw, 28vw";
+const fullSizes = "(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px";
 
 // 水印配置
 const watermark = randomCoverImage.watermark;
@@ -181,7 +183,7 @@ const watermarkStyles = showWatermark
       format="webp"
       quality={preview ? 80 : 90}
       widths={preview ? [200, 400, 600] : [800, 1200, 1600, 2000]}
-      sizes={preview ? "(max-width: 768px) 100vw, 28vw" : "(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"}
+      sizes={preview ? previewSizes : fullSizes}
       onloadstart={`(function(img){
         const container = img.parentElement;
         if (container) {
@@ -217,7 +219,7 @@ const watermarkStyles = showWatermark
   <!-- 远程图片（包括随机图API和普通远程图片） -->
   {!isLocal && (
     <img 
-      src={isPublic ? url(src) : src} 
+      src={isPublic ? url(src) : src}
       alt={alt || ""} 
       class:list={[
         imageClass,
