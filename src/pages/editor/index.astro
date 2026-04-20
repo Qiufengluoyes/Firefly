@@ -455,6 +455,16 @@ const today = new Date().toISOString().slice(0, 10);
 			};
 		}
 
+		function syncEditorBodyHeight() {
+			const textarea = elements.body;
+			if (!textarea) return;
+			textarea.style.height = "100%";
+		}
+
+		function syncEditorBodyHeightSoon() {
+			window.requestAnimationFrame(syncEditorBodyHeight);
+		}
+
 		function fillPost(post) {
 			const payload = post || {};
 			if (elements.title) elements.title.value = payload.title || "";
@@ -471,6 +481,7 @@ const today = new Date().toISOString().slice(0, 10);
 			if (elements.draft) elements.draft.checked = Boolean(payload.draft ?? true);
 			if (elements.pinned) elements.pinned.checked = Boolean(payload.pinned);
 			if (elements.comment) elements.comment.checked = Boolean(payload.comment ?? true);
+			syncEditorBodyHeightSoon();
 		}
 
 		function resetToNewPost() {
@@ -713,6 +724,7 @@ const today = new Date().toISOString().slice(0, 10);
 				const isActive = button.dataset.mode === normalized;
 				button.dataset.active = isActive ? "true" : "false";
 			}
+			syncEditorBodyHeightSoon();
 		}
 
 		function insertSnippet(content) {
@@ -723,6 +735,7 @@ const today = new Date().toISOString().slice(0, 10);
 			const before = textarea.value.slice(0, start);
 			const after = textarea.value.slice(end);
 			textarea.value = `${before}${content}${after}`;
+			syncEditorBodyHeightSoon();
 			const nextPos = start + content.length;
 			textarea.focus();
 			textarea.setSelectionRange(nextPos, nextPos);
@@ -732,6 +745,7 @@ const today = new Date().toISOString().slice(0, 10);
 			if (!elements.body) return;
 			const textarea = elements.body;
 			textarea.value = nextValue;
+			syncEditorBodyHeight();
 			textarea.focus();
 			const start = Math.max(0, Math.min(Number(nextStart) || 0, nextValue.length));
 			const end = Math.max(start, Math.min(Number(nextEnd ?? nextStart) || start, nextValue.length));
@@ -1363,8 +1377,14 @@ const today = new Date().toISOString().slice(0, 10);
 				elements.body,
 			];
 			for (const input of autoPreviewInputs) {
-				input?.addEventListener("input", () => scheduleAutoPreview(360));
-				input?.addEventListener("change", () => scheduleAutoPreview(180));
+				input?.addEventListener("input", () => {
+					if (input === elements.body) syncEditorBodyHeightSoon();
+					scheduleAutoPreview(360);
+				});
+				input?.addEventListener("change", () => {
+					if (input === elements.body) syncEditorBodyHeightSoon();
+					scheduleAutoPreview(180);
+				});
 			}
 			elements.draft?.addEventListener("change", () => scheduleAutoPreview(220));
 			elements.pinned?.addEventListener("change", () => scheduleAutoPreview(220));
@@ -1427,6 +1447,7 @@ const today = new Date().toISOString().slice(0, 10);
 				event.preventDefault();
 				queuePreview({ silent: false, force: true });
 			});
+			window.addEventListener("resize", syncEditorBodyHeightSoon);
 		}
 
 		fillPost({
@@ -1674,6 +1695,7 @@ body.dark #editor-root input[type="date"].editor-input,
 
 #editor-root {
 	--editor-panel-height: 42rem;
+	--editor-split-pane-height: 48rem;
 }
 
 #editor-root .editor-pane.hidden {
@@ -1695,11 +1717,15 @@ body.dark #editor-root input[type="date"].editor-input,
 	width: 100%;
 	min-height: 100%;
 	height: 100%;
+	box-sizing: border-box;
 	border: none;
 	border-radius: 0.85rem;
 	padding: 1rem 1.05rem;
 	line-height: 1.72;
-	resize: vertical;
+	resize: none;
+	overflow: auto;
+	overscroll-behavior-y: contain;
+	touch-action: pan-y;
 	background: transparent;
 	color: var(--btn-content);
 	font-family:
@@ -1714,13 +1740,13 @@ body.dark #editor-root input[type="date"].editor-input,
 		monospace;
 }
 
+#editor-root #editor-edit-panel .editor-scroll-shell {
+	overflow: hidden;
+}
+
 #editor-root .editor-preview-shell {
-	padding: 0;
+	padding: 0.95rem 1.05rem;
 	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	min-height: 0;
 }
 
 #editor-root[data-editor-mode="split"] #editor-workspace {
@@ -1728,37 +1754,33 @@ body.dark #editor-root input[type="date"].editor-input,
 }
 
 #editor-root[data-editor-mode="split"] .editor-pane {
-	height: 100%;
-	min-height: 0;
+	height: var(--editor-split-pane-height);
+	min-height: var(--editor-split-pane-height);
+	max-height: var(--editor-split-pane-height);
 }
 
 #editor-root[data-editor-mode="split"] .editor-scroll-shell {
-	height: var(--editor-panel-height);
-	max-height: var(--editor-panel-height);
-	min-height: var(--editor-panel-height);
+	height: auto;
+	max-height: none;
+	min-height: 0;
 	flex: 1 1 auto;
 }
 
 #editor-root #editor-preview-panel .editor-scroll-shell {
-	overflow: hidden;
+	overflow: auto;
 }
 
 #editor-root #editor-preview-panel #editor-preview-headings {
-	flex: 0 0 auto;
-	margin: 0.95rem 1.05rem 0.7rem;
+	margin: 0 0 0.7rem;
 }
 
 #editor-root #editor-preview-divider {
-	flex: 0 0 auto;
-	margin: 0 1.05rem 0.85rem;
+	margin: 0 0 0.85rem;
 }
 
 #editor-root #editor-preview-panel #editor-preview-content {
-	flex: 1 1 auto;
-	min-height: 0;
-	overflow: auto;
-	padding: 0 1.05rem 1rem;
-	box-sizing: border-box;
+	overflow: visible;
+	padding: 0;
 }
 
 #editor-root #editor-preview-content {
@@ -2205,6 +2227,7 @@ body.dark #editor-root input[type="date"].editor-input,
 @media (max-width: 1024px) {
 	#editor-root {
 		--editor-panel-height: 34rem;
+		--editor-split-pane-height: 40rem;
 	}
 
 	#editor-root .editor-scroll-shell {
@@ -2213,7 +2236,7 @@ body.dark #editor-root input[type="date"].editor-input,
 	}
 
 	#editor-root[data-editor-mode="split"] .editor-scroll-shell {
-		min-height: var(--editor-panel-height);
+		min-height: 0;
 	}
 
 	#editor-root .editor-textarea {
