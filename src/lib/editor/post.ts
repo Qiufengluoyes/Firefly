@@ -115,26 +115,44 @@ export function buildFrontmatterData(post: NormalizedEditorPost): EditorPostInpu
 	const frontmatter: EditorPostInput = {
 		title: post.title,
 		published: post.published,
-		description: post.description,
-		tags: post.tags,
-		category: post.category || "",
-		lang: post.lang || "",
-		pinned: post.pinned,
-		draft: post.draft,
-		comment: post.comment,
 	};
 
 	if (post.updated) {
 		frontmatter.updated = post.updated;
 	}
+	if (post.description) {
+		frontmatter.description = post.description;
+	}
 	if (post.image) {
 		frontmatter.image = post.image;
+	}
+	if (post.tags.length > 0) {
+		frontmatter.tags = post.tags;
+	}
+	if (post.category) {
+		frontmatter.category = post.category;
+	}
+	frontmatter.draft = post.draft;
+	if (post.pinned) {
+		frontmatter.pinned = true;
+	}
+	if (post.lang) {
+		frontmatter.lang = post.lang;
+	}
+	if (post.comment === false) {
+		frontmatter.comment = false;
 	}
 
 	return frontmatter;
 }
 
 export function buildMarkdownDocument(post: NormalizedEditorPost): string {
-	const file = matter.stringify(`${post.body}\n`, buildFrontmatterData(post));
-	return file.replace(/\r\n/g, "\n");
+	const file = matter.stringify(`${post.body}\n`, buildFrontmatterData(post), {
+		flowLevel: 1,
+		lineWidth: -1,
+		sortKeys: false,
+	});
+	return file
+		.replace(/\r\n/g, "\n")
+		.replace(/^(published|updated):\s'(\d{4}-\d{2}-\d{2})'$/gm, "$1: $2");
 }

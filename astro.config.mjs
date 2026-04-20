@@ -32,11 +32,16 @@ import { LinkCardComponent } from "./src/plugins/rehype-component-link-card.mjs"
 import remarkImageCaption from "./src/plugins/remark-image-caption.ts";
 import remarkImageWidth from './src/plugins/remark-image-width.js';
 import rehypeEmailProtection from "./src/plugins/rehype-email-protection.mjs";
+import { rehypeResponsiveImages } from "./src/plugins/rehype-responsive-images.mjs";
 
 // https://astro.build/config
 export default defineConfig({
 	site: siteConfig.site_url,
 	adapter: vercel(),
+	image: {
+		responsiveStyles: true,
+		layout: "constrained",
+	},
 
 	base: "/",
 	trailingSlash: "always",
@@ -149,6 +154,7 @@ export default defineConfig({
 			remarkMermaid,
 		],
 		rehypePlugins: [
+			rehypeResponsiveImages,
 			[rehypeKatex, { katex }],
 			[rehypeCallouts, { theme: siteConfig.rehypeCallouts.theme }],
 			rehypeSlug,

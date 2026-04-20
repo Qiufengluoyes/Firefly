@@ -170,11 +170,13 @@ const watermarkStyles = showWatermark
       alt={alt || ""} 
       class:list={[
         imageClass,
+        "ff-theme-responsive-image",
         preview ? 'random-cover-preview-image' : 'random-cover-full-image'
       ]}
       style={imageStyle}
       width={preview ? 400 : 1200}
       height={preview ? 300 : 800}
+      layout="constrained"
       loading="lazy"
       format="webp"
       quality={preview ? 80 : 90}
@@ -219,6 +221,7 @@ const watermarkStyles = showWatermark
       alt={alt || ""} 
       class:list={[
         imageClass,
+        "ff-theme-responsive-image",
         preview ? 'random-cover-preview-image' : 'random-cover-full-image'
       ]}
       style={imageStyle}

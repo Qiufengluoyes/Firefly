@@ -201,6 +201,27 @@ const today = new Date().toISOString().slice(0, 10);
 							<h3 class="text-base font-semibold text-black/80 dark:text-white/80 whitespace-nowrap">编辑区</h3>
 							<span class="text-xs text-black/55 dark:text-white/55">快捷键：Ctrl/Cmd + S 渲染预览</span>
 						</div>
+						<div class="editor-md-toolbar mb-3" role="toolbar" aria-label="Markdown 工具栏">
+							<button type="button" class="editor-md-toolbtn" data-md-action="bold" title="加粗 (Ctrl+B)">加粗</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="italic" title="斜体 (Ctrl+I)">斜体</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="strike" title="删除线">删除线</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="code" title="行内代码">行内代码</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="link" title="插入链接">链接</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="quote" title="引用">引用</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="ul" title="无序列表">无序列表</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="ol" title="有序列表">有序列表</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="task" title="任务列表">任务列表</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="codeblock" title="代码块">代码块</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="hr" title="分割线">分割线</button>
+							<select id="editor-md-heading" class="editor-md-select" aria-label="标题级别">
+								<option value="">标题级别</option>
+								<option value="1">H1</option>
+								<option value="2">H2</option>
+								<option value="3">H3</option>
+								<option value="4">H4</option>
+								<option value="0">正文</option>
+							</select>
+						</div>
 						<div class="editor-scroll-shell">
 							<textarea
 								id="editor-body"
@@ -313,6 +334,8 @@ const today = new Date().toISOString().slice(0, 10);
 			feedback: document.getElementById("editor-feedback"),
 			publishResult: document.getElementById("editor-publish-result"),
 			snippetButtons: Array.from(root.querySelectorAll("[data-snippet]")),
+			mdToolButtons: Array.from(root.querySelectorAll("[data-md-action]")),
+			mdHeadingSelect: document.getElementById("editor-md-heading"),
 			modeButtons: Array.from(root.querySelectorAll(".editor-mode-btn")),
 		};
 
@@ -691,6 +714,146 @@ const today = new Date().toISOString().slice(0, 10);
 			const nextPos = start + content.length;
 			textarea.focus();
 			textarea.setSelectionRange(nextPos, nextPos);
+		}
+
+		function updateEditorBody(nextValue, nextStart, nextEnd) {
+			if (!elements.body) return;
+			const textarea = elements.body;
+			textarea.value = nextValue;
+			textarea.focus();
+			const start = Math.max(0, Math.min(Number(nextStart) || 0, nextValue.length));
+			const end = Math.max(start, Math.min(Number(nextEnd ?? nextStart) || start, nextValue.length));
+			textarea.setSelectionRange(start, end);
+			scheduleAutoPreview(120);
+		}
+
+		function insertAtSelection(content, selectInserted) {
+			if (!elements.body) return;
+			const textarea = elements.body;
+			const start = textarea.selectionStart || 0;
+			const end = textarea.selectionEnd || 0;
+			const before = textarea.value.slice(0, start);
+			const after = textarea.value.slice(end);
+			const nextValue = `${before}${content}${after}`;
+			const insertedEnd = start + content.length;
+			if (selectInserted) {
+				updateEditorBody(nextValue, start, insertedEnd);
+				return;
+			}
+			updateEditorBody(nextValue, insertedEnd, insertedEnd);
+		}
+
+		function wrapSelection(prefix, suffix, placeholder) {
+			if (!elements.body) return;
+			const textarea = elements.body;
+			const start = textarea.selectionStart || 0;
+			const end = textarea.selectionEnd || 0;
+			const selected = textarea.value.slice(start, end);
+			const before = textarea.value.slice(0, start);
+			const after = textarea.value.slice(end);
+			const middle = selected || placeholder;
+			const wrapped = `${prefix}${middle}${suffix}`;
+			const nextValue = `${before}${wrapped}${after}`;
+			if (!selected) {
+				const middleStart = start + prefix.length;
+				const middleEnd = middleStart + middle.length;
+				updateEditorBody(nextValue, middleStart, middleEnd);
+				return;
+			}
+			const nextPos = start + wrapped.length;
+			updateEditorBody(nextValue, nextPos, nextPos);
+		}
+
+		function transformSelectedLines(transformLine, fallbackLine) {
+			if (!elements.body) return;
+			const textarea = elements.body;
+			const value = textarea.value;
+			const selStart = textarea.selectionStart || 0;
+			const selEnd = textarea.selectionEnd || 0;
+			const lineStart = value.lastIndexOf("\n", Math.max(0, selStart - 1)) + 1;
+			let lineEnd = value.indexOf("\n", selEnd);
+			if (lineEnd < 0) lineEnd = value.length;
+
+			const original = value.slice(lineStart, lineEnd);
+			const base = original || fallbackLine;
+			const lines = base.split("\n");
+			const nextLines = lines.map((line, index) => transformLine(line, index, lines.length));
+			const replaced = nextLines.join("\n");
+			const nextValue = `${value.slice(0, lineStart)}${replaced}${value.slice(lineEnd)}`;
+			updateEditorBody(nextValue, lineStart, lineStart + replaced.length);
+		}
+
+		function applyHeadingLevel(levelRaw) {
+			const level = Number(levelRaw);
+			if (!Number.isFinite(level)) return;
+			transformSelectedLines(
+				(line) => {
+					const stripped = line.replace(/^\s{0,3}#{1,6}\s+/, "").trim();
+					if (level <= 0) return stripped || "正文内容";
+					return `${"#".repeat(level)} ${stripped || "标题"}`;
+				},
+				level <= 0 ? "正文内容" : "标题",
+			);
+		}
+
+		function applyMarkdownAction(action) {
+			const key = String(action || "");
+			if (!key) return;
+			if (key === "bold") {
+				wrapSelection("**", "**", "加粗文本");
+				return;
+			}
+			if (key === "italic") {
+				wrapSelection("*", "*", "斜体文本");
+				return;
+			}
+			if (key === "strike") {
+				wrapSelection("~~", "~~", "删除线文本");
+				return;
+			}
+			if (key === "code") {
+				wrapSelection("`", "`", "代码");
+				return;
+			}
+			if (key === "link") {
+				if (!elements.body) return;
+				const textarea = elements.body;
+				const start = textarea.selectionStart || 0;
+				const end = textarea.selectionEnd || 0;
+				const selected = textarea.value.slice(start, end) || "链接文字";
+				const url = "https://example.com";
+				const content = `[${selected}](${url})`;
+				const before = textarea.value.slice(0, start);
+				const after = textarea.value.slice(end);
+				const nextValue = `${before}${content}${after}`;
+				const urlStart = start + selected.length + 3;
+				const urlEnd = urlStart + url.length;
+				updateEditorBody(nextValue, urlStart, urlEnd);
+				return;
+			}
+			if (key === "quote") {
+				transformSelectedLines((line) => `> ${line || "引用内容"}`, "引用内容");
+				return;
+			}
+			if (key === "ul") {
+				transformSelectedLines((line) => `- ${line || "列表项"}`, "列表项");
+				return;
+			}
+			if (key === "ol") {
+				transformSelectedLines((line, index) => `${index + 1}. ${line || "列表项"}`, "列表项");
+				return;
+			}
+			if (key === "task") {
+				transformSelectedLines((line) => `- [ ] ${line || "待办项"}`, "待办项");
+				return;
+			}
+			if (key === "codeblock") {
+				wrapSelection("```text\n", "\n```", "在这里输入代码");
+				return;
+			}
+			if (key === "hr") {
+				insertAtSelection("\n\n---\n\n", false);
+			}
 		}
 
 		function escapeCssId(id) {
@@ -1207,6 +1370,19 @@ const today = new Date().toISOString().slice(0, 10);
 				});
 			}
 
+			for (const button of elements.mdToolButtons) {
+				button.addEventListener("click", () => {
+					applyMarkdownAction(button.dataset.mdAction || "");
+				});
+			}
+
+			elements.mdHeadingSelect?.addEventListener("change", (event) => {
+				const target = event.currentTarget;
+				const level = target && typeof target === "object" ? target.value : "";
+				applyHeadingLevel(level);
+				elements.mdHeadingSelect.value = "";
+			});
+
 			for (const button of elements.modeButtons) {
 				button.addEventListener("click", () => {
 					applyMode(button.dataset.mode || "split");
@@ -1214,9 +1390,27 @@ const today = new Date().toISOString().slice(0, 10);
 			}
 
 			document.addEventListener("keydown", (event) => {
-				const isSave = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s";
-				if (!isSave) return;
 				const active = document.activeElement;
+				const key = event.key.toLowerCase();
+				const withMeta = event.ctrlKey || event.metaKey;
+				if (withMeta && active === elements.body && key === "b") {
+					event.preventDefault();
+					applyMarkdownAction("bold");
+					return;
+				}
+				if (withMeta && active === elements.body && key === "i") {
+					event.preventDefault();
+					applyMarkdownAction("italic");
+					return;
+				}
+				if (withMeta && active === elements.body && key === "k") {
+					event.preventDefault();
+					applyMarkdownAction("link");
+					return;
+				}
+
+				const isSave = withMeta && key === "s";
+				if (!isSave) return;
 				if (active !== elements.body && active !== elements.description) return;
 				event.preventDefault();
 				queuePreview({ silent: false, force: true });
@@ -1386,6 +1580,43 @@ body.dark #editor-root input[type="date"].editor-input,
 	border-color: transparent;
 	color: #ffffff;
 	font-weight: 600;
+}
+
+#editor-root .editor-md-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.38rem;
+}
+
+#editor-root .editor-md-toolbtn {
+	background: var(--btn-regular-bg);
+	border: 1px solid var(--line-divider);
+	color: var(--btn-content);
+	border-radius: 0.62rem;
+	padding: 0.38rem 0.58rem;
+	font-size: 0.78rem;
+	line-height: 1;
+	white-space: nowrap;
+	transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+#editor-root .editor-md-toolbtn:hover {
+	background: var(--btn-regular-bg-hover);
+}
+
+#editor-root .editor-md-toolbtn:active {
+	transform: scale(0.98);
+}
+
+#editor-root .editor-md-select {
+	min-height: 2rem;
+	background: var(--btn-regular-bg);
+	border: 1px solid var(--line-divider);
+	color: var(--btn-content);
+	border-radius: 0.62rem;
+	padding: 0.3rem 0.55rem;
+	font-size: 0.78rem;
 }
 
 #editor-root .editor-mode-btn {

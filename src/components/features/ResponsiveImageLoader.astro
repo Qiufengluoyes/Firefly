@@ -1,0 +1,239 @@
+<script>
+const TARGET_IMAGE_SELECTOR = "img.md3-responsive-image, img.ff-theme-responsive-image";
+
+type WindowWithResponsiveLoader = Window & {
+	__fireflyResponsiveImageLoaderInit__?: boolean;
+};
+
+function ensureLoaderHost(parent: HTMLElement) {
+	if (window.getComputedStyle(parent).position === "static") {
+		parent.classList.add("ff-md3-loader-host");
+	}
+}
+
+function getOrCreateLoader(img: HTMLImageElement) {
+	const parent = img.parentElement as HTMLElement | null;
+	if (!parent) {
+		return null;
+	}
+
+	if (!img.dataset.ffMd3LoaderId) {
+		img.dataset.ffMd3LoaderId = `ff-md3-loader-${Math.random().toString(36).slice(2, 10)}`;
+	}
+
+	let loader = parent.querySelector<HTMLSpanElement>(
+		`:scope > span[data-ff-md3-loader-for="${img.dataset.ffMd3LoaderId}"]`,
+	);
+	if (loader) {
+		return loader;
+	}
+
+	ensureLoaderHost(parent);
+	loader = document.createElement("span");
+	loader.className = "ff-md3-image-loader";
+	loader.dataset.ffMd3LoaderFor = img.dataset.ffMd3LoaderId;
+	loader.setAttribute("aria-hidden", "true");
+	loader.innerHTML = '<span class="ff-md3-image-loader__indicator"></span>';
+	parent.append(loader);
+	return loader;
+}
+
+function syncLoaderPosition(img: HTMLImageElement) {
+	const parent = img.parentElement as HTMLElement | null;
+	if (!parent || !img.dataset.ffMd3LoaderId) {
+		return;
+	}
+
+	const loader = parent.querySelector<HTMLSpanElement>(
+		`:scope > span[data-ff-md3-loader-for="${img.dataset.ffMd3LoaderId}"]`,
+	);
+	if (!loader) {
+		return;
+	}
+
+	const width = img.offsetWidth;
+	const height = img.offsetHeight;
+
+	if (width <= 0 || height <= 0) {
+		loader.classList.remove("ff-md3-image-loader--active");
+		return;
+	}
+
+	loader.style.left = `${img.offsetLeft}px`;
+	loader.style.top = `${img.offsetTop + height - 3}px`;
+	loader.style.width = `${width}px`;
+}
+
+function hideLoader(img: HTMLImageElement) {
+	const parent = img.parentElement as HTMLElement | null;
+	if (!parent || !img.dataset.ffMd3LoaderId) {
+		return;
+	}
+
+	const loader = parent.querySelector<HTMLSpanElement>(
+		`:scope > span[data-ff-md3-loader-for="${img.dataset.ffMd3LoaderId}"]`,
+	);
+	if (!loader) {
+		return;
+	}
+
+	loader.classList.remove("ff-md3-image-loader--active");
+	window.setTimeout(() => loader.remove(), 220);
+}
+
+function bindImageLoader(img: HTMLImageElement) {
+	if (img.dataset.ffMd3LoaderBound === "true") {
+		syncLoaderPosition(img);
+		return;
+	}
+
+	img.dataset.ffMd3LoaderBound = "true";
+	const loader = getOrCreateLoader(img);
+	if (!loader) {
+		return;
+	}
+
+	const onDone = () => {
+		hideLoader(img);
+		img.removeEventListener("load", onDone);
+		img.removeEventListener("error", onDone);
+	};
+
+	img.addEventListener("load", onDone);
+	img.addEventListener("error", onDone);
+
+	if (img.complete && img.naturalWidth > 0) {
+		hideLoader(img);
+	} else {
+		loader.classList.add("ff-md3-image-loader--active");
+		syncLoaderPosition(img);
+	}
+}
+
+function initResponsiveImageLoader(root: ParentNode = document) {
+	root.querySelectorAll<HTMLImageElement>(TARGET_IMAGE_SELECTOR).forEach(bindImageLoader);
+}
+
+function syncAllLoaderPositions() {
+	document.querySelectorAll<HTMLImageElement>(TARGET_IMAGE_SELECTOR).forEach(syncLoaderPosition);
+}
+
+function createDynamicObserver() {
+	const observer = new MutationObserver((mutations) => {
+		mutations.forEach((mutation) => {
+			mutation.addedNodes.forEach((node) => {
+				if (!(node instanceof HTMLElement)) {
+					return;
+				}
+
+				if (node.matches(TARGET_IMAGE_SELECTOR)) {
+					bindImageLoader(node as HTMLImageElement);
+				}
+
+				initResponsiveImageLoader(node);
+				requestAnimationFrame(syncAllLoaderPositions);
+			});
+		});
+	});
+
+	observer.observe(document.body, { childList: true, subtree: true });
+}
+
+function setupResponsiveImageLoader() {
+	const win = window as WindowWithResponsiveLoader;
+	if (win.__fireflyResponsiveImageLoaderInit__) {
+		initResponsiveImageLoader();
+		requestAnimationFrame(syncAllLoaderPositions);
+		return;
+	}
+
+	document.addEventListener("astro:page-load", () => {
+		initResponsiveImageLoader();
+		requestAnimationFrame(syncAllLoaderPositions);
+	});
+	document.addEventListener("swup:content:replace", () => {
+		initResponsiveImageLoader();
+		requestAnimationFrame(syncAllLoaderPositions);
+	});
+	document.addEventListener("swup:contentReplaced", () => {
+		initResponsiveImageLoader();
+		requestAnimationFrame(syncAllLoaderPositions);
+	});
+	window.addEventListener("resize", () => {
+		requestAnimationFrame(syncAllLoaderPositions);
+	});
+
+	createDynamicObserver();
+	win.__fireflyResponsiveImageLoaderInit__ = true;
+	initResponsiveImageLoader();
+	requestAnimationFrame(syncAllLoaderPositions);
+}
+
+if (document.readyState === "loading") {
+	document.addEventListener("DOMContentLoaded", setupResponsiveImageLoader, { once: true });
+} else {
+	setupResponsiveImageLoader();
+}
+</script>
+
+<style is:global>
+:root {
+	--ff-md3-loader-track: color-mix(in oklch, var(--primary) 22%, transparent);
+	--ff-md3-loader-indicator-start: color-mix(in oklch, var(--primary) 60%, white 40%);
+	--ff-md3-loader-indicator-end: color-mix(in oklch, var(--primary) 90%, white 10%);
+}
+
+:root.dark {
+	--ff-md3-loader-track: color-mix(in oklch, var(--primary) 36%, black 64%);
+	--ff-md3-loader-indicator-start: color-mix(in oklch, var(--primary) 68%, white 32%);
+	--ff-md3-loader-indicator-end: color-mix(in oklch, var(--primary) 88%, white 12%);
+}
+
+.ff-md3-loader-host {
+	position: relative;
+}
+
+.ff-md3-image-loader {
+	position: absolute;
+	height: 3px;
+	border-radius: 999px;
+	background: var(--ff-md3-loader-track);
+	overflow: hidden;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 180ms cubic-bezier(0.2, 0, 0, 1);
+	z-index: 6;
+}
+
+.ff-md3-image-loader--active {
+	opacity: 1;
+}
+
+.ff-md3-image-loader__indicator {
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: 42%;
+	background: linear-gradient(
+		90deg,
+		var(--ff-md3-loader-indicator-start) 0%,
+		var(--ff-md3-loader-indicator-end) 100%
+	);
+	animation: ff-md3-loader-slide 1.15s cubic-bezier(0.2, 0, 0, 1) infinite;
+}
+
+@keyframes ff-md3-loader-slide {
+	0% {
+		transform: translateX(-130%);
+	}
+	100% {
+		transform: translateX(320%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ff-md3-image-loader__indicator {
+		animation: none;
+		transform: translateX(0);
+	}
+}
+</style>
