@@ -394,22 +394,40 @@ function hideLoader(img: HTMLImageElement) {
 }
 
 function markImagePending(img: HTMLImageElement) {
+	img.dataset.ffMd3ImageReady = "false";
 	img.classList.add("ff-md3-image-fade");
 	img.classList.remove("ff-md3-image-fade--ready");
 	img.classList.add("ff-md3-image-fade--pending");
 }
 
 function markImageReady(img: HTMLImageElement) {
+	img.dataset.ffMd3ImageReady = "true";
 	img.classList.add("ff-md3-image-fade");
 	img.classList.remove("ff-md3-image-fade--pending");
 	img.classList.add("ff-md3-image-fade--ready");
 }
 
+function queueImageReady(img: HTMLImageElement) {
+	if (img.dataset.ffMd3ImageReady === "true") {
+		return;
+	}
+	if (img.dataset.ffMd3ImageReadyQueued === "true") {
+		return;
+	}
+
+	img.dataset.ffMd3ImageReadyQueued = "true";
+	requestAnimationFrame(() => {
+		requestAnimationFrame(() => {
+			markImageReady(img);
+			img.dataset.ffMd3ImageReadyQueued = "false";
+		});
+	});
+}
+
 function bindImageLoader(img: HTMLImageElement) {
+	markImagePending(img);
 	if (img.complete && img.naturalWidth > 0) {
-		markImageReady(img);
-	} else {
-		markImagePending(img);
+		queueImageReady(img);
 	}
 
 	if (img.dataset.ffMd3LoaderBound === "true") {
@@ -424,7 +442,7 @@ function bindImageLoader(img: HTMLImageElement) {
 			}
 		}
 		if (img.complete && img.naturalWidth > 0) {
-			markImageReady(img);
+			queueImageReady(img);
 		}
 		syncLoaderPosition(img);
 		return;
@@ -438,7 +456,7 @@ function bindImageLoader(img: HTMLImageElement) {
 
 	const onDone = () => {
 		hideLoader(img);
-		markImageReady(img);
+		queueImageReady(img);
 		img.removeEventListener("load", onDone);
 		img.removeEventListener("error", onDone);
 	};
@@ -448,7 +466,7 @@ function bindImageLoader(img: HTMLImageElement) {
 
 	if (img.complete && img.naturalWidth > 0) {
 		hideLoader(img);
-		markImageReady(img);
+		queueImageReady(img);
 	} else {
 		loader.classList.add("ff-md3-image-loader--active");
 		markImagePending(img);
