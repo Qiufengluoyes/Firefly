@@ -21,31 +21,57 @@ function uniquePaths(items: string[]): string[] {
 }
 
 export function detectEditorPostFormat(entryId: string): "md" | "mdx" {
-	const normalizedId = normalizeEntryId(entryId);
-	if (!normalizedId) return "md";
+	const sourcePath = resolveEditorPostSourcePath(entryId);
+	return sourcePath.toLowerCase().endsWith(".mdx") ? "mdx" : "md";
+}
 
-	const lower = normalizedId.toLowerCase();
-	if (lower.endsWith(".mdx")) return "mdx";
-	if (lower.endsWith(".md")) return "md";
+export function resolveEditorPostSourcePath(entryId: string): string {
+	const normalizedId = normalizeEntryId(entryId).replace(/^\/+|\/+$/g, "");
+	if (!normalizedId) return "";
+
+	const slugFromId = removeFileExtension(normalizedId).replace(/^\/+|\/+$/g, "");
+	const lowerId = normalizedId.toLowerCase();
+	if (
+		slugFromId &&
+		!slugFromId.includes("/") &&
+		(lowerId.endsWith(".md") || lowerId.endsWith(".mdx"))
+	) {
+		const preferFolderIndex = uniquePaths([
+			`${slugFromId}/index.mdx`,
+			`${slugFromId}/index.md`,
+		]);
+		for (const candidate of preferFolderIndex) {
+			if (fs.existsSync(path.join(POSTS_DIR, candidate))) {
+				return candidate;
+			}
+		}
+	}
+
+	if ((lowerId.endsWith(".md") || lowerId.endsWith(".mdx")) && fs.existsSync(path.join(POSTS_DIR, normalizedId))) {
+		return normalizedId;
+	}
 
 	const slug = removeFileExtension(normalizedId).replace(/^\/+|\/+$/g, "");
-	const slashIndexSlug = slug.endsWith("/index") ? slug.slice(0, -"/index".length) : slug;
+	if (!slug) return "";
+
+	const withoutIndex = slug.endsWith("/index") ? slug.slice(0, -"/index".length) : slug;
 	const candidates = uniquePaths([
-		slug,
-		slashIndexSlug,
-		slug ? `${slug}/index` : "",
-		slashIndexSlug ? `${slashIndexSlug}/index` : "",
+		`${slug}.mdx`,
+		`${slug}.md`,
+		withoutIndex ? `${withoutIndex}/index.mdx` : "",
+		withoutIndex ? `${withoutIndex}/index.md` : "",
+		withoutIndex ? `${withoutIndex}.mdx` : "",
+		withoutIndex ? `${withoutIndex}.md` : "",
 	]).filter(Boolean);
 
 	for (const candidate of candidates) {
-		const mdxPath = path.join(POSTS_DIR, `${candidate}.mdx`);
-		if (fs.existsSync(mdxPath)) return "mdx";
+		if (fs.existsSync(path.join(POSTS_DIR, candidate))) {
+			return candidate;
+		}
 	}
 
-	for (const candidate of candidates) {
-		const mdPath = path.join(POSTS_DIR, `${candidate}.md`);
-		if (fs.existsSync(mdPath)) return "md";
+	if (slug.endsWith("/index")) {
+		return `${slug}.md`;
 	}
-
-	return "md";
+	return `${slug}.md`;
 }

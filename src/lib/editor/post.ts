@@ -63,6 +63,26 @@ function normalizeFormat(value: unknown): "md" | "mdx" {
 	return normalized === "mdx" ? "mdx" : "md";
 }
 
+function normalizeSourcePath(value: unknown, slug: string, format: "md" | "mdx"): string {
+	const expectedExt = format === "mdx" ? ".mdx" : ".md";
+	const fallback = `${slug}${expectedExt}`;
+	if (typeof value !== "string") return fallback;
+
+	let normalized = value.trim().replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+	if (!normalized) return fallback;
+	if (normalized.includes("..")) {
+		throw new Error("sourcePath 非法，请勿包含路径跳转字符。");
+	}
+
+	if (!/\.(md|mdx)$/i.test(normalized)) {
+		normalized = `${normalized}${expectedExt}`;
+	} else {
+		normalized = normalized.replace(/\.(md|mdx)$/i, expectedExt);
+	}
+
+	return normalized;
+}
+
 export function slugifyTitle(title: string): string {
 	return title
 		.trim()
@@ -107,10 +127,12 @@ export function normalizeEditorPostInput(input: unknown): NormalizedEditorPost {
 	const updatedRaw = normalizeDate(data.updated, "");
 	const updated = updatedRaw || undefined;
 	const format = normalizeFormat(data.format);
+	const sourcePath = normalizeSourcePath(data.sourcePath, slug, format);
 
 	return {
 		title,
 		slug,
+		sourcePath,
 		format,
 		description: String(data.description ?? "").trim(),
 		body: body.trimEnd(),
@@ -166,12 +188,13 @@ export function buildMarkdownDocument(post: NormalizedEditorPost): string {
 		flowLevel: 1,
 		lineWidth: -1,
 		sortKeys: false,
-	});
+	} as unknown as Parameters<typeof matter.stringify>[2]);
 	const normalized = file
 		.replace(/\r\n/g, "\n")
 		.replace(/^(published|updated):\s'(\d{4}-\d{2}-\d{2})'$/gm, "$1: $2");
-	return normalized.replace(/^category:\s*(.+)$/gm, (_match, rawValue: string) => {
+	const withQuotedCategory = normalized.replace(/^category:\s*(.+)$/gm, (_match, rawValue: string) => {
 		const category = unquoteYamlScalar(rawValue);
 		return `category: ${toYamlSingleQuoted(category)}`;
 	});
+	return withQuotedCategory.replace(/^(---\n[\s\S]*?\n---)\n*/, "$1\n\n");
 }

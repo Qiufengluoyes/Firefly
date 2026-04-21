@@ -237,17 +237,19 @@ const today = new Date().toISOString().slice(0, 10);
 							<span id="editor-preview-meta" class="text-xs text-black/55 dark:text-white/55"></span>
 						</div>
 						<div class="editor-scroll-shell editor-preview-shell">
-							<div id="editor-preview-headings" class="flex flex-wrap gap-2"></div>
-							<div
-								id="editor-preview-divider"
-								class="border-[var(--line-divider)] border-dashed border-b"
-							></div>
-							<article
-								id="editor-preview-content"
-								class="prose dark:prose-invert prose-base !max-w-none custom-md markdown-content"
-							>
-								<p class="text-black/60 dark:text-white/60">输入后将自动实时预览。</p>
-							</article>
+							<div class="editor-preview-scroll-inner">
+								<div id="editor-preview-headings" class="flex flex-wrap gap-2"></div>
+								<div
+									id="editor-preview-divider"
+									class="border-[var(--line-divider)] border-dashed border-b"
+								></div>
+								<article
+									id="editor-preview-content"
+									class="prose dark:prose-invert prose-base !max-w-none custom-md markdown-content"
+								>
+									<p class="text-black/60 dark:text-white/60">输入后将自动实时预览。</p>
+								</article>
+							</div>
 						</div>
 					</section>
 				</div>
@@ -293,6 +295,7 @@ const today = new Date().toISOString().slice(0, 10);
 			posts: [],
 			filteredPosts: [],
 			selectedSlug: "",
+			sourcePath: "",
 			mode: "split",
 			authenticated: false,
 			isLoadingPost: false,
@@ -440,6 +443,7 @@ const today = new Date().toISOString().slice(0, 10);
 			return {
 				title: (elements.title?.value || "").trim(),
 				slug: (elements.slug?.value || "").trim(),
+				sourcePath: state.sourcePath || "",
 				format: (elements.format?.value || "md").trim() === "mdx" ? "mdx" : "md",
 				description: (elements.description?.value || "").trim(),
 				body: (elements.body?.value || "").replace(/\r\n/g, "\n"),
@@ -467,6 +471,7 @@ const today = new Date().toISOString().slice(0, 10);
 
 		function fillPost(post) {
 			const payload = post || {};
+			state.sourcePath = String(payload.sourcePath || "").trim();
 			if (elements.title) elements.title.value = payload.title || "";
 			if (elements.slug) elements.slug.value = payload.slug || "";
 			if (elements.format) elements.format.value = payload.format === "mdx" ? "mdx" : "md";
@@ -486,6 +491,7 @@ const today = new Date().toISOString().slice(0, 10);
 
 		function resetToNewPost() {
 			state.selectedSlug = "";
+			state.sourcePath = "";
 			state.lastPreviewFingerprint = "";
 			updatePostListSelection();
 			fillPost({
@@ -1724,7 +1730,7 @@ body.dark #editor-root input[type="date"].editor-input,
 #editor-root .editor-scroll-shell {
 	height: var(--editor-panel-height);
 	max-height: var(--editor-panel-height);
-	overflow: auto;
+	overflow: hidden;
 	border-radius: 0.85rem;
 	border: 1px solid var(--line-divider);
 	background: var(--card-bg);
@@ -1759,13 +1765,54 @@ body.dark #editor-root input[type="date"].editor-input,
 		monospace;
 }
 
+#editor-root .editor-textarea,
+#editor-root .editor-preview-scroll-inner {
+	scrollbar-width: thin;
+	scrollbar-color: color-mix(in srgb, var(--line-divider) 80%, transparent) transparent;
+}
+
+#editor-root .editor-textarea::-webkit-scrollbar,
+#editor-root .editor-preview-scroll-inner::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+#editor-root .editor-textarea::-webkit-scrollbar-track,
+#editor-root .editor-preview-scroll-inner::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+#editor-root .editor-textarea::-webkit-scrollbar-thumb,
+#editor-root .editor-preview-scroll-inner::-webkit-scrollbar-thumb {
+	background: color-mix(in srgb, var(--line-divider) 80%, transparent);
+	border-radius: 999px;
+	border: 2px solid transparent;
+	background-clip: content-box;
+}
+
+#editor-root .editor-textarea::-webkit-scrollbar-thumb:hover,
+#editor-root .editor-preview-scroll-inner::-webkit-scrollbar-thumb:hover {
+	background: color-mix(in srgb, var(--line-divider) 96%, transparent);
+}
+
 #editor-root #editor-edit-panel .editor-scroll-shell {
 	overflow: hidden;
 }
 
 #editor-root .editor-preview-shell {
+	padding: 0;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+#editor-root .editor-preview-scroll-inner {
+	height: 100%;
+	max-height: 100%;
+	overflow: auto;
 	padding: 0.95rem 1.05rem;
 	box-sizing: border-box;
+	scrollbar-width: thin;
+	overscroll-behavior-y: contain;
 }
 
 #editor-root[data-editor-mode="split"] #editor-workspace {
@@ -1783,10 +1830,6 @@ body.dark #editor-root input[type="date"].editor-input,
 	max-height: none;
 	min-height: 0;
 	flex: 1 1 auto;
-}
-
-#editor-root #editor-preview-panel .editor-scroll-shell {
-	overflow: auto;
 }
 
 #editor-root #editor-preview-panel #editor-preview-headings {
@@ -2293,8 +2336,9 @@ body.dark #editor-root input[type="date"].editor-input,
 	}
 
 	#editor-root .editor-post-item {
-		height: auto;
+		height: 6.4rem;
 		min-height: 6.4rem;
+		max-height: 6.4rem;
 		padding: 0.6rem 0.66rem;
 	}
 
@@ -2311,18 +2355,18 @@ body.dark #editor-root input[type="date"].editor-input,
 	#editor-root .editor-post-item-meta {
 		font-size: 0.78rem;
 		line-height: 1.3;
-		white-space: normal;
+		white-space: nowrap;
 		overflow: hidden;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		min-height: 0;
+		text-overflow: ellipsis;
+		display: block;
+		min-height: 1.02rem;
 	}
 
 	#editor-root .editor-post-item-flags {
-		flex-wrap: wrap;
-		row-gap: 0.26rem;
-		column-gap: 0.3rem;
+		flex-wrap: nowrap;
+		row-gap: 0;
+		column-gap: 0.35rem;
+		overflow: hidden;
 	}
 }
 

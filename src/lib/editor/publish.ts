@@ -74,6 +74,31 @@ function encodeContentPath(path: string) {
 		.join("/");
 }
 
+function resolvePublishFilePath(config: PublishConfig, post: NormalizedEditorPost) {
+	const expectedExt = post.format === "mdx" ? ".mdx" : ".md";
+	const fallback = `${post.slug}${expectedExt}`;
+	let relativePath = String(post.sourcePath || "")
+		.trim()
+		.replace(/\\/g, "/")
+		.replace(/^\/+|\/+$/g, "");
+
+	if (!relativePath) {
+		relativePath = fallback;
+	}
+
+	if (relativePath.includes("..")) {
+		throw new Error("目标路径非法，请检查 sourcePath 或 slug。");
+	}
+
+	if (!/\.(md|mdx)$/i.test(relativePath)) {
+		relativePath = `${relativePath}${expectedExt}`;
+	} else {
+		relativePath = relativePath.replace(/\.(md|mdx)$/i, expectedExt);
+	}
+
+	return `${config.postsDir}/${relativePath}`;
+}
+
 async function readGitHubError(response: Response) {
 	const text = await response.text();
 	try {
@@ -92,11 +117,7 @@ export async function publishPostToGitHub(post: NormalizedEditorPost) {
 		);
 	}
 
-	const extension = post.format === "mdx" ? "mdx" : "md";
-	const filePath = `${config.postsDir}/${post.slug}.${extension}`;
-	if (filePath.includes("..")) {
-		throw new Error("目标路径非法，请检查 slug。");
-	}
+	const filePath = resolvePublishFilePath(config, post);
 
 	const encodedPath = encodeContentPath(filePath);
 	const endpoint = `${GITHUB_API_BASE}/repos/${config.owner}/${config.repo}/contents/${encodedPath}`;

@@ -1,6 +1,7 @@
 export interface EditorPostInput {
 	title: string;
 	slug?: string;
+	sourcePath?: string;
 	format?: "md" | "mdx" | string;
 	description?: string;
 	body?: string;
@@ -18,6 +19,7 @@ export interface EditorPostInput {
 export interface NormalizedEditorPost {
 	title: string;
 	slug: string;
+	sourcePath: string;
 	format: "md" | "mdx";
 	description: string;
 	body: string;

@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 import { ensureEditorAuth } from "@/lib/editor/auth";
-import { detectEditorPostFormat } from "@/lib/editor/format";
+import { detectEditorPostFormat, resolveEditorPostSourcePath } from "@/lib/editor/format";
 import { formatDateToYYYYMMDD } from "@/utils/date-utils";
 import { removeFileExtension } from "@/utils/url-utils";
 
@@ -40,6 +40,7 @@ export const GET: APIRoute = async (context) => {
 		post: {
 			title: entry.data.title,
 			slug: removeFileExtension(entry.id),
+			sourcePath: resolveEditorPostSourcePath(entry.id),
 			format: detectEditorPostFormat(entry.id),
 			description: entry.data.description || "",
 			published: formatDateToYYYYMMDD(new Date(entry.data.published)),
