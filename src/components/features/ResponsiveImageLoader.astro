@@ -1,9 +1,13 @@
 <script>
 const TARGET_IMAGE_SELECTOR = "img.md3-responsive-image, img.ff-theme-responsive-image";
 const IMAGE_LOADER_HEIGHT = 4;
+const IMAGE_LOADER_MAX_WIDTH = 420;
+const IMAGE_LOADER_MIN_WIDTH = 56;
 const PAGE_LOADER_PROGRESS_DURATION = 6000;
 const PAGE_LOADER_FINISH_DURATION = 420;
 const PAGE_LOADER_MIN_ACTIVE_MS = 260;
+const IMAGE_FALLBACK_ASPECT_RATIO = "16 / 9";
+const IMAGE_PLACEHOLDER_MIN_HEIGHT = 72;
 
 type WindowWithResponsiveLoader = Window & {
 	__fireflyResponsiveImageLoaderInit__?: boolean;
@@ -363,9 +367,17 @@ function syncLoaderPosition(img: HTMLImageElement) {
 	const baseLeft = imageWidth > 0 ? img.offsetLeft : 0;
 	const baseTop = imageHeight > 0 ? img.offsetTop : 0;
 	const horizontalGap = Math.max(12, Math.min(24, Math.round(baseWidth * 0.08)));
-	const width = baseWidth - horizontalGap * 2;
-	const left = baseLeft + horizontalGap;
-	const top = baseTop + Math.max(0, baseHeight / 2 - IMAGE_LOADER_HEIGHT / 2);
+	const targetWidth = baseWidth - horizontalGap * 2;
+	const width = Math.max(
+		IMAGE_LOADER_MIN_WIDTH,
+		Math.min(IMAGE_LOADER_MAX_WIDTH, targetWidth),
+	);
+	const rawLeft = baseLeft + Math.max(horizontalGap, (baseWidth - width) / 2);
+	const maxLeft = Math.max(0, parentWidth - width);
+	const left = Math.min(Math.max(0, rawLeft), maxLeft);
+	const rawTop = baseTop + Math.max(0, baseHeight / 2 - IMAGE_LOADER_HEIGHT / 2);
+	const maxTop = Math.max(0, parentHeight - IMAGE_LOADER_HEIGHT);
+	const top = Math.min(Math.max(0, rawTop), maxTop);
 
 	if (width <= 40) {
 		return;
@@ -393,11 +405,106 @@ function hideLoader(img: HTMLImageElement) {
 	window.setTimeout(() => loader.remove(), 220);
 }
 
+function parsePositiveDimension(value: string | null | undefined) {
+	if (!value) {
+		return undefined;
+	}
+
+	const normalized = value.trim();
+	if (!normalized || normalized.endsWith("%")) {
+		return undefined;
+	}
+
+	const numeric = Number(normalized);
+	if (!Number.isFinite(numeric) || numeric <= 0) {
+		return undefined;
+	}
+	return numeric;
+}
+
+function parseAspectRatioNumber(ratio: string) {
+	const match = ratio.match(/^\s*([0-9]+(?:\.[0-9]+)?)\s*\/\s*([0-9]+(?:\.[0-9]+)?)\s*$/);
+	if (!match) {
+		return undefined;
+	}
+
+	const width = Number(match[1]);
+	const height = Number(match[2]);
+	if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+		return undefined;
+	}
+	return width / height;
+}
+
+function isArticleResponsiveImage(img: HTMLImageElement) {
+	return img.classList.contains("md3-responsive-image");
+}
+
+function resolveImageFallbackAspectRatio(img: HTMLImageElement) {
+	const widthAttr = parsePositiveDimension(img.getAttribute("width"));
+	const heightAttr = parsePositiveDimension(img.getAttribute("height"));
+	if (widthAttr && heightAttr) {
+		return `${widthAttr} / ${heightAttr}`;
+	}
+
+	if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+		return `${img.naturalWidth} / ${img.naturalHeight}`;
+	}
+
+	return IMAGE_FALLBACK_ASPECT_RATIO;
+}
+
+function syncImagePlaceholderSizing(img: HTMLImageElement) {
+	if (!isArticleResponsiveImage(img)) {
+		return;
+	}
+
+	const fallbackRatio = resolveImageFallbackAspectRatio(img);
+	img.style.setProperty("--ff-md3-fallback-ratio", fallbackRatio);
+
+	if (img.dataset.ffMd3ImageReady === "true" || (img.complete && img.naturalWidth > 0)) {
+		img.style.removeProperty("--ff-md3-placeholder-min-height");
+		return;
+	}
+
+	const renderedHeight = img.getBoundingClientRect().height;
+	if (renderedHeight > 0) {
+		img.style.removeProperty("--ff-md3-placeholder-min-height");
+		return;
+	}
+
+	const ratioValue = parseAspectRatioNumber(fallbackRatio);
+	if (!ratioValue) {
+		return;
+	}
+
+	let baseWidth = img.getBoundingClientRect().width;
+	if (baseWidth <= 0) {
+		const parent = img.parentElement as HTMLElement | null;
+		if (parent) {
+			baseWidth = parent.clientWidth || parent.getBoundingClientRect().width;
+		}
+	}
+	if (baseWidth <= 0) {
+		const widthAttr = parsePositiveDimension(img.getAttribute("width"));
+		if (widthAttr) {
+			baseWidth = widthAttr;
+		}
+	}
+	if (baseWidth <= 0) {
+		return;
+	}
+
+	const minHeight = Math.max(IMAGE_PLACEHOLDER_MIN_HEIGHT, Math.round(baseWidth / ratioValue));
+	img.style.setProperty("--ff-md3-placeholder-min-height", `${minHeight}px`);
+}
+
 function markImagePending(img: HTMLImageElement) {
 	img.dataset.ffMd3ImageReady = "false";
 	img.classList.add("ff-md3-image-fade");
 	img.classList.remove("ff-md3-image-fade--ready");
 	img.classList.add("ff-md3-image-fade--pending");
+	syncImagePlaceholderSizing(img);
 }
 
 function markImageReady(img: HTMLImageElement) {
@@ -405,6 +512,8 @@ function markImageReady(img: HTMLImageElement) {
 	img.classList.add("ff-md3-image-fade");
 	img.classList.remove("ff-md3-image-fade--pending");
 	img.classList.add("ff-md3-image-fade--ready");
+	syncImagePlaceholderSizing(img);
+	img.style.removeProperty("--ff-md3-placeholder-min-height");
 }
 
 function queueImageReady(img: HTMLImageElement) {
@@ -425,6 +534,7 @@ function queueImageReady(img: HTMLImageElement) {
 }
 
 function bindImageLoader(img: HTMLImageElement) {
+	syncImagePlaceholderSizing(img);
 	markImagePending(img);
 	if (img.complete && img.naturalWidth > 0) {
 		queueImageReady(img);
@@ -444,6 +554,7 @@ function bindImageLoader(img: HTMLImageElement) {
 		if (img.complete && img.naturalWidth > 0) {
 			queueImageReady(img);
 		}
+		syncImagePlaceholderSizing(img);
 		syncLoaderPosition(img);
 		return;
 	}
@@ -455,6 +566,7 @@ function bindImageLoader(img: HTMLImageElement) {
 	}
 
 	const onDone = () => {
+		syncImagePlaceholderSizing(img);
 		hideLoader(img);
 		queueImageReady(img);
 		img.removeEventListener("load", onDone);
@@ -465,11 +577,13 @@ function bindImageLoader(img: HTMLImageElement) {
 	img.addEventListener("error", onDone);
 
 	if (img.complete && img.naturalWidth > 0) {
+		syncImagePlaceholderSizing(img);
 		hideLoader(img);
 		queueImageReady(img);
 	} else {
 		loader.classList.add("ff-md3-image-loader--active");
 		markImagePending(img);
+		syncImagePlaceholderSizing(img);
 		syncLoaderPosition(img);
 	}
 }
@@ -479,7 +593,10 @@ function initResponsiveImageLoader(root: ParentNode = document) {
 }
 
 function syncAllLoaderPositions() {
-	document.querySelectorAll<HTMLImageElement>(TARGET_IMAGE_SELECTOR).forEach(syncLoaderPosition);
+	document.querySelectorAll<HTMLImageElement>(TARGET_IMAGE_SELECTOR).forEach((img) => {
+		syncImagePlaceholderSizing(img);
+		syncLoaderPosition(img);
+	});
 }
 
 function createDynamicObserver() {
@@ -566,6 +683,14 @@ if (document.readyState === "loading") {
 
 .ff-md3-loader-host {
 	position: relative;
+}
+
+img.md3-responsive-image {
+	display: block;
+	max-width: 100%;
+	height: auto;
+	aspect-ratio: auto var(--ff-md3-fallback-ratio, 16 / 9);
+	min-height: var(--ff-md3-placeholder-min-height, 0px);
 }
 
 img.md3-responsive-image:not(.ff-md3-image-fade--ready),

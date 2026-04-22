@@ -207,6 +207,7 @@ const today = new Date().toISOString().slice(0, 10);
 							<button type="button" class="editor-md-toolbtn" data-md-action="strike" title="删除线">删除线</button>
 							<button type="button" class="editor-md-toolbtn" data-md-action="code" title="行内代码">行内代码</button>
 							<button type="button" class="editor-md-toolbtn" data-md-action="link" title="插入链接">链接</button>
+							<button type="button" class="editor-md-toolbtn" data-md-action="image" title="插入图片">图片</button>
 							<button type="button" class="editor-md-toolbtn" data-md-action="quote" title="引用">引用</button>
 							<button type="button" class="editor-md-toolbtn" data-md-action="ul" title="无序列表">无序列表</button>
 							<button type="button" class="editor-md-toolbtn" data-md-action="ol" title="有序列表">有序列表</button>
@@ -866,6 +867,22 @@ const today = new Date().toISOString().slice(0, 10);
 				const after = textarea.value.slice(end);
 				const nextValue = `${before}${content}${after}`;
 				const urlStart = start + selected.length + 3;
+				const urlEnd = urlStart + url.length;
+				updateEditorBody(nextValue, urlStart, urlEnd);
+				return;
+			}
+			if (key === "image") {
+				if (!elements.body) return;
+				const textarea = elements.body;
+				const start = textarea.selectionStart || 0;
+				const end = textarea.selectionEnd || 0;
+				const selected = textarea.value.slice(start, end) || "图片描述";
+				const url = "https://example.com/image.jpg";
+				const content = `![${selected}](${url})`;
+				const before = textarea.value.slice(0, start);
+				const after = textarea.value.slice(end);
+				const nextValue = `${before}${content}${after}`;
+				const urlStart = start + selected.length + 4;
 				const urlEnd = urlStart + url.length;
 				updateEditorBody(nextValue, urlStart, urlEnd);
 				return;
@@ -2038,12 +2055,14 @@ body.dark #editor-root input[type="date"].editor-input,
 #editor-root .editor-post-list {
 	height: 17rem;
 	max-height: 17rem;
-	overflow: auto;
+	overflow-y: auto;
+	overflow-x: hidden;
 	padding: 0.55rem;
 	border: 1px solid var(--line-divider);
 	background: var(--card-bg);
 	display: grid;
 	gap: 0.55rem;
+	box-sizing: border-box;
 }
 
 #editor-root .editor-post-list-empty {
@@ -2068,6 +2087,10 @@ body.dark #editor-root input[type="date"].editor-input,
 	flex-direction: column;
 	justify-content: flex-start;
 	gap: 0;
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
 }
 
 #editor-root .editor-post-item:hover {
@@ -2087,6 +2110,8 @@ body.dark #editor-root input[type="date"].editor-input,
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
+	word-break: break-word;
+	overflow-wrap: anywhere;
 	min-height: 0;
 	margin-bottom: 0;
 }
@@ -2108,6 +2133,7 @@ body.dark #editor-root input[type="date"].editor-input,
 	overflow: hidden;
 	text-overflow: ellipsis;
 	min-height: 1.02rem;
+	min-width: 0;
 }
 
 #editor-root .editor-post-item-flags {
@@ -2118,6 +2144,7 @@ body.dark #editor-root input[type="date"].editor-input,
 	margin-top: auto;
 	min-height: 1.2rem;
 	overflow: hidden;
+	min-width: 0;
 }
 
 #editor-root .editor-post-flag {
@@ -2333,6 +2360,8 @@ body.dark #editor-root input[type="date"].editor-input,
 		max-height: clamp(14rem, 38vh, 20rem);
 		padding: 0.48rem;
 		gap: 0.48rem;
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
 
 	#editor-root .editor-post-item {
@@ -2340,6 +2369,9 @@ body.dark #editor-root input[type="date"].editor-input,
 		min-height: 6.4rem;
 		max-height: 6.4rem;
 		padding: 0.6rem 0.66rem;
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
 	}
 
 	#editor-root .editor-post-item-title {
