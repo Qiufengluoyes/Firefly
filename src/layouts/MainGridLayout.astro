@@ -41,6 +41,11 @@ interface Props {
 	setOGTypeArticle?: boolean;
 	postSlug?: string;
 	headings?: MarkdownHeading[];
+	bannerOverlayMeta?: {
+		published?: string;
+		words?: number | string;
+		minutes?: number | string;
+	};
 }
 
 const backgroundImages = getBackgroundImages();
@@ -53,6 +58,7 @@ const {
 	setOGTypeArticle,
 	postSlug,
 	headings = [],
+	bannerOverlayMeta,
 } = Astro.props;
 
 // 检查背景壁纸模式和是否允许切换
@@ -109,6 +115,18 @@ const isHomePageCheck = isHomePage(Astro.url.pathname);
 
 // 检查是否在文章详情页
 const isPostPage = !!postSlug;
+const bannerOverlayType = isHomePageCheck ? "home" : isPostPage ? "post" : "page";
+const bannerOverlayTitle = title || siteConfig.title;
+const bannerOverlayPublished = bannerOverlayMeta?.published || "";
+const bannerOverlayWords =
+	bannerOverlayMeta?.words !== undefined && bannerOverlayMeta?.words !== null
+		? String(bannerOverlayMeta.words)
+		: "";
+const bannerOverlayMinutes =
+	bannerOverlayMeta?.minutes !== undefined &&
+	bannerOverlayMeta?.minutes !== null
+		? String(bannerOverlayMeta.minutes)
+		: "";
 
 // 随机选择副标题（当打字机关闭且为数组时）
 const getRandomSubtitle = () => {
@@ -264,6 +282,35 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             </div>
         </div>
     )}
+
+    <div
+        id="banner-page-overlay"
+        class="banner-page-overlay absolute inset-0 z-20 hidden flex items-center justify-center pointer-events-none"
+    >
+        <div class="banner-page-overlay-content w-[88%] md:w-[80%] text-center">
+            <h1
+                id="banner-page-title"
+                class="banner-page-overlay-title text-white font-bold leading-tight text-[1.7rem] md:text-[2.75rem]"
+            ></h1>
+            <div
+                id="banner-post-meta"
+                class="banner-page-overlay-meta mt-3 hidden items-center justify-center gap-4 md:gap-6 text-white/90 text-sm md:text-base"
+            >
+                <span class="inline-flex items-center gap-1.5">
+                    <Icon name="mdi:calendar-month-outline" class="text-lg md:text-xl" />
+                    <span id="banner-post-date"></span>
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                    <Icon name="mdi:file-document-outline" class="text-lg md:text-xl" />
+                    <span id="banner-post-words"></span>
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                    <Icon name="mdi:clock-time-eight-outline" class="text-lg md:text-xl" />
+                    <span id="banner-post-minutes"></span>
+                </span>
+            </div>
+        </div>
+    </div>
     
     <script is:inline>
         function setRandomSubtitle() {
@@ -292,6 +339,104 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
         // Run on initial load
         setRandomSubtitle();
+
+        function applyBannerPageOverlay() {
+            const overlay = document.getElementById('banner-page-overlay');
+            const titleElement = document.getElementById('banner-page-title');
+            const metaRow = document.getElementById('banner-post-meta');
+            const dateElement = document.getElementById('banner-post-date');
+            const wordsElement = document.getElementById('banner-post-words');
+            const minutesElement = document.getElementById('banner-post-minutes');
+            const source = document.getElementById('banner-overlay-source');
+
+            if (!overlay || !titleElement || !metaRow) return;
+
+            const wallpaperMode = document.documentElement.getAttribute('data-wallpaper-mode');
+            if (!source || wallpaperMode !== 'banner') {
+                overlay.classList.remove('is-visible');
+                overlay.classList.add('hidden');
+                return;
+            }
+
+            const pageType = source.getAttribute('data-banner-overlay-type') || 'page';
+            if (pageType === 'home') {
+                overlay.classList.remove('is-visible');
+                overlay.classList.add('hidden');
+                return;
+            }
+
+            const pageTitle = source.getAttribute('data-banner-overlay-title') || document.title;
+            const published = source.getAttribute('data-banner-overlay-published') || '';
+            const words = source.getAttribute('data-banner-overlay-words') || '';
+            const minutes = source.getAttribute('data-banner-overlay-minutes') || '';
+
+            titleElement.textContent = pageTitle;
+
+            if (pageType === 'post') {
+                metaRow.classList.remove('hidden');
+                metaRow.classList.add('flex');
+                if (dateElement) dateElement.textContent = published || '--';
+                if (wordsElement) wordsElement.textContent = words ? `${words} 字` : '--';
+                if (minutesElement) minutesElement.textContent = minutes ? `${minutes} 分钟` : '--';
+            } else {
+                metaRow.classList.add('hidden');
+                metaRow.classList.remove('flex');
+            }
+
+            overlay.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                overlay.classList.add('is-visible');
+            });
+        }
+
+        function hideBannerPageOverlay() {
+            const overlay = document.getElementById('banner-page-overlay');
+            if (!overlay) return;
+            overlay.classList.remove('is-visible');
+        }
+
+        function bindBannerPageOverlayHooks() {
+            if (window.fireflyBannerOverlayHooksBound) return;
+            window.fireflyBannerOverlayHooksBound = true;
+
+            const bindSwupHooks = () => {
+                if (!window.swup || !window.swup.hooks) return;
+                window.swup.hooks.on('visit:start', hideBannerPageOverlay);
+                window.swup.hooks.on('content:replace', () => {
+                    requestAnimationFrame(applyBannerPageOverlay);
+                });
+                window.swup.hooks.on('page:view', () => {
+                    requestAnimationFrame(applyBannerPageOverlay);
+                });
+            };
+
+            if (window.swup && window.swup.hooks) {
+                bindSwupHooks();
+            } else {
+                document.addEventListener('swup:enable', bindSwupHooks, { once: true });
+            }
+
+            if (!window.fireflyBannerOverlayObserver) {
+                const observer = new MutationObserver(() => {
+                    requestAnimationFrame(applyBannerPageOverlay);
+                });
+                observer.observe(document.documentElement, {
+                    attributes: true,
+                    attributeFilter: ['data-wallpaper-mode'],
+                });
+                window.fireflyBannerOverlayObserver = observer;
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                applyBannerPageOverlay();
+                bindBannerPageOverlayHooks();
+            });
+        } else {
+            applyBannerPageOverlay();
+            bindBannerPageOverlayHooks();
+        }
     </script>
     
     <!-- Water waves effect - 始终渲染以便动态切换 -->
@@ -412,6 +557,15 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             <main id="swup-container" class={`${mainContentClass} transition-main`}>
                 {/* 携带网格布局类名，用于JS更新父容器 */}
                 <div id="grid-class-carrier" data-grid-class={gridCols} class="hidden"></div>
+                <div
+                    id="banner-overlay-source"
+                    class="hidden"
+                    data-banner-overlay-type={bannerOverlayType}
+                    data-banner-overlay-title={bannerOverlayTitle}
+                    data-banner-overlay-published={bannerOverlayPublished}
+                    data-banner-overlay-words={bannerOverlayWords}
+                    data-banner-overlay-minutes={bannerOverlayMinutes}
+                ></div>
                 {/* 备用 h1 标题 - 当主页横幅文本未启用时，提供隐藏的主标题 */}
                 {isHomePageCheck && !showHomeText && (
                         <h1 class="sr-only">{siteConfig.title}</h1>
@@ -494,6 +648,41 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
   .banner-subtitle {
     text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  .banner-page-overlay {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    transition: opacity 280ms ease, transform 320ms ease;
+    padding-top: calc(var(--banner-height-extend, 0px) * 0.00);
+    box-sizing: border-box;
+  }
+
+  .banner-page-overlay.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .banner-page-overlay-title {
+    text-shadow: 0 8px 28px rgba(0, 0, 0, 0.78);
+  }
+
+  .banner-page-overlay-meta {
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.75);
+  }
+
+  html.is-changing .banner-page-overlay.is-visible,
+  html.is-animating .banner-page-overlay.is-visible,
+  html.is-leaving .banner-page-overlay.is-visible {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+
+  @media (max-width: 1023px) {
+    .banner-page-overlay-content {
+      width: 92%;
+      margin-top: 0;
+    }
   }
 </style>
 

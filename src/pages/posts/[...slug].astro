@@ -100,6 +100,11 @@ const jsonLd = {
   lang={entry.data.lang}
   setOGTypeArticle={true}
   postSlug={entry.id}
+  bannerOverlayMeta={{
+    published: formatDateToYYYYMMDD(entry.data.published),
+    words: remarkPluginFrontmatter.words,
+    minutes: remarkPluginFrontmatter.minutes,
+  }}
   headings={headings}
 >
   <script
