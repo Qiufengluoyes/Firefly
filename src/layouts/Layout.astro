@@ -53,6 +53,8 @@ const navbarTransparentMode =
 // 判断是否应该显示顶部高光效果（只在full和semifull模式下显示）
 const shouldShowTopHighlight =
 	navbarTransparentMode === "full" || navbarTransparentMode === "semifull";
+// 统一控制 navbar 与三栏主布局宽度（仅增大中间栏，侧栏固定宽度不变）
+const LAYOUT_CONTENT_WIDTH = PAGE_WIDTH + 4;
 if (!banner || typeof banner !== "string" || banner.trim() === "") {
 	banner = getDefaultBackground();
 }
@@ -381,6 +383,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
       define:vars={{
         configHue,
         "page-width": `${PAGE_WIDTH}rem`,
+        "layout-content-width": `${LAYOUT_CONTENT_WIDTH}rem`,
       }}
     ></style>
     <slot name="head" />
