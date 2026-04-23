@@ -124,8 +124,8 @@ const randomSubtitle = getRandomSubtitle();
 // 主页横幅文本只在首页且全局开关为 true 时显示，不区分设备
 const homeTextEnable = backgroundWallpaper.banner?.homeText?.enable;
 const showHomeText = isBannerMode && !!homeTextEnable && isHomePageCheck;
-// 手机端非首页不显示banner的CSS类
-const mobileNonHomeBannerClass = !isHomePageCheck ? "mobile-hide-banner" : "";
+// 所有页面保持与首页一致的位置，不再在非首页隐藏 banner
+const mobileNonHomeBannerClass = "";
 
 // 计算主内容区域位置，考虑手机端非首页时banner被隐藏
 const mainPanelTop =
@@ -209,7 +209,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 <!-- Navbar -->
 <slot slot="head" name="head"></slot>
 <div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 mx-auto" class:list={[navbarWidthFull ? "" : "max-w-[var(--page-width)] px-0 md:px-4"]}>
-    <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all">
+    <div id="navbar-wrapper" class="pointer-events-auto fixed top-0 left-0 right-0 z-[70] transition-all">
         <Navbar></Navbar>
     </div>
 </div>
@@ -352,7 +352,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
         <div id="main-grid"
-          class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-2 md:px-4 ${!sidebarConfig.mobileShowSidebar ? 'mobile-no-sidebar' : ''}`}
+          class={`w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-2 md:px-4 ${!sidebarConfig.mobileShowSidebar ? 'mobile-no-sidebar' : ''}`}
           data-sidebar-position={sidebarLayoutConfig.position}
           data-show-right-sidebar-on-post={sidebarLayoutConfig.showRightSidebarOnPostPage ? "true" : "false"}
         >

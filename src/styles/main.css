@@ -16,6 +16,22 @@ html {
     scroll-behavior: smooth;
 }
 
+/* 页面切换期间禁用平滑滚动，避免出现整块向上滚动的过渡感 */
+html.is-page-transitioning,
+html.is-changing,
+html.is-animating,
+html.is-leaving {
+    scroll-behavior: auto !important;
+}
+
+/* 页面跳转时恢复回顶动画（优先级高于 swup 状态类） */
+html.is-scroll-to-top-animating,
+html.is-scroll-to-top-animating.is-changing,
+html.is-scroll-to-top-animating.is-animating,
+html.is-scroll-to-top-animating.is-leaving {
+    scroll-behavior: smooth !important;
+}
+
 /* 页面顶部渐变高光效果 */
 .top-gradient-highlight {
     position: fixed;

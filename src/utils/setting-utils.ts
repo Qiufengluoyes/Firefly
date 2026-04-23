@@ -381,25 +381,15 @@ function showBannerMode() {
 	// 显示banner壁纸（通过CSS类和display控制）
 	const bannerWrapper = document.getElementById("banner-wrapper");
 	if (bannerWrapper) {
-		// 检查当前是否为首页
-		const isHomePage = checkIsHomePage(window.location.pathname);
-		const isMobile = window.innerWidth < 1024;
-
-		// 移动端非首页时，不显示banner；桌面端始终显示
-		if (isMobile && !isHomePage) {
-			bannerWrapper.style.display = "none";
-			bannerWrapper.classList.add("mobile-hide-banner");
-		} else {
-			// 首页或桌面端：先设置display，然后使用requestAnimationFrame确保渲染
-			bannerWrapper.style.display = "block";
-			bannerWrapper.style.setProperty("display", "block", "important");
-			requestAnimationFrame(() => {
-				bannerWrapper.classList.remove("hidden");
-				bannerWrapper.classList.remove("opacity-0");
-				bannerWrapper.classList.add("opacity-100");
-				bannerWrapper.classList.remove("mobile-hide-banner");
-			});
-		}
+		// 所有页面统一显示 banner，保持与首页一致的位置
+		bannerWrapper.style.display = "block";
+		bannerWrapper.style.setProperty("display", "block", "important");
+		requestAnimationFrame(() => {
+			bannerWrapper.classList.remove("hidden");
+			bannerWrapper.classList.remove("opacity-0");
+			bannerWrapper.classList.add("opacity-100");
+			bannerWrapper.classList.remove("mobile-hide-banner");
+		});
 	}
 
 	// 显示横幅图片来源文本
@@ -427,19 +417,6 @@ function showBannerMode() {
 
 	// 调整主内容位置
 	adjustMainContentPosition("banner");
-
-	// 处理移动端非首页主内容区域位置
-	const mainContentWrapper = document.querySelector(".absolute.w-full.z-30");
-	if (mainContentWrapper) {
-		const isHomePage = checkIsHomePage(window.location.pathname);
-		const isMobile = window.innerWidth < 1024;
-		// 只在移动端非首页时调整主内容位置
-		if (isMobile && !isHomePage) {
-			mainContentWrapper.classList.add("mobile-main-no-banner");
-		} else {
-			mainContentWrapper.classList.remove("mobile-main-no-banner");
-		}
-	}
 
 	// 移除透明效果（横幅模式不使用半透明）
 	adjustMainContentTransparency(false);
@@ -608,8 +585,8 @@ function adjustMainContentPosition(
 
 	switch (mode) {
 		case "banner":
-			// Banner模式：主内容在banner下方
-			mainContent.style.top = "calc(var(--banner-height) - 3rem)";
+			// Banner模式：与首页一致，保持固定重叠位置
+			mainContent.style.top = "calc(var(--banner-height) - 3.5rem)";
 			break;
 		case "overlay":
 			// Overlay模式：使用紧凑布局，主内容从导航栏下方开始

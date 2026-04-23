@@ -324,16 +324,9 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
           } else {
             // banner模式：显示banner，隐藏全屏壁纸
             if (bannerWrapper) {
-              const isMobile = window.innerWidth < 1024;
-              // 移动端非首页时隐藏banner（初始状态直接隐藏，不需要动画）
-              // 桌面端始终显示banner
-              if (isMobile && !isHomePage) {
-                bannerWrapper.style.display = "none";
-                bannerWrapper.classList.add("mobile-hide-banner");
-              } else {
-                bannerWrapper.style.display = "block";
-                bannerWrapper.classList.remove("mobile-hide-banner");
-              }
+              // 与首页保持一致：文章/页面也显示 banner，不再触发遮挡动画
+              bannerWrapper.style.display = "block";
+              bannerWrapper.classList.remove("mobile-hide-banner");
             }
             if (overlayWallpaper) {
               overlayWallpaper.style.display = "none";
@@ -346,13 +339,8 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
             ".absolute.w-full.z-30"
           );
           if (mainContentWrapper) {
-            const isMobile = window.innerWidth < 1024;
-            // 只在移动端非首页时调整主内容位置
-            if (isMobile && !isHomePage) {
-              mainContentWrapper.classList.add("mobile-main-no-banner");
-            } else {
-              mainContentWrapper.classList.remove("mobile-main-no-banner");
-            }
+            // 与首页保持一致：不再上推主区域
+            mainContentWrapper.classList.remove("mobile-main-no-banner");
           }
 
           // 处理credit元素
@@ -454,32 +442,25 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 >
   @tailwind components;
   @layer components {
-    .enable-banner.is-home #banner-wrapper {
+    .enable-banner #banner-wrapper {
       @apply h-[var(--banner-height-home)] translate-y-[var(--banner-height-extend)];
     }
-    .enable-banner #banner-wrapper {
-      @apply h-[var(--banner-height-home)];
-    }
-
-    .enable-banner.is-home #banner {
+    .enable-banner #banner {
       @apply h-[var(--banner-height-home)] translate-y-0;
     }
-    .enable-banner #banner {
-      @apply h-[var(--banner-height-home)] translate-y-[var(--bannerOffset)];
-    }
-    .enable-banner.is-home #main-grid {
+    .enable-banner #main-grid {
       @apply translate-y-[var(--banner-height-extend)];
     }
     .enable-banner #top-row {
       @apply h-[calc(var(--banner-height-home)_-_4.5rem)] transition-all duration-300;
     }
-    .enable-banner.is-home #sidebar-sticky {
+    .enable-banner #sidebar-sticky {
       @apply top-[calc(1rem_-_var(--banner-height-extend))];
     }
-    .enable-banner.is-home #left-sidebar-sticky {
+    .enable-banner #left-sidebar-sticky {
       @apply top-[calc(1rem_-_var(--banner-height-extend))];
     }
-    .enable-banner.is-home #right-sidebar-sticky {
+    .enable-banner #right-sidebar-sticky {
       @apply top-[calc(1rem_-_var(--banner-height-extend))];
     }
     .navbar-hidden {
@@ -492,7 +473,6 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
   import { pathsEqual, url } from "@/utils/url-utils";
   import {
     BANNER_HEIGHT,
-    BANNER_HEIGHT_HOME,
     BANNER_HEIGHT_EXTEND,
     // MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
   } from "@/constants/constants";
@@ -695,16 +675,6 @@ function disableAnimation() {
 
       
  
-      // 简化navbar处理逻辑
-      if (bannerEnabled) {
-        const navbar = document.getElementById("navbar-wrapper");
-        if (navbar && document.body.classList.contains("lg:is-home")) {
-          const threshold = window.innerHeight * (BANNER_HEIGHT / 100) - 88;
-          if (document.documentElement.scrollTop >= threshold) {
-            navbar.classList.add("navbar-hidden");
-          }
-        }
-      }
     });
     window.swup.hooks.on("content:replace", () => {
       // 更新侧边栏组件的可见性（根据新页面的 URL）
@@ -761,8 +731,12 @@ function disableAnimation() {
         bodyElement!.classList.remove("lg:is-home");
       }
 
-      // 切换开始时立即回顶，避免过渡阶段出现整体位移抖动
-      window.scrollTo({ top: 0, behavior: "auto" });
+      // 切换开始时恢复回顶动画
+      document.documentElement.classList.add("is-scroll-to-top-animating");
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
 
       // Control banner text visibility based on page
      
@@ -795,56 +769,41 @@ function disableAnimation() {
         }
       }
 
-      // Control mobile banner visibility based on page
-      // 只在移动端（1024px以下）处理banner隐藏
-      const isMobile = window.innerWidth < 1024;
+      // 进入文章/页面时保持与首页一致的位置，不再触发遮挡 banner 的上移逻辑
       const postListContainer = document.getElementById("post-list-container");
       const bannerWrapper = document.getElementById("banner-wrapper");
       const mainContentWrapper = document.querySelector(
         ".absolute.w-full.z-30"
       ) as HTMLElement | null;
+      const isBannerWallpaper =
+        document.documentElement.getAttribute("data-wallpaper-mode") ===
+        "banner";
 
-      if (isMobile && postListContainer) {
+      if (postListContainer) {
         postListContainer.style.transition = "none";
       }
-
-      if (isMobile && bannerWrapper && mainContentWrapper) {
-        // 禁用位置过渡，避免导航时主区域上下跳动
+      if (mainContentWrapper) {
         mainContentWrapper.style.transition = "none";
-
-        if (isHomePage) {
-          bannerWrapper.style.display = "";
-          bannerWrapper.classList.remove("mobile-hide-banner");
-          mainContentWrapper.classList.remove("mobile-main-no-banner");
-        } else {
-          bannerWrapper.style.display = "";
-          bannerWrapper.classList.add("mobile-hide-banner");
-          mainContentWrapper.classList.add("mobile-main-no-banner");
-        }
-
-        requestAnimationFrame(() => {
-          mainContentWrapper.style.transition = "";
-          if (postListContainer) {
-            postListContainer.style.transition = "";
-          }
-        });
-      } else if (!isMobile && bannerWrapper) {
-        // 桌面端：确保banner正常显示
+        mainContentWrapper.classList.remove("mobile-main-no-banner");
+      }
+      if (isBannerWallpaper && bannerWrapper) {
         bannerWrapper.style.display = "";
         bannerWrapper.classList.remove("mobile-hide-banner");
+      }
+
+      requestAnimationFrame(() => {
         if (mainContentWrapper) {
-          mainContentWrapper.classList.remove("mobile-main-no-banner");
           mainContentWrapper.style.transition = "";
         }
         if (postListContainer) {
           postListContainer.style.transition = "";
         }
-      }
+      });
 
       // increase the page height during page transition to prevent the scrolling animation from jumping
       const heightExtend = document.getElementById("page-height-extend");
       if (heightExtend) {
-        heightExtend.classList.remove("hidden");
+        heightExtend.classList.add("hidden");
       }
 
       // Hide the TOC while scrolling back to top
@@ -864,17 +823,22 @@ function disableAnimation() {
         heightExtend.classList.add("hidden");
       }
 
-      // 再次确保在新页面视图阶段保持顶部位置，避免平滑滚动造成整体抖动
-      window.scrollTo({
-        top: 0,
-        behavior: "auto",
-      });
+      // 新页面渲染后，若尚未回到顶部则立即校正
+      if (window.scrollY > 1 || document.documentElement.scrollTop > 1) {
+        window.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
 
       // 恢复文章列表容器过渡
       const postListContainer = document.getElementById("post-list-container");
       if (postListContainer) {
         postListContainer.style.transition = "";
       }
+      document.documentElement.classList.remove("is-scroll-to-top-animating");
 
      
       // 同步主题状态 - 解决从首页进入文章页面时代码块渲染问题
@@ -935,6 +899,7 @@ function disableAnimation() {
 
         // 移除页面切换保护，恢复过渡动画
         document.documentElement.classList.remove("is-page-transitioning");
+        document.documentElement.classList.remove("is-scroll-to-top-animating");
       }, 200);
     });
   };
@@ -970,24 +935,6 @@ function disableAnimation() {
           toc.classList.remove("toc-hide");
         } else {
           toc.classList.add("toc-hide");
-        }
-      });
-    }
-
-    if (bannerEnabled && navbar) {
-      operations.push(() => {
-        const isHome =
-          document.body.classList.contains("lg:is-home") &&
-          window.innerWidth >= 1024;
-        const currentBannerHeight = isHome ? BANNER_HEIGHT_HOME : BANNER_HEIGHT;
-        const threshold = window.innerHeight * (currentBannerHeight / 100) - 88;
-
-        if (scrollTop >= threshold) {
-       
- 
-          navbar.classList.add("navbar-hidden");
-        } else {
-          navbar.classList.remove("navbar-hidden");
         }
       });
     }
