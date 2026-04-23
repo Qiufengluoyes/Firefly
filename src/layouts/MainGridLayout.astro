@@ -340,7 +340,171 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         // Run on initial load
         setRandomSubtitle();
 
-        function applyBannerPageOverlay() {
+        const BANNER_OVERLAY_FADE_MS = 200;
+        let bannerOverlayHideTimer = 0;
+        let bannerOverlayRevealTimer = 0;
+        let bannerOverlaySyncRaf = 0;
+
+        function canRevealBannerPageOverlayNow() {
+            const root = document.documentElement;
+            return !(
+                root.classList.contains('is-leaving')
+            );
+        }
+
+        function hideBannerPageOverlay(forceHidden = false) {
+            const overlay = document.getElementById('banner-page-overlay');
+            if (!overlay) return;
+            if (bannerOverlayHideTimer) {
+                window.clearTimeout(bannerOverlayHideTimer);
+                bannerOverlayHideTimer = 0;
+            }
+            if (bannerOverlayRevealTimer) {
+                window.clearTimeout(bannerOverlayRevealTimer);
+                bannerOverlayRevealTimer = 0;
+            }
+            if (bannerOverlaySyncRaf) {
+                window.cancelAnimationFrame(bannerOverlaySyncRaf);
+                bannerOverlaySyncRaf = 0;
+            }
+            overlay.classList.remove('is-visible');
+
+            if (forceHidden) {
+                overlay.classList.add('hidden');
+                overlay.dataset.pendingShow = 'false';
+                return;
+            }
+
+            bannerOverlayHideTimer = window.setTimeout(() => {
+                const stillOverlay = document.getElementById('banner-page-overlay');
+                if (!stillOverlay) return;
+                if (!stillOverlay.classList.contains('is-visible')) {
+                    stillOverlay.classList.add('hidden');
+                }
+                bannerOverlayHideTimer = 0;
+            }, BANNER_OVERLAY_FADE_MS);
+        }
+
+        function revealBannerPageOverlay(delayed = false) {
+            const overlay = document.getElementById('banner-page-overlay');
+            if (!overlay) return;
+            if (overlay.dataset.pendingShow !== 'true') return;
+            if (bannerOverlayHideTimer) {
+                window.clearTimeout(bannerOverlayHideTimer);
+                bannerOverlayHideTimer = 0;
+            }
+            if (bannerOverlayRevealTimer) {
+                window.clearTimeout(bannerOverlayRevealTimer);
+                bannerOverlayRevealTimer = 0;
+            }
+            if (bannerOverlaySyncRaf) {
+                window.cancelAnimationFrame(bannerOverlaySyncRaf);
+                bannerOverlaySyncRaf = 0;
+            }
+
+            const doReveal = () => {
+                overlay.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    overlay.classList.add('is-visible');
+                });
+            };
+
+            if (delayed) {
+                bannerOverlayRevealTimer = window.setTimeout(() => {
+                    doReveal();
+                    bannerOverlayRevealTimer = 0;
+                }, 0);
+                return;
+            }
+
+            doReveal();
+        }
+
+        function revealBannerOverlayWhenContentStarts() {
+            const overlay = document.getElementById('banner-page-overlay');
+            const swupContainer = document.getElementById('swup-container');
+            if (!overlay) return;
+            if (overlay.dataset.pendingShow !== 'true') return;
+            if (!swupContainer) {
+                revealBannerPageOverlay(false);
+                return;
+            }
+
+            if (bannerOverlaySyncRaf) {
+                window.cancelAnimationFrame(bannerOverlaySyncRaf);
+                bannerOverlaySyncRaf = 0;
+            }
+
+            let attempts = 0;
+            const maxAttempts = 24;
+
+            const syncReveal = () => {
+                if (overlay.dataset.pendingShow !== 'true') {
+                    bannerOverlaySyncRaf = 0;
+                    return;
+                }
+
+                const currentOpacity = parseFloat(
+                    window.getComputedStyle(swupContainer).opacity || '1'
+                );
+
+                if (currentOpacity > 0.03 || attempts >= maxAttempts) {
+                    bannerOverlaySyncRaf = 0;
+                    revealBannerPageOverlay(false);
+                    return;
+                }
+
+                attempts += 1;
+                bannerOverlaySyncRaf = window.requestAnimationFrame(syncReveal);
+            };
+
+            bannerOverlaySyncRaf = window.requestAnimationFrame(syncReveal);
+        }
+
+        function hideBannerOverlayWhenContentStartsLeaving() {
+            const overlay = document.getElementById('banner-page-overlay');
+            const swupContainer = document.getElementById('swup-container');
+            if (!overlay || !overlay.classList.contains('is-visible')) {
+                hideBannerPageOverlay(false);
+                return;
+            }
+            if (!swupContainer) {
+                hideBannerPageOverlay(false);
+                return;
+            }
+
+            if (bannerOverlaySyncRaf) {
+                window.cancelAnimationFrame(bannerOverlaySyncRaf);
+                bannerOverlaySyncRaf = 0;
+            }
+
+            let attempts = 0;
+            const maxAttempts = 24;
+
+            const syncHide = () => {
+                if (!overlay.classList.contains('is-visible')) {
+                    bannerOverlaySyncRaf = 0;
+                    return;
+                }
+
+                const currentOpacity = parseFloat(
+                    window.getComputedStyle(swupContainer).opacity || '1'
+                );
+
+                if (currentOpacity < 0.97 || attempts >= maxAttempts) {
+                    bannerOverlaySyncRaf = 0;
+                    hideBannerPageOverlay(false);
+                    return;
+                }
+
+                attempts += 1;
+                bannerOverlaySyncRaf = window.requestAnimationFrame(syncHide);
+            };
+
+            bannerOverlaySyncRaf = window.requestAnimationFrame(syncHide);
+        }
+
+        function applyBannerPageOverlay(options = { deferReveal: false }) {
             const overlay = document.getElementById('banner-page-overlay');
             const titleElement = document.getElementById('banner-page-title');
             const metaRow = document.getElementById('banner-post-meta');
@@ -353,15 +517,13 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
             const wallpaperMode = document.documentElement.getAttribute('data-wallpaper-mode');
             if (!source || wallpaperMode !== 'banner') {
-                overlay.classList.remove('is-visible');
-                overlay.classList.add('hidden');
+                hideBannerPageOverlay(true);
                 return;
             }
 
             const pageType = source.getAttribute('data-banner-overlay-type') || 'page';
             if (pageType === 'home') {
-                overlay.classList.remove('is-visible');
-                overlay.classList.add('hidden');
+                hideBannerPageOverlay(true);
                 return;
             }
 
@@ -383,16 +545,15 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 metaRow.classList.remove('flex');
             }
 
-            overlay.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                overlay.classList.add('is-visible');
-            });
-        }
+            overlay.dataset.pendingShow = 'true';
 
-        function hideBannerPageOverlay() {
-            const overlay = document.getElementById('banner-page-overlay');
-            if (!overlay) return;
-            overlay.classList.remove('is-visible');
+            if (options.deferReveal || !canRevealBannerPageOverlayNow()) {
+                overlay.classList.remove('is-visible');
+                overlay.classList.remove('hidden');
+                return;
+            }
+
+            revealBannerPageOverlay(false);
         }
 
         function bindBannerPageOverlayHooks() {
@@ -401,12 +562,19 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
             const bindSwupHooks = () => {
                 if (!window.swup || !window.swup.hooks) return;
-                window.swup.hooks.on('visit:start', hideBannerPageOverlay);
-                window.swup.hooks.on('content:replace', () => {
-                    requestAnimationFrame(applyBannerPageOverlay);
+                window.swup.hooks.on('animation:out:start', () => {
+                    hideBannerOverlayWhenContentStartsLeaving();
                 });
-                window.swup.hooks.on('page:view', () => {
-                    requestAnimationFrame(applyBannerPageOverlay);
+                window.swup.hooks.on('content:replace', () => {
+                    requestAnimationFrame(() => {
+                        applyBannerPageOverlay({ deferReveal: true });
+                    });
+                });
+                window.swup.hooks.on('animation:in:start', () => {
+                    requestAnimationFrame(() => {
+                        applyBannerPageOverlay({ deferReveal: false });
+                        revealBannerOverlayWhenContentStarts();
+                    });
                 });
             };
 
@@ -418,7 +586,11 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
             if (!window.fireflyBannerOverlayObserver) {
                 const observer = new MutationObserver(() => {
-                    requestAnimationFrame(applyBannerPageOverlay);
+                    requestAnimationFrame(() => {
+                        applyBannerPageOverlay({
+                            deferReveal: !canRevealBannerPageOverlayNow(),
+                        });
+                    });
                 });
                 observer.observe(document.documentElement, {
                     attributes: true,
@@ -430,11 +602,11 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                applyBannerPageOverlay();
+                applyBannerPageOverlay({ deferReveal: false });
                 bindBannerPageOverlayHooks();
             });
         } else {
-            applyBannerPageOverlay();
+            applyBannerPageOverlay({ deferReveal: false });
             bindBannerPageOverlayHooks();
         }
     </script>
@@ -652,15 +824,15 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
   .banner-page-overlay {
     opacity: 0;
-    transform: translate3d(0, 14px, 0);
-    transition: opacity 280ms ease, transform 320ms ease;
+    transform: none;
+    transition: opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
     padding-top: calc(var(--banner-height-extend, 0px) * 0.00);
     box-sizing: border-box;
   }
 
   .banner-page-overlay.is-visible {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 
   .banner-page-overlay-title {
@@ -671,11 +843,10 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.75);
   }
 
-  html.is-changing .banner-page-overlay.is-visible,
-  html.is-animating .banner-page-overlay.is-visible,
   html.is-leaving .banner-page-overlay.is-visible {
+    transition: opacity 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
     opacity: 0;
-    transform: translate3d(0, 10px, 0);
+    transform: none;
   }
 
   @media (max-width: 1023px) {
