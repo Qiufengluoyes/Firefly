@@ -3,23 +3,23 @@
 /* Banner text styles */
 .banner-title {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    animation: banner-fadeInUp 1s ease-out;
+    animation: banner-fadeIn 1s ease-out;
     font-weight: bold;
 }
 
 .banner-subtitle {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
-    animation: banner-fadeInUp 1s ease-out 0.3s both;
+    animation: banner-fadeIn 1s ease-out 0.3s both;
 }
 
-@keyframes banner-fadeInUp {
+@keyframes banner-fadeIn {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: none;
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: none;
     }
 }
 
@@ -321,9 +321,9 @@
         transition: transform 0.3s ease-in, opacity 0.2s ease-in !important;
     }
     
-    /* 手机端非首页时主内容区域从顶部开始 - 延迟出现的动画 */
+    /* 手机端非首页时主内容区域从顶部开始 */
     .absolute.w-full.z-30 {
-        transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
+        transition: opacity 0.2s ease-out;
         /* 硬件加速优化 */
         will-change: top;
         /* 禁用transform以保证back to top 按钮可以显示
@@ -335,8 +335,7 @@
     .absolute.w-full.z-30.mobile-main-no-banner {
         top: 5.5rem !important;
         min-height: calc(100vh - 5.5rem) !important;
-        /* 内容区域快速上移 */
-        transition: top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s !important;
+        transition: opacity 0.2s ease-out !important;
     }
 }
 

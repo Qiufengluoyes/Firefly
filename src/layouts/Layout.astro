@@ -761,6 +761,9 @@ function disableAnimation() {
         bodyElement!.classList.remove("lg:is-home");
       }
 
+      // 切换开始时立即回顶，避免过渡阶段出现整体位移抖动
+      window.scrollTo({ top: 0, behavior: "auto" });
+
       // Control banner text visibility based on page
      
  
@@ -792,53 +795,49 @@ function disableAnimation() {
         }
       }
 
-      // Control mobile banner visibility based on page with improved staging animation
+      // Control mobile banner visibility based on page
       // 只在移动端（1024px以下）处理banner隐藏
       const isMobile = window.innerWidth < 1024;
-      // 在移动端禁用文章列表容器的过渡动画，防止与主内容区位置变化冲突
-      if (isMobile) {
-        const postListContainer = document.getElementById("post-list-container");
-        if (postListContainer) {
-          postListContainer.style.transition = "none";
-        }
-      }
-
+      const postListContainer = document.getElementById("post-list-container");
       const bannerWrapper = document.getElementById("banner-wrapper");
       const mainContentWrapper = document.querySelector(
         ".absolute.w-full.z-30"
-      ) as HTMLElement |
-      null;
+      ) as HTMLElement | null;
+
+      if (isMobile && postListContainer) {
+        postListContainer.style.transition = "none";
+      }
 
       if (isMobile && bannerWrapper && mainContentWrapper) {
+        // 禁用位置过渡，避免导航时主区域上下跳动
+        mainContentWrapper.style.transition = "none";
+
         if (isHomePage) {
-          // 首页：禁用主内容区域的过渡动画，防止文章列表下移
-          mainContentWrapper.style.transition = "none";
-          // 先显示banner，然后移除隐藏类让其优雅出现
           bannerWrapper.style.display = "";
-          setTimeout(() => {
-            bannerWrapper.classList.remove("mobile-hide-banner");
-          }, 100);
-          setTimeout(() => {
-            mainContentWrapper.classList.remove("mobile-main-no-banner");
-            // 在移除类之后立即恢复过渡动画（下次导航时使用）
-            setTimeout(() => {
-              mainContentWrapper.style.transition = "";
-            }, 50);
-          }, 150);
+          bannerWrapper.classList.remove("mobile-hide-banner");
+          mainContentWrapper.classList.remove("mobile-main-no-banner");
         } else {
-          // 非首页：分阶段隐藏，先隐藏banner，再移动内容
+          bannerWrapper.style.display = "";
           bannerWrapper.classList.add("mobile-hide-banner");
-          // 延迟移动内容，让banner先完全消失
-          setTimeout(() => {
-            mainContentWrapper.classList.add("mobile-main-no-banner");
-          }, 100);
+          mainContentWrapper.classList.add("mobile-main-no-banner");
         }
+
+        requestAnimationFrame(() => {
+          mainContentWrapper.style.transition = "";
+          if (postListContainer) {
+            postListContainer.style.transition = "";
+          }
+        });
       } else if (!isMobile && bannerWrapper) {
         // 桌面端：确保banner正常显示
         bannerWrapper.style.display = "";
         bannerWrapper.classList.remove("mobile-hide-banner");
         if (mainContentWrapper) {
           mainContentWrapper.classList.remove("mobile-main-no-banner");
+          mainContentWrapper.style.transition = "";
+        }
+        if (postListContainer) {
+          postListContainer.style.transition = "";
         }
       }
 
@@ -862,28 +861,20 @@ function disableAnimation() {
       // hide the temp high element when the transition is done
       const heightExtend = document.getElementById("page-height-extend");
       if (heightExtend) {
-        heightExtend.classList.remove("hidden");
+        heightExtend.classList.add("hidden");
       }
 
-      // 确保页面滚动到顶部，使用平滑滚动避免侧边栏闪烁
+      // 再次确保在新页面视图阶段保持顶部位置，避免平滑滚动造成整体抖动
       window.scrollTo({
         top: 0,
-        behavior: "smooth",
+        behavior: "auto",
       });
 
-      // 在移动端恢复文章列表容器的过渡动画（在主内容区位置动画完成后）
-      
- 
-      const isMobile = window.innerWidth < 1024;
-      if (isMobile) {
-        setTimeout(() => {
-          const postListContainer = document.getElementById("post-list-container");
-          if (postListContainer) {
-            postListContainer.style.transition = "";
-          }
-        }, 600); // 等待主内容区动画完成（0.4s + 0.1s delay + 100ms buffer）
-     
-       }
+      // 恢复文章列表容器过渡
+      const postListContainer = document.getElementById("post-list-container");
+      if (postListContainer) {
+        postListContainer.style.transition = "";
+      }
 
      
       // 同步主题状态 - 解决从首页进入文章页面时代码块渲染问题

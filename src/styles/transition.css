@@ -9,39 +9,35 @@
 /* Main Content Transition */
 .transition-main {
     transition: 
-        opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* Leaving Animation */
 .transition-leaving {
     transition:
-        transform 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19),
         opacity 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
 }
 
 /* State: Changing (Swup) */
 html.is-changing .transition-main {
     transition: 
-        opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 html.is-leaving .transition-main {
     transition: 
-        opacity 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19),
-        transform 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
+        opacity 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
 }
 
 /* State: Animating (Entering) */
 html.is-animating .transition-main {
     opacity: 0;
-    transform: translateY(1.5rem) translateX(0.5rem);
+    transform: none;
 }
 
 /* State: Leaving */
 html.is-animating.is-leaving .transition-leaving {
-    transform: translateY(-1rem) translateX(-0.5rem);
+    transform: none;
     opacity: 0;
 }
 
@@ -52,21 +48,21 @@ html.is-changing .transition-swup-fade {
 
 html.is-animating .transition-swup-fade {
     opacity: 0;
-    transform: translateY(1.5rem);
+    transform: none;
 }
 
 /* --------------------------------------------------------------------------
    2. Keyframes
    -------------------------------------------------------------------------- */
 
-@keyframes fade-in-up {
+@keyframes fade-in {
     from {
         opacity: 0;
-        transform: translateY(1.5rem) translateX(0.5rem);
+        transform: none;
     }
     to {
         opacity: 1;
-        transform: translateY(0) translateX(0);
+        transform: none;
     }
 }
 
@@ -76,7 +72,7 @@ html.is-animating .transition-swup-fade {
 
 .onload-animation {
     opacity: 0;
-    animation: fade-in-up 200ms ease-out forwards;
+    animation: fade-in 200ms ease-out forwards;
 }
 
 /* 渐进式动画延迟 */
