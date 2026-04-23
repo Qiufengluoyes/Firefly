@@ -449,7 +449,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
     #sidebar-sticky,
     #left-sidebar-sticky,
     #right-sidebar-sticky {
-      @apply top-[4.8rem];
+      top: 5.15rem;
     }
 
     .enable-banner #banner-wrapper {
@@ -465,13 +465,13 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
       @apply h-[calc(var(--banner-height-home)_-_4.3rem)] transition-all duration-300;
     }
     .enable-banner #sidebar-sticky {
-      @apply top-[calc(4.8rem_-_var(--banner-height-extend))];
+      top: calc(5.15rem - var(--banner-height-extend));
     }
     .enable-banner #left-sidebar-sticky {
-      @apply top-[calc(4.8rem_-_var(--banner-height-extend))];
+      top: calc(5.15rem - var(--banner-height-extend));
     }
     .enable-banner #right-sidebar-sticky {
-      @apply top-[calc(4.8rem_-_var(--banner-height-extend))];
+      top: calc(5.15rem - var(--banner-height-extend));
     }
     .navbar-hidden {
       @apply opacity-0 -translate-y-16;
