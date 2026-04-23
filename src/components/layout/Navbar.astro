@@ -60,30 +60,32 @@ let links: NavBarLink[] = navBarConfig.links.map(
 <div id="navbar" class="z-50" style={`--navbar-glass-blur: ${navbarBlur}px;`} data-transparent-mode={navbarTransparentMode} data-enable-blur={String(navbarEnableBlur)} data-is-home={isHomePageCheck} data-full-width={navbarWidthFull}>
     <div class:list={[
         className,
-        "!overflow-visible h-[4.5rem] mx-auto flex items-center px-4",
-        navbarWidthFull ? "" : "justify-between max-w-[calc(var(--layout-content-width)-2rem)]"
+        "!overflow-visible h-[4.3rem] mx-auto flex items-center px-4",
+        navbarWidthFull ? "justify-start" : "justify-start max-w-[calc(var(--layout-content-width)-2.05rem)]"
     ]}>
-        <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
-            <div class:list={[
-                "flex flex-row items-center text-md",
-                siteConfig.navbar.followTheme ? "text-[var(--primary)]" : "dark:text-white text-black"
-            ]}>
-                                {siteConfig.navbar.logo?.type === "icon" ? (
-                                    <Icon name={siteConfig.navbar.logo.value || "material-symbols:home-pin-outline"} class="text-[1.75rem] mb-1 mr-2" />
-                                ) : siteConfig.navbar.logo?.type === "image" ? (
-                                    <img src={url(siteConfig.navbar.logo.value)} alt={siteConfig.navbar.logo.alt || siteConfig.title} class="h-[1.75rem] w-[1.75rem] mb-0.2 mr-2 object-contain" loading="lazy" />
-                                ) : (
-                                    <Icon name="material-symbols:home-pin-outline" class="text-[1.75rem] mb-1 mr-2" />
-                                )}
-                {navbarTitle}
+        <div class="flex items-center min-w-0">
+            <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
+                <div class:list={[
+                    "flex flex-row items-center text-md",
+                    siteConfig.navbar.followTheme ? "text-[var(--primary)]" : "dark:text-white text-black"
+                ]}>
+                                    {siteConfig.navbar.logo?.type === "icon" ? (
+                                        <Icon name={siteConfig.navbar.logo.value || "material-symbols:home-pin-outline"} class="text-[1.75rem] mb-1 mr-2" />
+                                    ) : siteConfig.navbar.logo?.type === "image" ? (
+                                        <img src={url(siteConfig.navbar.logo.value)} alt={siteConfig.navbar.logo.alt || siteConfig.title} class="h-[1.75rem] w-[1.75rem] mb-0.2 mr-2 object-contain" loading="lazy" />
+                                    ) : (
+                                        <Icon name="material-symbols:home-pin-outline" class="text-[1.75rem] mb-1 mr-2" />
+                                    )}
+                    {navbarTitle}
+                </div>
+            </a>
+            <div class="hidden lg:flex items-center space-x-1 ml-1">
+                {links.map((l) => {
+                    return <DropdownMenu link={l} />;
+                })}
             </div>
-        </a>
-        <div class="hidden lg:flex items-center space-x-1">
-            {links.map((l) => {
-                return <DropdownMenu link={l} />;
-            })}
         </div>
-        <div class:list={["flex", navbarWidthFull ? "ml-auto" : ""]}>
+        <div class="flex ml-auto shrink-0">
             <!--<SearchPanel client:load>-->
             <Search
                 client:load

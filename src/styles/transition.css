@@ -70,6 +70,20 @@ html.is-animating .transition-swup-fade {
    3. Onload Animations
    -------------------------------------------------------------------------- */
 
+/* 整页首屏淡入（浏览器刷新进入网站时生效） */
+@keyframes site-initial-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.initial-fade-in {
+    animation: site-initial-fade-in 360ms ease-out both;
+}
+
 .onload-animation {
     opacity: 0;
     animation: fade-in 200ms ease-out forwards;

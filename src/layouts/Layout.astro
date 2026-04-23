@@ -401,6 +401,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
     class="min-h-screen"
     data-overlayscrollbars-initialize
     class:list={[
+      "initial-fade-in",
       { "lg:is-home": isHomePageCheck, "enable-banner": enableBanner, "enable-card-border": siteConfig.card?.border },
       ...(siteConfig.font.enable && siteConfig.font.selected
       
@@ -445,6 +446,12 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 >
   @tailwind components;
   @layer components {
+    #sidebar-sticky,
+    #left-sidebar-sticky,
+    #right-sidebar-sticky {
+      @apply top-[4.8rem];
+    }
+
     .enable-banner #banner-wrapper {
       @apply h-[var(--banner-height-home)] translate-y-[var(--banner-height-extend)];
     }
@@ -455,16 +462,16 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
       @apply translate-y-[var(--banner-height-extend)];
     }
     .enable-banner #top-row {
-      @apply h-[calc(var(--banner-height-home)_-_4.5rem)] transition-all duration-300;
+      @apply h-[calc(var(--banner-height-home)_-_4.3rem)] transition-all duration-300;
     }
     .enable-banner #sidebar-sticky {
-      @apply top-[calc(1rem_-_var(--banner-height-extend))];
+      @apply top-[calc(4.8rem_-_var(--banner-height-extend))];
     }
     .enable-banner #left-sidebar-sticky {
-      @apply top-[calc(1rem_-_var(--banner-height-extend))];
+      @apply top-[calc(4.8rem_-_var(--banner-height-extend))];
     }
     .enable-banner #right-sidebar-sticky {
-      @apply top-[calc(1rem_-_var(--banner-height-extend))];
+      @apply top-[calc(4.8rem_-_var(--banner-height-extend))];
     }
     .navbar-hidden {
       @apply opacity-0 -translate-y-16;

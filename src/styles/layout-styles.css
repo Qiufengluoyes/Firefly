@@ -52,7 +52,8 @@
         height: 70vh !important; /* 保持较大高度优先显示banner */
         min-height: 450px;
         max-height: none; /* 移除最大高度限制 */
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+        top: 0 !important; /* 移动端从顶部开始 */
+        transform: none !important; /* 覆盖 enable-banner 的 translateY，避免上下留白 */
     }
     
     /* 主内容区域位置调整 - 向上移动以部分遮挡banner */
@@ -107,7 +108,8 @@
         height: 75vh !important;
         min-height: 500px;
         max-height: none; /* 移除最大高度限制 */
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+        top: 0 !important; /* 移动端从顶部开始 */
+        transform: none !important; /* 覆盖 enable-banner 的 translateY，避免上下留白 */
     }
     
     /* 主内容区域位置调整 - 向上移动以部分遮挡banner */
@@ -162,7 +164,8 @@
         height: 72vh !important;
         min-height: 520px;
         max-height: none; /* 移除最大高度限制 */
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+        top: 0 !important; /* 移动端从顶部开始 */
+        transform: none !important; /* 覆盖 enable-banner 的 translateY，避免上下留白 */
     }
     
     /* 主内容区域位置调整 - 向上移动以部分遮挡banner */
@@ -216,7 +219,8 @@
     #banner-wrapper:not(.mobile-hide-banner) {
         height: 70vh !important;
         min-height: 500px;
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+        top: 0 !important; /* 移动端从顶部开始 */
+        transform: none !important; /* 覆盖 enable-banner 的 translateY，避免上下留白 */
     }
     
     /* 主内容区域位置调整 - 向上移动以部分遮挡banner */
@@ -302,6 +306,11 @@
 
 /* 平板和手机端非首页隐藏banner - 改进的分阶段动画 (1024px以下) */
 @media (max-width: 1023px) {
+    /* 移动端 banner 已使用 top 定位，禁用 main-grid 的额外下移，避免水波纹下方出现空白 */
+    body.enable-banner #main-grid {
+        transform: none !important;
+    }
+
     #banner-wrapper {
         transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease-out;
         transform-origin: top center;
@@ -439,7 +448,8 @@
 /* 移动端横屏优化 */
 @media (max-width: 1023px) and (orientation: landscape) {
     #banner-wrapper:not(.mobile-hide-banner) {
-        top: 0 !important; /* 横屏模式从顶部开始，避免被导航栏覆盖 */
+        top: 0 !important; /* 横屏模式从顶部开始 */
+        transform: none !important; /* 覆盖 enable-banner 的 translateY，避免上下留白 */
         height: 60vh !important;
     }
     
