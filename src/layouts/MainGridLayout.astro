@@ -348,7 +348,9 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         function canRevealBannerPageOverlayNow() {
             const root = document.documentElement;
             return !(
-                root.classList.contains('is-leaving')
+                root.classList.contains('is-leaving') ||
+                root.classList.contains('is-changing') ||
+                root.classList.contains('is-animating')
             );
         }
 
@@ -423,9 +425,11 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         function revealBannerOverlayWhenContentStarts() {
             const overlay = document.getElementById('banner-page-overlay');
             const swupContainer = document.getElementById('swup-container');
+            const contentWrapper = document.getElementById('content-wrapper');
+            const target = swupContainer || contentWrapper;
             if (!overlay) return;
             if (overlay.dataset.pendingShow !== 'true') return;
-            if (!swupContainer) {
+            if (!target) {
                 revealBannerPageOverlay(false);
                 return;
             }
@@ -445,10 +449,10 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 }
 
                 const currentOpacity = parseFloat(
-                    window.getComputedStyle(swupContainer).opacity || '1'
+                    window.getComputedStyle(target).opacity || '1'
                 );
 
-                if (currentOpacity > 0.03 || attempts >= maxAttempts) {
+                if (currentOpacity > 0.12 || attempts >= maxAttempts) {
                     bannerOverlaySyncRaf = 0;
                     revealBannerPageOverlay(false);
                     return;
@@ -572,7 +576,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 });
                 window.swup.hooks.on('animation:in:start', () => {
                     requestAnimationFrame(() => {
-                        applyBannerPageOverlay({ deferReveal: false });
+                        applyBannerPageOverlay({ deferReveal: true });
                         revealBannerOverlayWhenContentStarts();
                     });
                 });
