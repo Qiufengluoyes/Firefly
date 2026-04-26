@@ -344,6 +344,19 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         let bannerOverlayHideTimer = 0;
         let bannerOverlayRevealTimer = 0;
         let bannerOverlaySyncRaf = 0;
+        let bannerOverlaySyncCleanup = null;
+
+        function cleanupBannerOverlaySync() {
+            if (bannerOverlaySyncRaf) {
+                window.cancelAnimationFrame(bannerOverlaySyncRaf);
+                bannerOverlaySyncRaf = 0;
+            }
+            if (bannerOverlaySyncCleanup) {
+                const cleanup = bannerOverlaySyncCleanup;
+                bannerOverlaySyncCleanup = null;
+                cleanup();
+            }
+        }
 
         function canRevealBannerPageOverlayNow() {
             const root = document.documentElement;
@@ -365,10 +378,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 window.clearTimeout(bannerOverlayRevealTimer);
                 bannerOverlayRevealTimer = 0;
             }
-            if (bannerOverlaySyncRaf) {
-                window.cancelAnimationFrame(bannerOverlaySyncRaf);
-                bannerOverlaySyncRaf = 0;
-            }
+            cleanupBannerOverlaySync();
             overlay.classList.remove('is-visible');
 
             if (forceHidden) {
@@ -399,10 +409,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 window.clearTimeout(bannerOverlayRevealTimer);
                 bannerOverlayRevealTimer = 0;
             }
-            if (bannerOverlaySyncRaf) {
-                window.cancelAnimationFrame(bannerOverlaySyncRaf);
-                bannerOverlaySyncRaf = 0;
-            }
+            cleanupBannerOverlaySync();
 
             const doReveal = () => {
                 overlay.classList.remove('hidden');
@@ -434,17 +441,34 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 return;
             }
 
-            if (bannerOverlaySyncRaf) {
-                window.cancelAnimationFrame(bannerOverlaySyncRaf);
-                bannerOverlaySyncRaf = 0;
-            }
+            cleanupBannerOverlaySync();
 
             let attempts = 0;
             const maxAttempts = 24;
+            let revealed = false;
+
+            const revealOnce = () => {
+                if (revealed) return;
+                revealed = true;
+                cleanupBannerOverlaySync();
+                revealBannerPageOverlay(false);
+            };
+
+            const onTransitionStart = (event) => {
+                if (event.target === target && event.propertyName === 'opacity') {
+                    revealOnce();
+                }
+            };
+
+            target.addEventListener('transitionstart', onTransitionStart);
+            bannerOverlaySyncCleanup = () => {
+                target.removeEventListener('transitionstart', onTransitionStart);
+            };
 
             const syncReveal = () => {
+                if (revealed) return;
                 if (overlay.dataset.pendingShow !== 'true') {
-                    bannerOverlaySyncRaf = 0;
+                    cleanupBannerOverlaySync();
                     return;
                 }
 
@@ -452,9 +476,8 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                     window.getComputedStyle(target).opacity || '1'
                 );
 
-                if (currentOpacity > 0.12 || attempts >= maxAttempts) {
-                    bannerOverlaySyncRaf = 0;
-                    revealBannerPageOverlay(false);
+                if ((currentOpacity > 0.01 && currentOpacity < 0.99) || attempts >= maxAttempts) {
+                    revealOnce();
                     return;
                 }
 
@@ -477,10 +500,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 return;
             }
 
-            if (bannerOverlaySyncRaf) {
-                window.cancelAnimationFrame(bannerOverlaySyncRaf);
-                bannerOverlaySyncRaf = 0;
-            }
+            cleanupBannerOverlaySync();
 
             let attempts = 0;
             const maxAttempts = 24;
@@ -575,10 +595,8 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                     });
                 });
                 window.swup.hooks.on('animation:in:start', () => {
-                    requestAnimationFrame(() => {
-                        applyBannerPageOverlay({ deferReveal: true });
-                        revealBannerOverlayWhenContentStarts();
-                    });
+                    applyBannerPageOverlay({ deferReveal: true });
+                    revealBannerOverlayWhenContentStarts();
                 });
             };
 
