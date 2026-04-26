@@ -8,9 +8,9 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 背景图片配置
 	src: {
 		// 桌面背景图片
-		desktop: "https://fengblog.s3.bitiful.net/fast-image/home-wallpaper-2.webp",
+		desktop: "https://image.091026.xyz/i/2026/04/27/o4uz-hh.webp",
 		// 移动背景图片
-		mobile: "https://fengblog.s3.bitiful.net/fast-image/home-wallpaper-2.webp",
+		mobile: "https://image.091026.xyz/i/2026/04/27/o4uz-hh.webp",
 	},
 	// Banner模式特有配置
 	banner: {
@@ -58,9 +58,9 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			},
 			text: {
 				// 桌面端要显示的来源文本
-				desktop: "2026 新年快乐！",
+				desktop: "和你的日常，就是奇迹",
 				// 移动端要显示的来源文本
-				mobile: "2026 新年快乐！",
+				mobile: "和你的日常，就是奇迹",
 			},
 			url: {
 				// 桌面端原始艺术品或艺术家页面的 URL 链接
