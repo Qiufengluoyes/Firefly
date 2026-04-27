@@ -175,6 +175,15 @@ export function setTheme(theme: LIGHT_DARK_MODE): void {
 		// 如果切换其他模式，移除系统主题监听
 		cleanupSystemThemeListener();
 	}
+
+	window.dispatchEvent(
+		new CustomEvent("theme-change", {
+			detail: {
+				theme,
+				resolvedTheme: resolveTheme(theme),
+			},
+		}),
+	);
 }
 
 // 设置系统主题监听器

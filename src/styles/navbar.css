@@ -457,12 +457,21 @@ body.wallpaper-transparent #navbar>div::before {
 
 #navbar #display-setting {
     right: 0 !important;
+    transform: translateZ(0) !important;
+    transition-property: opacity !important;
+    transition-duration: 150ms !important;
+    transition-timing-function: var(--ease-standard) !important;
+    will-change: opacity;
+}
+
+#navbar #display-setting.float-panel-closed {
+    transform: translateZ(0) !important;
 }
 
 #navbar #theme-mode-panel {
     position: fixed !important;
     top: var(--navbar-panel-top) !important;
-    right: var(--navbar-panel-inline-edge) !important;
+    right: 0 !important;
     padding-top: 0 !important;
 }
 
