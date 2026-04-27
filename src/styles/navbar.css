@@ -41,6 +41,15 @@
     will-change: transform, background-color, border-color, box-shadow;
 }
 
+#navbar {
+    --navbar-panel-gap: 0.65rem;
+    --navbar-panel-top: calc(4.3rem + var(--navbar-panel-gap));
+    --navbar-panel-inline-edge: max(
+        0px,
+        calc((100vw - (var(--layout-content-width) - 2.05rem)) / 2)
+    );
+}
+
 #navbar>div::before {
     content: "";
     position: absolute;
@@ -337,6 +346,28 @@ body.wallpaper-transparent .float-panel {
     background: rgba(16, 16, 20, 0.72) !important;
     box-shadow: var(--navbar-glass-shadow, var(--shadow-md)) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Navbar panel placement */
+#navbar #display-setting,
+#navbar #search-panel,
+#navbar #nav-menu-panel {
+    top: var(--navbar-panel-top) !important;
+}
+
+#navbar #display-setting {
+    right: 0 !important;
+}
+
+#navbar #theme-mode-panel {
+    position: fixed !important;
+    top: var(--navbar-panel-top) !important;
+    right: var(--navbar-panel-inline-edge) !important;
+    padding-top: 0 !important;
+}
+
+#navbar .dropdown-menu {
+    padding-top: calc(var(--navbar-panel-gap) + 0.775rem) !important;
 }
 
 /* ============================================
