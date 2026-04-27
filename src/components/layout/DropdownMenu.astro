@@ -1,7 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
 import DropdownItem from "@/components/common/DropdownItem.astro";
-import DropdownPanel from "@/components/common/DropdownPanel.astro";
 import { LinkPresets } from "@/constants/link-presets";
 import { LinkPreset, type NavBarLink } from "@/types/config";
 import { url } from "@/utils/url-utils";
@@ -52,8 +51,8 @@ const hasChildren = processedLink.children && processedLink.children.length > 0;
 				<Icon name="material-symbols:keyboard-arrow-down-rounded" class="text-[1.25rem] transition-transform duration-200 dropdown-arrow ml-1" />
 			</div>
 		</button>
-		<div class="dropdown-menu" data-dropdown-menu>
-			<DropdownPanel class="dropdown-content">
+		<div class="dropdown-menu navbar-dropdown-menu" data-dropdown-menu>
+			<div class="navbar-dropdown-panel">
 				{processedLink.children?.map((child, index) => (
 					<DropdownItem
 						href={child.external ? child.url : url(child.url)}
@@ -68,7 +67,7 @@ const hasChildren = processedLink.children && processedLink.children.length > 0;
 						)}
 					</DropdownItem>
 				))}
-			</DropdownPanel>
+			</div>
 		</div>
 	) : (
 		<a 
@@ -105,7 +104,7 @@ const hasChildren = processedLink.children && processedLink.children.length > 0;
 		@apply rotate-180;
 	}
 
-	.dropdown-content {
+	.navbar-dropdown-panel {
 		@apply min-w-[12rem];
 	}
 

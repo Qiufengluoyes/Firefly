@@ -348,6 +348,106 @@ body.wallpaper-transparent .float-panel {
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
 }
 
+/* Keep navbar blur on its own glass layer so child panels can blur the page backdrop too. */
+#banner-wrapper~* #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div,
+body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div,
+#banner-wrapper~* #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div,
+body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div,
+body.wallpaper-transparent #navbar>div {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: transparent !important;
+}
+
+#banner-wrapper~* #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div::before,
+body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div::before,
+#banner-wrapper~* #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
+body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
+body.wallpaper-transparent #navbar>div::before {
+    opacity: 1;
+    background: var(--navbar-glass-bg) !important;
+    -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
+    backdrop-filter: var(--navbar-glass-filter) !important;
+}
+
+/* Navbar panels use the same blur strength and glass color as the navbar itself. */
+#navbar :is(#display-setting, #search-panel, #nav-menu-panel),
+#navbar :is(#theme-mode-panel, #wallpaper-mode-panel)>.float-panel {
+    -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
+    backdrop-filter: var(--navbar-glass-filter) !important;
+    background: var(--navbar-glass-bg) !important;
+    border: 1px solid var(--navbar-glass-border) !important;
+    box-shadow: var(--navbar-glass-shadow) !important;
+    background-clip: padding-box;
+    overflow: hidden !important;
+}
+
+/* Desktop link dropdowns keep padding as hover hit-area; glass starts below it. */
+#navbar .navbar-dropdown-menu {
+    -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
+    backdrop-filter: var(--navbar-glass-filter) !important;
+    background: var(--navbar-glass-bg) !important;
+    border: 1px solid var(--navbar-glass-border) !important;
+    border-radius: var(--radius-large) !important;
+    box-shadow: var(--navbar-glass-shadow) !important;
+    background-clip: padding-box;
+    overflow: visible;
+    transition-property: opacity, transform, visibility !important;
+    transition-duration: 140ms, 140ms, 0ms !important;
+    transition-timing-function: var(--ease-standard), var(--ease-standard), step-end !important;
+    transition-delay: 0ms, 0ms, 140ms !important;
+    will-change: opacity, transform;
+    transform: translate3d(0, -8px, 0) !important;
+}
+
+#navbar .navbar-dropdown-menu::before {
+    content: none;
+}
+
+#navbar .navbar-dropdown-menu::after {
+    content: "";
+    position: absolute;
+    top: calc(-1 * (var(--navbar-panel-gap) + 0.775rem));
+    right: 0;
+    left: 0;
+    height: calc(var(--navbar-panel-gap) + 0.775rem);
+    z-index: 0;
+    pointer-events: auto;
+    background: transparent;
+}
+
+#navbar .dropdown-container:hover .navbar-dropdown-menu,
+#navbar .dropdown-container:focus-within .navbar-dropdown-menu {
+    transition-delay: 28ms, 28ms, 0ms !important;
+    transform: translate3d(0, 0, 0) !important;
+}
+
+#navbar .navbar-dropdown-panel {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background-clip: padding-box;
+    border-radius: var(--radius-large);
+    overflow: hidden !important;
+    padding: 0.5rem;
+    min-width: 12rem;
+    position: relative;
+    z-index: 1;
+    transform: translateZ(0);
+    transition-property: color, background-color, border-color, box-shadow !important;
+}
+
+#navbar :is(#theme-mode-panel, #wallpaper-mode-panel) {
+    -webkit-backdrop-filter: var(--navbar-glass-filter);
+    backdrop-filter: var(--navbar-glass-filter);
+    background: rgba(255, 255, 255, 0.001);
+    border-radius: var(--radius-large);
+    transform: translateZ(0);
+    will-change: opacity, transform, backdrop-filter;
+}
+
 /* Navbar panel placement */
 #navbar #display-setting,
 #navbar #search-panel,
@@ -366,8 +466,9 @@ body.wallpaper-transparent .float-panel {
     padding-top: 0 !important;
 }
 
-#navbar .dropdown-menu {
-    padding-top: calc(var(--navbar-panel-gap) + 0.775rem) !important;
+#navbar .navbar-dropdown-menu {
+    margin-top: calc(var(--navbar-panel-gap) + 0.775rem) !important;
+    padding-top: 0 !important;
 }
 
 /* ============================================
