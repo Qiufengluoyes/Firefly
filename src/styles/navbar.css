@@ -28,10 +28,47 @@
         0 14px 34px rgba(0, 0, 0, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.45);
     --navbar-glass-filter: saturate(180%) blur(max(var(--navbar-glass-blur, 28px), 24px));
+    --navbar-glass-stabilizer: saturate(170%) blur(max(var(--navbar-glass-blur, 28px), 22px));
     background: var(--card-bg);
     border: 1px solid transparent;
     border-radius: 0 0 0.75rem 0.75rem;
+    backface-visibility: hidden;
+    background-clip: padding-box;
+    isolation: isolate;
+    position: relative;
+    transform: translate3d(0, 0, 0);
     transition: all var(--duration-medium) var(--ease-standard);
+    will-change: transform, background-color, border-color, box-shadow;
+}
+
+#navbar>div::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0;
+    background: rgba(255, 255, 255, 0.015);
+    -webkit-backdrop-filter: var(--navbar-glass-stabilizer);
+    backdrop-filter: var(--navbar-glass-stabilizer);
+    transform: translate3d(0, 0, 0);
+    transition: opacity var(--duration-medium) var(--ease-standard);
+    will-change: opacity, backdrop-filter;
+}
+
+#navbar>div>.flex {
+    position: relative;
+    z-index: 1;
+}
+
+#navbar>div>.float-panel,
+#navbar>div>#display-setting,
+#navbar>div>#nav-menu-panel,
+#navbar>div>#search-panel,
+#navbar>div>#theme-mode-panel,
+#navbar>div>#wallpaper-mode-panel {
+    z-index: 2;
 }
 
 :root.dark #navbar>div {
@@ -46,6 +83,19 @@
 body.wallpaper-transparent #navbar>div {
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
+}
+
+#banner-wrapper~* #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div::before,
+body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div::before,
+#banner-wrapper~* #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
+body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
+body.wallpaper-transparent #navbar>div::before {
+    opacity: 1;
+}
+
+#navbar[data-transparent-mode="full"]>div::before,
+#navbar[data-transparent-mode="semifull"]:not(.scrolled)>div::before {
+    opacity: 0;
 }
 
 /* ============================================
