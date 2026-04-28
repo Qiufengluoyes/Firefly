@@ -44,6 +44,8 @@
 #navbar {
     --navbar-panel-gap: 0.65rem;
     --navbar-panel-top: calc(4.3rem + var(--navbar-panel-gap));
+    --navbar-button-hover-duration: 170ms;
+    --navbar-button-hover-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
     --navbar-panel-inline-edge: max(
         0px,
         calc((100vw - (var(--layout-content-width) - 2.05rem)) / 2)
@@ -471,8 +473,43 @@ body.wallpaper-transparent #navbar>div::before {
     box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--primary) 90%, black 10%);
     opacity: 0;
     transform: scale(1) !important;
-    transition: opacity 150ms var(--ease-standard) !important;
+    transition: opacity var(--navbar-button-hover-duration) var(--navbar-button-hover-ease) !important;
     will-change: opacity;
+}
+
+#navbar > div > div:first-child > a.btn-plain.scale-animation,
+#navbar > div > div:first-child > a.btn-plain.scale-animation :is(div, span, svg),
+#navbar .dropdown-container > .btn-plain.scale-animation,
+#navbar .dropdown-container > .btn-plain.scale-animation :is(div, span, svg),
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation :is(div, span, svg),
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation,
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation :is(div, span, svg) {
+    transition-property: color, fill, stroke !important;
+    transition-duration: var(--navbar-button-hover-duration) !important;
+    transition-timing-function: var(--navbar-button-hover-ease) !important;
 }
 
 #navbar > div > div:first-child > a.btn-plain.scale-animation:hover,
@@ -663,8 +700,14 @@ body.wallpaper-transparent #navbar>div::before {
     border: 0;
     box-shadow: inset 0 0 0 0 color-mix(in srgb, var(--primary) 90%, black 10%);
     transition:
-        color 150ms var(--ease-standard),
-        box-shadow 150ms var(--ease-standard) !important;
+        color var(--navbar-button-hover-duration) var(--navbar-button-hover-ease),
+        box-shadow var(--navbar-button-hover-duration) var(--navbar-button-hover-ease) !important;
+}
+
+#nav-menu-panel :is(a, button) :is(div, span, svg) {
+    transition-property: color, fill, stroke !important;
+    transition-duration: var(--navbar-button-hover-duration) !important;
+    transition-timing-function: var(--navbar-button-hover-ease) !important;
 }
 
 #nav-menu-panel :is(a, button):hover,
