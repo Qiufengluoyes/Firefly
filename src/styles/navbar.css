@@ -530,9 +530,36 @@ body.wallpaper-transparent #navbar>div::before {
 #nav-menu-panel :is(a, button) {
     transform: translate3d(0, 0, 0) scale(1) !important;
     transform-origin: center center;
+    line-height: 1;
     transition-property: transform, color, fill, stroke !important;
     transition-duration: var(--navbar-button-release-duration), var(--navbar-button-hover-duration), var(--navbar-button-hover-duration), var(--navbar-button-hover-duration) !important;
     transition-timing-function: var(--navbar-button-release-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease) !important;
+}
+
+#navbar .dropdown-container > :is(a, button).btn-plain.scale-animation .navbar-icon {
+    display: block;
+    line-height: 1;
+    transform-origin: center center;
+    backface-visibility: hidden;
+}
+
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation svg,
+#navbar .dropdown-container > .btn-plain.scale-animation svg,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation svg,
+#nav-menu-panel :is(a, button) svg {
+    display: block;
+    flex-shrink: 0;
 }
 
 #navbar > div > div:first-child > a.btn-plain.scale-animation:active,
@@ -554,6 +581,10 @@ body.wallpaper-transparent #navbar>div::before {
     transform: translate3d(0, 0, 0) scale(0.982) !important;
     transition-duration: var(--navbar-button-press-duration), var(--navbar-button-hover-duration), var(--navbar-button-hover-duration), var(--navbar-button-hover-duration) !important;
     transition-timing-function: var(--navbar-button-press-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease) !important;
+}
+
+#navbar .dropdown-container > :is(a, button).btn-plain.scale-animation:active {
+    transform: translate3d(0, 0, 0) scale(1) !important;
 }
 
 #navbar > div > div:first-child > a.btn-plain.scale-animation:hover,
