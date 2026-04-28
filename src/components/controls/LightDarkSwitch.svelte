@@ -13,17 +13,6 @@ import {
 	setTheme,
 } from "@/utils/setting-utils";
 
-// Define Swup type for window object
-interface SwupHooks {
-	on(event: string, callback: () => void): void;
-}
-
-interface SwupInstance {
-	hooks?: SwupHooks;
-}
-
-type WindowWithSwup = Window & { swup?: SwupInstance };
-
 let mode: LIGHT_DARK_MODE = $state(LIGHT_MODE);
 let displayedMode: LIGHT_DARK_MODE = $state(LIGHT_MODE); // 显示的实际主题（在system模式下会随系统变化）
 
@@ -80,14 +69,12 @@ onMount(() => {
 	};
 
 	// 检查Swup是否已经加载
-	const win = window as WindowWithSwup;
-	if (win.swup?.hooks) {
-		win.swup.hooks.on("content:replace", handleContentReplace);
+	if (window.swup?.hooks) {
+		window.swup.hooks.on("content:replace", handleContentReplace);
 	} else {
 		document.addEventListener("swup:enable", () => {
-			const w = window as WindowWithSwup;
-			if (w.swup?.hooks) {
-				w.swup.hooks.on("content:replace", handleContentReplace);
+			if (window.swup?.hooks) {
+				window.swup.hooks.on("content:replace", handleContentReplace);
 			}
 		});
 	}
@@ -133,7 +120,7 @@ onMount(() => {
                 onclick={() => switchScheme(LIGHT_MODE)}
             >
                 <Icon icon="material-symbols:wb-sunny-outline-rounded" class="text-[1.25rem] mr-3"></Icon>
-                {i18n(I18nKey.lightMode)}
+                <span class="theme-mode-label">{i18n(I18nKey.lightMode)}</span>
             </DropdownItem>
             <DropdownItem
                 role="menuitem"
@@ -142,7 +129,7 @@ onMount(() => {
                 onclick={() => switchScheme(DARK_MODE)}
             >
                 <Icon icon="material-symbols:dark-mode-outline-rounded" class="text-[1.25rem] mr-3"></Icon>
-                {i18n(I18nKey.darkMode)}
+                <span class="theme-mode-label">{i18n(I18nKey.darkMode)}</span>
             </DropdownItem>
             <DropdownItem
                 role="menuitem"
@@ -151,7 +138,7 @@ onMount(() => {
                 onclick={() => switchScheme(SYSTEM_MODE)}
             >
                 <Icon icon="material-symbols:brightness-auto-outline-rounded" class="text-[1.25rem] mr-3"></Icon>
-                {i18n(I18nKey.systemMode)}
+                <span class="theme-mode-label">{i18n(I18nKey.systemMode)}</span>
             </DropdownItem>
         </DropdownPanel>
     </div>

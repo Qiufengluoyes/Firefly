@@ -182,8 +182,8 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
         {#each result.slice(0, 5) as item}
             <a href={item.url}
                on:click={(e) => handleResultClick(e, item.url)}
-               class="transition first-of-type:mt-2 lg:first-of-type:mt-0 group block
-           rounded-xl text-lg px-3 py-2 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)]">
+               class="transition first-of-type:mt-2 lg:first-of-type:mt-0 group block search-result-card
+           rounded-xl text-lg px-3 py-2">
                 <div class="transition text-90 inline-flex font-bold group-hover:text-[var(--primary)]">
                     {@html item.meta.title}
                     <Icon icon="fa6-solid:chevron-right"
@@ -215,7 +215,7 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
         {#if result.length > 5}
             <a href={getSearchUrl(keywordDesktop || keywordMobile)}
                on:click={(e) => handleResultClick(e, getSearchUrl(keywordDesktop || keywordMobile))}
-               class="transition first-of-type:mt-2 lg:first-of-type:mt-0 group block rounded-xl text-lg px-3 py-2 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] text-[var(--primary)] font-bold text-center">
+               class="transition first-of-type:mt-2 lg:first-of-type:mt-0 group block search-result-card rounded-xl text-lg px-3 py-2 text-[var(--primary)] font-bold text-center">
                 <span class="inline-flex items-center">
                     {i18n(I18nKey.searchViewMore).replace('{count}', (result.length - 5).toString())}
                     <Icon icon="fa6-solid:arrow-right" class="transition text-[0.75rem] ml-1"></Icon>
@@ -241,6 +241,23 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
     .search-panel {
         max-height: calc(100vh - 100px);
         overflow-y: auto;
+    }
+
+    .search-result-card {
+        background: transparent;
+        box-shadow: inset 0 0 0 0 color-mix(in srgb, var(--primary) 90%, black 10%);
+        outline: none;
+    }
+
+    .search-result-card + .search-result-card {
+        margin-top: 0.35rem;
+    }
+
+    .search-result-card:hover,
+    .search-result-card:focus-visible,
+    .search-result-card:active {
+        background: transparent;
+        box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--primary) 90%, black 10%);
     }
 </style>
 

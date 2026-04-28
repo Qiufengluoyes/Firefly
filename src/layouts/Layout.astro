@@ -86,8 +86,6 @@ if (!lang) {
 }
 const siteLang = lang.replace("_", "-");
 
-// 使用固定的banner偏移量，position配置用于图片定位
-const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 ---
 
 <!doctype html>
@@ -299,11 +297,6 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
           const overlayWallpaper = document.querySelector(
             "[data-overlay-wallpaper]"
           );
-          // 检查当前是否为首页
-          const isHomePage =
-            window.location.pathname === baseUrl ||
-            (baseUrl !== '/' && window.location.pathname === baseUrl.replace(/\/$/, '')) ||
-            window.location.pathname === "/";
           if (wallpaperMode === WALLPAPER_OVERLAY) {
             // 全屏壁纸透明模式：显示全屏壁纸，隐藏banner
             if (bannerWrapper) {
@@ -439,7 +432,6 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 <style
   is:global
   define:vars={{
-    bannerOffset,
     "banner-height-home": `${BANNER_HEIGHT_HOME}vh`,
     "banner-height": `${BANNER_HEIGHT}vh`,
   }}
@@ -507,39 +499,6 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
   // 		console.log("Failed to load fonts:", error);
   // 	}
   // })();
-  /* TODO This is a temporary solution for style flicker issue when the transition is activated */
-  /* issue link: https://github.com/withastro/astro/issues/8711, the solution get from here too */
-  /* update: fixed in Astro 3.2.4 */
-  /*
-function disableAnimation() {
-	const css = document.createElement('style')
-	css.appendChild(
-		document.createTextNode(
-			`*{
-              -webkit-transition:none!important;
-              -moz-transition:none!important;
-              -o-transition:none!important;
-              -ms-transition:none!important;
- 
- 
-              transition:none!important
-              }`
-		)
-	)
-	document.head.appendChild(css)
-
-	return () => {
-		// Force restyle
-		;(() => window.getComputedStyle(document.body))()
-
-		// Wait for next tick before removing
-		setTimeout(() => {
-			document.head.removeChild(css)
-		}, 1)
-	}
-}
-*/
-
   const bannerEnabled = !!document.getElementById("banner-wrapper");
   function setClickOutsideToClose(panel: string, ignores: string[]) {
       document.addEventListener("click", (event) => {

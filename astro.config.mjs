@@ -206,6 +206,7 @@ export default defineConfig({
 					"**/.git/**",
 					"**/dist/**",
 					"**/.vercel/**",
+					"**/.astro/**",
 					"**/node_modules/**",
 					"**/.pnpm/**",
 				],
