@@ -448,6 +448,233 @@ body.wallpaper-transparent #navbar>div::before {
     will-change: opacity, transform, backdrop-filter;
 }
 
+/* Navbar buttons: keep accent text, replace hover fill with a fading accent outline. */
+#navbar > div > div:first-child > a.btn-plain.scale-animation::before,
+#navbar .dropdown-container > .btn-plain.scale-animation::before,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation::before,
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation::before {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 0;
+    box-sizing: border-box;
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--primary) 90%, black 10%);
+    opacity: 0;
+    transform: scale(1) !important;
+    transition: opacity 150ms var(--ease-standard) !important;
+    will-change: opacity;
+}
+
+#navbar > div > div:first-child > a.btn-plain.scale-animation:hover,
+#navbar > div > div:first-child > a.btn-plain.scale-animation:focus-visible,
+#navbar .dropdown-container:hover > .btn-plain.scale-animation,
+#navbar .dropdown-container:focus-within > .btn-plain.scale-animation,
+#navbar .dropdown-container > .btn-plain.scale-animation:hover,
+#navbar .dropdown-container > .btn-plain.scale-animation:focus-visible,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:hover,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:focus-visible,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .current-theme-btn,
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation:hover,
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation:focus-visible {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: var(--primary) !important;
+}
+
+#navbar > div > div:first-child > a.btn-plain.scale-animation:hover :is(div, span, svg),
+#navbar > div > div:first-child > a.btn-plain.scale-animation:focus-visible :is(div, span, svg),
+#navbar .dropdown-container:hover > .btn-plain.scale-animation :is(div, span, svg),
+#navbar .dropdown-container:focus-within > .btn-plain.scale-animation :is(div, span, svg),
+#navbar .dropdown-container > .btn-plain.scale-animation:hover :is(div, span, svg),
+#navbar .dropdown-container > .btn-plain.scale-animation:focus-visible :is(div, span, svg),
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:hover :is(div, span, svg),
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:focus-visible :is(div, span, svg),
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation:hover :is(div, span, svg),
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation:focus-visible :is(div, span, svg) {
+    color: var(--primary) !important;
+}
+
+#navbar > div > div:first-child > a.btn-plain.scale-animation:hover::before,
+#navbar > div > div:first-child > a.btn-plain.scale-animation:focus-visible::before,
+#navbar .dropdown-container:hover > .btn-plain.scale-animation::before,
+#navbar .dropdown-container:focus-within > .btn-plain.scale-animation::before,
+#navbar .dropdown-container > .btn-plain.scale-animation:hover::before,
+#navbar .dropdown-container > .btn-plain.scale-animation:focus-visible::before,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:hover::before,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:focus-visible::before,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .current-theme-btn::before,
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation:hover::before,
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation:focus-visible::before,
+#navbar > div > div:first-child > a.btn-plain.scale-animation:active::before,
+#navbar .dropdown-container > .btn-plain.scale-animation:active::before,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:active::before,
+#navbar :is(
+    #display-settings-switch,
+    #search-switch,
+    #wallpaper-mode-switch,
+    #scheme-switch,
+    #nav-menu-switch,
+    .theme-switch-btn
+).btn-plain.scale-animation:active::before {
+    background: transparent !important;
+    background-color: transparent !important;
+    opacity: 1;
+    transform: scale(1) !important;
+}
+
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) :is(.btn-plain.scale-animation, .current-theme-btn) {
+    color: rgb(0 0 0 / 0.75) !important;
+}
+
+:root.dark #navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) :is(.btn-plain.scale-animation, .current-theme-btn) {
+    color: rgb(255 255 255 / 0.75) !important;
+}
+
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:hover,
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:focus-visible {
+    color: var(--primary) !important;
+}
+
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:hover :is(div, span, svg),
+#navbar :is(
+    .navbar-dropdown-panel,
+    #theme-mode-panel > .float-panel,
+    #wallpaper-mode-panel > .float-panel
+) .btn-plain.scale-animation:focus-visible :is(div, span, svg) {
+    color: var(--primary) !important;
+}
+
+#nav-menu-panel :is(a, button) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 0;
+    box-shadow: inset 0 0 0 0 color-mix(in srgb, var(--primary) 90%, black 10%);
+    transition:
+        color 150ms var(--ease-standard),
+        box-shadow 150ms var(--ease-standard) !important;
+}
+
+#nav-menu-panel :is(a, button):hover,
+#nav-menu-panel :is(a, button):focus-visible,
+#nav-menu-panel :is(a, button):active {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--primary) 90%, black 10%);
+}
+
 /* Navbar panel placement */
 #navbar #display-setting,
 #navbar #search-panel,
