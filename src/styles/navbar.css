@@ -536,13 +536,6 @@ body.wallpaper-transparent #navbar>div::before {
     transition-timing-function: var(--navbar-button-release-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease) !important;
 }
 
-#navbar .dropdown-container > :is(a, button).btn-plain.scale-animation .navbar-icon {
-    display: block;
-    line-height: 1;
-    transform-origin: center center;
-    backface-visibility: hidden;
-}
-
 #navbar :is(
     #display-settings-switch,
     #search-switch,
@@ -578,13 +571,36 @@ body.wallpaper-transparent #navbar>div::before {
     .theme-switch-btn
 ).btn-plain.scale-animation:active,
 #nav-menu-panel :is(a, button):active {
-    transform: translate3d(0, 0, 0) scale(0.982) !important;
+    transform: translate3d(0, 0, 0) scale(0.965) !important;
     transition-duration: var(--navbar-button-press-duration), var(--navbar-button-hover-duration), var(--navbar-button-hover-duration), var(--navbar-button-hover-duration) !important;
     transition-timing-function: var(--navbar-button-press-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease) !important;
 }
 
-#navbar .dropdown-container > :is(a, button).btn-plain.scale-animation:active {
+#navbar .dropdown-container > :is(a, button).btn-plain.scale-animation {
     transform: translate3d(0, 0, 0) scale(1) !important;
+}
+
+#navbar .dropdown-container > :is(a, button).btn-plain.scale-animation > .navbar-link-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    transform: translate3d(0, 0, 0) scale(1);
+    transform-origin: center center;
+    transition: transform var(--navbar-button-release-duration) var(--navbar-button-release-ease);
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    will-change: transform;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    contain: paint;
+}
+
+#navbar .dropdown-container > :is(a, button).btn-plain.scale-animation:active > .navbar-link-content {
+    transform: translate3d(0, 0, 0) scale(0.965);
+    transition-duration: var(--navbar-button-press-duration);
+    transition-timing-function: var(--navbar-button-press-ease);
 }
 
 #navbar > div > div:first-child > a.btn-plain.scale-animation:hover,
@@ -730,7 +746,7 @@ body.wallpaper-transparent #navbar>div::before {
     background: transparent !important;
     background-color: transparent !important;
     opacity: 1;
-    transform: scale(0.982) !important;
+    transform: scale(0.965) !important;
     transition:
         opacity var(--navbar-button-hover-duration) var(--navbar-button-hover-ease),
         transform var(--navbar-button-press-duration) var(--navbar-button-press-ease) !important;
