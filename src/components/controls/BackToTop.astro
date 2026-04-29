@@ -25,70 +25,171 @@ import FloatingButton from "@/components/common/FloatingButton.astro";
 </div>
 
 <script is:raw is:inline>
+  var BACK_TO_TOP_VISIBLE_OFFSET = 200;
+
   function backToTop() {
     // 直接使用原生滚动，避免OverlayScrollbars冲突
     window.scroll({ top: 0, behavior: "smooth" });
   }
 
-  function calculateScrollProgress() {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  function clampScrollPercent(value) {
+    return Math.min(Math.max(value, 0), 100);
+  }
+
+  function getScrollTop() {
+    return (
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0
+    );
+  }
+
+  function getViewportHeight() {
+    return window.innerHeight || document.documentElement.clientHeight || 0;
+  }
+
+  function calculateDocumentScrollProgress() {
+    const scrollTop = getScrollTop();
+    const docHeight = document.documentElement.scrollHeight - getViewportHeight();
     const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-    return Math.min(scrollPercent, 100);
+    return clampScrollPercent(scrollPercent);
+  }
+
+  function isHomePagePath() {
+    const pathname = window.location.pathname.replace(/\/+$/, "");
+    return pathname === "";
+  }
+
+  function getContentProgressTarget() {
+    if (isHomePagePath()) return null;
+
+    return (
+      document.querySelector("[data-scroll-progress-target]") ||
+      document.querySelector("#content-wrapper .custom-md") ||
+      document.querySelector(".custom-md")
+    );
+  }
+
+  function getElementTop(element) {
+    return element.getBoundingClientRect().top + getScrollTop();
+  }
+
+  function getElementHeight(element) {
+    return Math.max(
+      element.scrollHeight || 0,
+      element.getBoundingClientRect().height || 0,
+      element.offsetHeight || 0
+    );
+  }
+
+  function calculateContentScrollProgress(contentElement) {
+    const scrollTop = getScrollTop();
+    const viewportHeight = getViewportHeight();
+    const contentTop = getElementTop(contentElement);
+    const contentBottom = contentTop + getElementHeight(contentElement);
+    const progressStart = Math.max(0, contentTop - viewportHeight);
+    const progressEnd = Math.max(progressStart, contentBottom - viewportHeight);
+
+    if (progressEnd <= progressStart) {
+      return scrollTop >= progressStart ? 100 : 0;
+    }
+
+    return clampScrollPercent(
+      ((scrollTop - progressStart) / (progressEnd - progressStart)) * 100
+    );
+  }
+
+  function calculateScrollProgress() {
+    const contentElement = getContentProgressTarget();
+    if (!contentElement) return calculateDocumentScrollProgress();
+
+    return calculateContentScrollProgress(contentElement);
   }
 
   // 响应式返回顶部按钮管理器
-  if (typeof window.BackToTopManager === "undefined") {
-    window.BackToTopManager = class BackToTopManager {
-      constructor() {
-        this.wrapper = document.getElementById("back-to-top-wrapper");
-        this.button = document.getElementById("back-to-top-btn");
-        this.progressRing = document.querySelector(".progress-ring-circle");
-        this.init();
+  window.BackToTopManager = class BackToTopManager {
+    constructor() {
+      this.wrapper = document.getElementById("back-to-top-wrapper");
+      this.button = document.getElementById("back-to-top-btn");
+      this.progressRing = this.wrapper?.querySelector(".progress-ring");
+      this.progressRingCircle = this.wrapper?.querySelector(
+        ".progress-ring-circle"
+      );
+      this.rafId = 0;
+      this.handleViewportChange = this.handleViewportChange.bind(this);
+      this.init();
+    }
+
+    init() {
+      if (!this.button || !this.wrapper) return;
+
+      window.addEventListener("scroll", this.handleViewportChange, {
+        passive: true,
+      });
+      window.addEventListener("resize", this.handleViewportChange, {
+        passive: true,
+      });
+      this.update();
+    }
+
+    destroy() {
+      window.removeEventListener("scroll", this.handleViewportChange);
+      window.removeEventListener("resize", this.handleViewportChange);
+      if (this.rafId) {
+        cancelAnimationFrame(this.rafId);
+        this.rafId = 0;
       }
+    }
 
-      init() {
-        if (!this.button || !this.wrapper) return;
+    handleViewportChange() {
+      if (this.rafId) cancelAnimationFrame(this.rafId);
+      this.rafId = requestAnimationFrame(() => {
+        this.rafId = 0;
+        this.update();
+      });
+    }
 
-        this.setupScrollListener();
+    setVisible(isVisible) {
+      this.wrapper.classList.toggle("hide", !isVisible);
+      this.button.classList.toggle("hide", !isVisible);
+      this.progressRing?.classList.toggle("hide", !isVisible);
+    }
+
+    update() {
+      const scrollTop = getScrollTop();
+      const scrollPercent = calculateScrollProgress();
+
+      this.setVisible(scrollTop > BACK_TO_TOP_VISIBLE_OFFSET);
+
+      // 更新进度条；底圈和进度圈由同一个 SVG 随 wrapper 一起显示/隐藏
+      if (this.progressRingCircle) {
+        this.progressRingCircle.style.setProperty(
+          "--progress",
+          `${scrollPercent}%`
+        );
       }
+    }
+  };
 
-      setupScrollListener() {
-        const updateVisibility = () => {
-          const scrollTop =
-            window.pageYOffset || document.documentElement.scrollTop;
-          const scrollPercent = calculateScrollProgress();
-
-          // 当滚动超过200px时显示按钮
-          if (scrollTop > 200) {
-            this.wrapper.classList.remove("hide");
-          } else {
-            this.wrapper.classList.add("hide");
-          }
-
-          // 更新进度条
-          if (this.progressRing) {
-            this.progressRing.style.setProperty("--progress", scrollPercent + "%");
-          }
-        };
-
-        window.addEventListener("scroll", updateVisibility, { passive: true });
-      }
-    };
+  function initBackToTopManager() {
+    if (window.fireflyBackToTopManager?.destroy) {
+      window.fireflyBackToTopManager.destroy();
+    }
+    window.fireflyBackToTopManager = new window.BackToTopManager();
   }
-  // ... existing initialization logic ...
-  // 页面加载完成后初始化
-  document.addEventListener("DOMContentLoaded", () => {
-    new BackToTopManager();
-  });
 
-  // 如果页面已经加载完成，立即初始化
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      new BackToTopManager();
+    document.addEventListener("DOMContentLoaded", initBackToTopManager, {
+      once: true,
     });
   } else {
-    new BackToTopManager();
+    initBackToTopManager();
+  }
+
+  if (!window.fireflyBackToTopPageLoadBound) {
+    document.addEventListener("astro:page-load", initBackToTopManager);
+    window.fireflyBackToTopPageLoadBound = true;
   }
 </script>
 
@@ -129,6 +230,13 @@ import FloatingButton from "@/components/common/FloatingButton.astro";
     height: 100%;
     transform: rotate(-90deg);
     pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .progress-ring.hide,
+  #back-to-top-btn.hide + .progress-ring {
+    opacity: 0;
   }
 
   .progress-ring-bg {

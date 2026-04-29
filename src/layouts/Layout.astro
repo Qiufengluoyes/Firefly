@@ -878,9 +878,7 @@ const siteLang = lang.replace("_", "-");
     document.addEventListener("swup:enable", setup);
   }
 
-  let backToTopBtn = document.getElementById("back-to-top-btn");
   let toc = document.getElementById("toc-wrapper");
-  let navbar = document.getElementById("navbar-wrapper");
   // 优化的滚动处理函数
   function scrollFunction() {
     const scrollTop = document.documentElement.scrollTop;
@@ -888,16 +886,6 @@ const siteLang = lang.replace("_", "-");
 
     // 使用批量DOM操作优化性能
     const operations: (() => void)[] = [];
-    if (backToTopBtn) {
-      operations.push(() => {
-        if (scrollTop > bannerHeight) {
-          backToTopBtn.classList.remove("hide");
-        } else {
-          backToTopBtn.classList.add("hide");
-        }
-      });
-    }
-
     if (bannerEnabled && toc) {
       operations.push(() => {
         if (scrollTop > bannerHeight) {

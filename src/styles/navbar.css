@@ -24,13 +24,14 @@
 #navbar>div {
     --navbar-glass-bg: rgba(255, 255, 255, 0.64);
     --navbar-glass-border: rgba(255, 255, 255, 0.38);
+    --navbar-body-border: var(--line-divider);
     --navbar-glass-shadow:
         0 14px 34px rgba(0, 0, 0, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.45);
     --navbar-glass-filter: saturate(180%) blur(max(var(--navbar-glass-blur, 28px), 24px));
     --navbar-glass-stabilizer: saturate(170%) blur(max(var(--navbar-glass-blur, 28px), 22px));
     background: var(--card-bg);
-    border: 1px solid transparent;
+    border: 1px solid var(--navbar-body-border);
     border-radius: 0 0 0.75rem 0.75rem;
     backface-visibility: hidden;
     background-clip: padding-box;
@@ -66,6 +67,19 @@
     transform: translate3d(0, 0, 0);
     transition: opacity var(--duration-medium) var(--ease-standard);
     will-change: opacity, backdrop-filter;
+}
+
+#navbar>div::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px var(--navbar-body-border);
+    transition:
+        opacity var(--duration-medium) var(--ease-standard),
+        box-shadow var(--duration-medium) var(--ease-standard);
 }
 
 #navbar>div>.flex {
@@ -105,7 +119,9 @@ body.wallpaper-transparent #navbar>div::before {
 }
 
 #navbar[data-transparent-mode="full"]>div::before,
-#navbar[data-transparent-mode="semifull"]:not(.scrolled)>div::before {
+#navbar[data-transparent-mode="full"]>div::after,
+#navbar[data-transparent-mode="semifull"]:not(.scrolled)>div::before,
+#navbar[data-transparent-mode="semifull"]:not(.scrolled)>div::after {
     opacity: 0;
 }
 
@@ -122,7 +138,7 @@ body.wallpaper-transparent #navbar>div::before {
         -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
         backdrop-filter: var(--navbar-glass-filter) !important;
         background: var(--navbar-glass-bg) !important;
-        border: 1px solid var(--navbar-glass-border) !important;
+        border: 1px solid var(--navbar-body-border) !important;
         border-radius: 0 0 0.75rem 0.75rem !important;
         box-shadow: var(--navbar-glass-shadow) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -156,7 +172,7 @@ body.wallpaper-transparent #navbar>div::before {
         -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
         backdrop-filter: var(--navbar-glass-filter) !important;
         background: var(--navbar-glass-bg) !important;
-        border: 1px solid var(--navbar-glass-border) !important;
+        border: 1px solid var(--navbar-body-border) !important;
         border-radius: 0 0 0.75rem 0.75rem !important;
         box-shadow: var(--navbar-glass-shadow) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -175,7 +191,7 @@ body.wallpaper-transparent #navbar>div::before {
         -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
         backdrop-filter: var(--navbar-glass-filter) !important;
         background: var(--navbar-glass-bg) !important;
-        border: 1px solid var(--navbar-glass-border) !important;
+        border: 1px solid var(--navbar-body-border) !important;
         border-radius: 0 0 0.75rem 0.75rem !important;
         box-shadow: var(--navbar-glass-shadow) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -209,7 +225,7 @@ body.wallpaper-transparent #navbar>div::before {
         -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
         backdrop-filter: var(--navbar-glass-filter) !important;
         background: var(--navbar-glass-bg) !important;
-        border: 1px solid var(--navbar-glass-border) !important;
+        border: 1px solid var(--navbar-body-border) !important;
         border-radius: 0 0 0.75rem 0.75rem !important;
         box-shadow: var(--navbar-glass-shadow) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -225,7 +241,7 @@ body.wallpaper-transparent #navbar>div::before {
     :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semi"]>div,
     :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"]>div {
         background: var(--navbar-glass-bg) !important;
-        border: 1px solid var(--navbar-glass-border) !important;
+        border: 1px solid var(--navbar-body-border) !important;
         box-shadow: var(--navbar-glass-shadow) !important;
     }
 
@@ -249,7 +265,7 @@ body.wallpaper-transparent #navbar>div::before {
     :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semifull"].scrolled>div,
     :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"].scrolled>div {
         background: var(--navbar-glass-bg) !important;
-        border: 1px solid var(--navbar-glass-border) !important;
+        border: 1px solid var(--navbar-body-border) !important;
         box-shadow: var(--navbar-glass-shadow) !important;
     }
 }
@@ -263,7 +279,7 @@ body.wallpaper-transparent #navbar>div::before {
     :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semi"]>div,
     :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"]>div {
         background: var(--navbar-glass-bg) !important;
-        border: 1px solid var(--navbar-glass-border) !important;
+        border: 1px solid var(--navbar-body-border) !important;
         box-shadow: var(--navbar-glass-shadow) !important;
     }
 
@@ -287,14 +303,14 @@ body.wallpaper-transparent #navbar>div::before {
     :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semifull"].scrolled>div,
     :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"].scrolled>div {
         background: var(--navbar-glass-bg) !important;
-        border: 1px solid var(--navbar-glass-border) !important;
+        border: 1px solid var(--navbar-body-border) !important;
         box-shadow: var(--navbar-glass-shadow) !important;
     }
 }
 
 body.wallpaper-transparent #navbar>div {
     background: var(--navbar-glass-bg) !important;
-    border: 1px solid var(--navbar-glass-border) !important;
+    border: 1px solid var(--navbar-body-border) !important;
     box-shadow: var(--navbar-glass-shadow) !important;
 }
 
