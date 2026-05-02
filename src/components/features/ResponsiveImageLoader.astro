@@ -28,6 +28,9 @@ let pageLoaderStartedAt = 0;
 let lastPageLoadingKey = "";
 let lastPageLoadingAt = 0;
 let hasSwupLifecycle = false;
+let loaderPositionRaf: number | undefined;
+let imageLoaderResizeObserver: ResizeObserver | undefined;
+const observedImageLoaderTargets = new WeakMap<HTMLImageElement, Element[]>();
 
 function getOrCreatePageLoader() {
 	let host = document.querySelector<HTMLDivElement>('[data-ff-md3-page-loader-root="true"]');
@@ -317,6 +320,67 @@ function ensureLoaderHost(parent: HTMLElement) {
 	}
 }
 
+function scheduleSyncAllLoaderPositions() {
+	if (loaderPositionRaf) {
+		return;
+	}
+
+	loaderPositionRaf = window.requestAnimationFrame(() => {
+		loaderPositionRaf = undefined;
+		syncAllLoaderPositions();
+	});
+}
+
+function getImageLoaderResizeObserver() {
+	if (!("ResizeObserver" in window)) {
+		return undefined;
+	}
+
+	if (!imageLoaderResizeObserver) {
+		imageLoaderResizeObserver = new ResizeObserver(() => {
+			scheduleSyncAllLoaderPositions();
+		});
+	}
+	return imageLoaderResizeObserver;
+}
+
+function getImageLoaderPositionTargets(img: HTMLImageElement) {
+	const targets: Element[] = [img];
+	const parent = img.parentElement;
+	const captionFigure = img.closest("figure.image-caption");
+
+	if (parent && !targets.includes(parent)) {
+		targets.push(parent);
+	}
+	if (captionFigure && !targets.includes(captionFigure)) {
+		targets.push(captionFigure);
+	}
+
+	return targets;
+}
+
+function observeImageLoaderPosition(img: HTMLImageElement) {
+	const observer = getImageLoaderResizeObserver();
+	if (!observer || observedImageLoaderTargets.has(img)) {
+		return;
+	}
+
+	const targets = getImageLoaderPositionTargets(img);
+	targets.forEach((target) => observer.observe(target));
+	observedImageLoaderTargets.set(img, targets);
+}
+
+function unobserveImageLoaderPosition(img: HTMLImageElement) {
+	const observer = imageLoaderResizeObserver;
+	const targets = observedImageLoaderTargets.get(img);
+	if (!observer || !targets) {
+		return;
+	}
+
+	targets.forEach((target) => observer.unobserve(target));
+	observedImageLoaderTargets.delete(img);
+}
+
 function getOrCreateLoader(img: HTMLImageElement) {
 	const parent = img.parentElement as HTMLElement | null;
 	if (!parent) {
@@ -368,10 +432,16 @@ function syncLoaderPosition(img: HTMLImageElement) {
 	const baseLeft = hasImageBox ? imageRect.left - parentRect.left : 0;
 	const baseTop = hasImageBox ? imageRect.top - parentRect.top : 0;
 	const horizontalGap = Math.max(12, Math.min(24, Math.round(baseWidth * 0.08)));
-	const targetWidth = baseWidth - horizontalGap * 2;
+	const targetWidth = Math.max(0, baseWidth - horizontalGap * 2);
+	const availableWidth = Math.min(parentWidth, baseWidth, targetWidth);
+	if (availableWidth <= 0 || parentWidth <= 0 || parentHeight <= 0) {
+		return;
+	}
+
+	const minWidth = Math.min(IMAGE_LOADER_MIN_WIDTH, availableWidth);
 	const width = Math.max(
-		IMAGE_LOADER_MIN_WIDTH,
-		Math.min(IMAGE_LOADER_MAX_WIDTH, targetWidth),
+		minWidth,
+		Math.min(IMAGE_LOADER_MAX_WIDTH, availableWidth),
 	);
 	const rawLeft = baseLeft + (baseWidth - width) / 2;
 	const maxLeft = Math.max(0, parentWidth - width);
@@ -379,10 +449,6 @@ function syncLoaderPosition(img: HTMLImageElement) {
 	const rawTop = baseTop + Math.max(0, baseHeight / 2 - IMAGE_LOADER_HEIGHT / 2);
 	const maxTop = Math.max(0, parentHeight - IMAGE_LOADER_HEIGHT);
 	const top = Math.min(Math.max(0, rawTop), maxTop);
-
-	if (width <= 40) {
-		return;
-	}
 
 	loader.style.left = `${left}px`;
 	loader.style.top = `${top}px`;
@@ -402,6 +468,7 @@ function hideLoader(img: HTMLImageElement) {
 		return;
 	}
 
+	unobserveImageLoaderPosition(img);
 	loader.classList.remove("ff-md3-image-loader--active");
 	window.setTimeout(() => loader.remove(), 220);
 }
@@ -550,6 +617,7 @@ function bindImageLoader(img: HTMLImageElement) {
 			if (loader && !(img.complete && img.naturalWidth > 0)) {
 				loader.classList.add("ff-md3-image-loader--active");
 				markImagePending(img);
+				observeImageLoaderPosition(img);
 			}
 		}
 		if (img.complete && img.naturalWidth > 0) {
@@ -584,6 +652,7 @@ function bindImageLoader(img: HTMLImageElement) {
 	} else {
 		loader.classList.add("ff-md3-image-loader--active");
 		markImagePending(img);
+		observeImageLoaderPosition(img);
 		syncImagePlaceholderSizing(img);
 		syncLoaderPosition(img);
 	}
@@ -613,7 +682,7 @@ function createDynamicObserver() {
 				}
 
 				initResponsiveImageLoader(node);
-				requestAnimationFrame(syncAllLoaderPositions);
+				scheduleSyncAllLoaderPositions();
 			});
 		});
 	});
@@ -625,7 +694,7 @@ function setupResponsiveImageLoader() {
 	const win = window as WindowWithResponsiveLoader;
 	if (win.__fireflyResponsiveImageLoaderInit__) {
 		initResponsiveImageLoader();
-		requestAnimationFrame(syncAllLoaderPositions);
+		scheduleSyncAllLoaderPositions();
 		return;
 	}
 
@@ -634,16 +703,16 @@ function setupResponsiveImageLoader() {
 
 	document.addEventListener("astro:page-load", () => {
 		initResponsiveImageLoader();
-		requestAnimationFrame(syncAllLoaderPositions);
+		scheduleSyncAllLoaderPositions();
 		stopPageLoading(true);
 	});
 	document.addEventListener("swup:content:replace", () => {
 		initResponsiveImageLoader();
-		requestAnimationFrame(syncAllLoaderPositions);
+		scheduleSyncAllLoaderPositions();
 	});
 	document.addEventListener("swup:contentReplaced", () => {
 		initResponsiveImageLoader();
-		requestAnimationFrame(syncAllLoaderPositions);
+		scheduleSyncAllLoaderPositions();
 		stopPageLoading(true);
 	});
 	document.addEventListener("swup:visit:end", () => {
@@ -653,13 +722,13 @@ function setupResponsiveImageLoader() {
 		stopPageLoading(true);
 	});
 	window.addEventListener("resize", () => {
-		requestAnimationFrame(syncAllLoaderPositions);
+		scheduleSyncAllLoaderPositions();
 	});
 
 	createDynamicObserver();
 	win.__fireflyResponsiveImageLoaderInit__ = true;
 	initResponsiveImageLoader();
-	requestAnimationFrame(syncAllLoaderPositions);
+	scheduleSyncAllLoaderPositions();
 }
 
 if (document.readyState === "loading") {
@@ -737,15 +806,22 @@ img.ff-theme-responsive-image:not(.ff-md3-image-fade--ready) {
 .ff-md3-loader-indicator {
 	position: absolute;
 	inset: 0 auto 0 0;
-	width: 58%;
+	width: 42%;
 	transform-origin: left center;
 	border-radius: 999px;
 	background: linear-gradient(
 		90deg,
-		var(--ff-md3-loader-indicator-start) 0%,
-		var(--ff-md3-loader-indicator-end) 100%
+		transparent 0%,
+		color-mix(in oklch, var(--ff-md3-loader-indicator-start) 68%, transparent 32%) 18%,
+		var(--ff-md3-loader-indicator-end) 50%,
+		color-mix(in oklch, var(--ff-md3-loader-indicator-start) 68%, transparent 32%) 82%,
+		transparent 100%
 	);
-	animation: ff-md3-loader-primary 1.75s cubic-bezier(0.2, 0, 0, 1) infinite;
+	box-shadow:
+		0 0 5px color-mix(in oklch, var(--ff-md3-loader-indicator-end) 30%, transparent 70%),
+		0 0 9px color-mix(in oklch, var(--ff-md3-loader-indicator-start) 18%, transparent 82%);
+	animation: ff-apple-loader-indeterminate 1.08s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+	will-change: transform;
 }
 
 .ff-md3-page-loader-root {
@@ -792,15 +868,18 @@ img.ff-theme-responsive-image:not(.ff-md3-image-fade--ready) {
 	opacity: 1;
 }
 
-@keyframes ff-md3-loader-primary {
+@keyframes ff-apple-loader-indeterminate {
 	0% {
-		transform: translateX(-130%) scaleX(0.3);
+		transform: translate3d(-115%, 0, 0) scaleX(0.62);
 	}
-	45% {
-		transform: translateX(8%) scaleX(0.95);
+	28% {
+		transform: translate3d(-42%, 0, 0) scaleX(0.9);
+	}
+	62% {
+		transform: translate3d(92%, 0, 0) scaleX(1);
 	}
 	100% {
-		transform: translateX(185%) scaleX(0.42);
+		transform: translate3d(252%, 0, 0) scaleX(0.64);
 	}
 }
 
@@ -821,7 +900,8 @@ img.ff-theme-responsive-image:not(.ff-md3-image-fade--ready) {
 
 	.ff-md3-loader-indicator {
 		animation: none;
-		transform: translateX(0);
+		left: 50%;
+		transform: translateX(-50%);
 	}
 
 	.ff-md3-page-loader-bar {

@@ -71,6 +71,8 @@ const { headings: _headings = [], class: className, style } = Astro.props;
     }
   }
 
+  (window as any).fireflyInitSidebarTOC = initSidebarTOC;
+
   // 初始化
   // 确保 DOM 准备好后再执行
   if (document.readyState === "loading") {

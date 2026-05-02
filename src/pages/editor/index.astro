@@ -66,43 +66,50 @@ const today = new Date().toISOString().slice(0, 10);
 
 		<div id="editor-protected" class="hidden space-y-4">
 			<section class="card-base p-5 md:p-6">
-				<h2 class="text-lg font-semibold text-black/85 dark:text-white/85 mb-3">文章列表</h2>
+				<div class="editor-section-header mb-3">
+					<h2 class="text-lg font-semibold text-black/85 dark:text-white/85">文章列表</h2>
+					<span id="editor-post-count" class="text-sm text-black/60 dark:text-white/60"></span>
+				</div>
 				<div class="grid gap-3">
-					<input
-						id="editor-search"
-						type="text"
-						placeholder="输入标题、slug、日期关键字进行筛选"
-						class="editor-input rounded-xl px-4 py-3"
-					/>
+					<div class="editor-post-controls">
+						<input
+							id="editor-search"
+							type="text"
+							placeholder="输入标题、slug、日期关键字进行筛选"
+							class="editor-input editor-search-input rounded-xl px-4 py-3"
+						/>
+						<div class="editor-post-actions">
+							<button id="editor-refresh-posts-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+								刷新列表
+							</button>
+							<button id="editor-load-post-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+								载入文章
+							</button>
+						</div>
+					</div>
 					<div
 						id="editor-post-list"
 						class="editor-post-list rounded-xl"
 						role="listbox"
 						aria-label="文章列表"
 					></div>
-					<div class="flex flex-wrap items-center gap-2">
-						<button id="editor-load-post-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
-							载入选中文章
-						</button>
-						<button id="editor-refresh-posts-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
-							刷新列表
-						</button>
-						<span id="editor-post-count" class="text-sm text-black/60 dark:text-white/60"></span>
-					</div>
 				</div>
 			</section>
 
 			<section class="card-base p-5 md:p-6">
-				<div class="flex flex-wrap items-center gap-2 mb-4">
-					<button id="editor-new-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
-						新建文章
-					</button>
-					<button id="editor-save-local-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
-						保存到浏览器草稿
-					</button>
-					<button id="editor-load-local-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
-						读取浏览器草稿
-					</button>
+				<div class="editor-section-header mb-4">
+					<h2 class="text-lg font-semibold text-black/85 dark:text-white/85">文章信息</h2>
+					<div class="editor-header-actions">
+						<button id="editor-new-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+							新建文章
+						</button>
+						<button id="editor-save-local-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+							保存草稿
+						</button>
+						<button id="editor-load-local-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">
+							读取草稿
+						</button>
+					</div>
 				</div>
 
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -173,26 +180,29 @@ const today = new Date().toISOString().slice(0, 10);
 			</section>
 
 			<section class="card-base p-5 md:p-6">
-				<div class="flex flex-wrap items-center gap-2 mb-4">
+				<div class="editor-section-header mb-4">
+					<h2 class="text-lg font-semibold text-black/85 dark:text-white/85">编辑与预览</h2>
+					<div class="editor-compose-actions">
+						<div class="editor-mode-switch inline-flex rounded-xl bg-[var(--btn-regular-bg)] p-1">
+							<button type="button" class="editor-mode-btn" data-mode="edit">仅编辑</button>
+							<button type="button" class="editor-mode-btn" data-mode="preview">仅预览</button>
+							<button type="button" class="editor-mode-btn" data-mode="split">分栏</button>
+						</div>
+
+						<div class="editor-header-actions">
+							<button id="editor-preview-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">渲染预览</button>
+							<button id="editor-publish-btn" type="button" class="editor-btn editor-btn-primary px-4 py-2 rounded-lg">发布到 GitHub</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="editor-snippet-bar mb-4">
 					<button type="button" data-snippet="note" class="editor-btn px-3 py-2 rounded-lg">插入 Note</button>
 					<button type="button" data-snippet="tip" class="editor-btn px-3 py-2 rounded-lg">插入 Tip</button>
 					<button type="button" data-snippet="github" class="editor-btn px-3 py-2 rounded-lg">插入 GitHub 卡片</button>
 					<button type="button" data-snippet="link-card" class="editor-btn px-3 py-2 rounded-lg">插入 Link Card</button>
 					<button type="button" data-snippet="mermaid" class="editor-btn px-3 py-2 rounded-lg">插入 Mermaid</button>
 					<button type="button" data-snippet="math" class="editor-btn px-3 py-2 rounded-lg">插入 KaTeX</button>
-				</div>
-
-				<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-					<div class="editor-mode-switch inline-flex rounded-xl bg-[var(--btn-regular-bg)] p-1">
-						<button type="button" class="editor-mode-btn" data-mode="edit">仅编辑</button>
-						<button type="button" class="editor-mode-btn" data-mode="preview">仅预览</button>
-						<button type="button" class="editor-mode-btn" data-mode="split">分栏</button>
-					</div>
-
-					<div class="flex flex-wrap items-center gap-2">
-						<button id="editor-preview-btn" type="button" class="editor-btn px-4 py-2 rounded-lg">渲染预览</button>
-						<button id="editor-publish-btn" type="button" class="editor-btn editor-btn-primary px-4 py-2 rounded-lg">发布到 GitHub</button>
-					</div>
 				</div>
 
 				<div id="editor-workspace" class="grid gap-4 xl:grid-cols-2">
@@ -2048,6 +2058,53 @@ body.dark #editor-root input[type="date"].editor-input,
 	display: none;
 }
 
+#editor-root .editor-section-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+}
+
+#editor-root .editor-section-header > h2 {
+	flex: 0 0 auto;
+}
+
+#editor-root .editor-header-actions,
+#editor-root .editor-compose-actions,
+#editor-root .editor-post-actions,
+#editor-root .editor-snippet-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+#editor-root .editor-compose-actions {
+	flex: 1 1 24rem;
+	justify-content: flex-end;
+}
+
+#editor-root .editor-header-actions {
+	justify-content: flex-end;
+}
+
+#editor-root .editor-post-controls {
+	display: flex;
+	align-items: stretch;
+	gap: 0.75rem;
+}
+
+#editor-root .editor-search-input {
+	flex: 1 1 16rem;
+	min-width: 0;
+}
+
+#editor-root .editor-post-actions {
+	flex: 0 0 auto;
+	justify-content: flex-end;
+}
+
 #editor-root .editor-format-select {
 	min-height: 2.75rem;
 }
@@ -2334,6 +2391,42 @@ body.dark #editor-root input[type="date"].editor-input,
 }
 
 @media (max-width: 768px) {
+	#editor-root .editor-section-header {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	#editor-root .editor-header-actions,
+	#editor-root .editor-compose-actions,
+	#editor-root .editor-post-actions,
+	#editor-root .editor-snippet-bar {
+		width: 100%;
+		justify-content: flex-start;
+	}
+
+	#editor-root .editor-post-controls {
+		flex-direction: column;
+	}
+
+	#editor-root .editor-post-actions {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	#editor-root .editor-post-actions .editor-btn,
+	#editor-root .editor-header-actions .editor-btn {
+		min-width: 0;
+	}
+
+	#editor-root .editor-compose-actions .editor-mode-switch {
+		width: 100%;
+	}
+
+	#editor-root .editor-compose-actions .editor-mode-btn {
+		flex: 1 1 0;
+		text-align: center;
+	}
+
 	#editor-root .editor-input,
 	#editor-root .editor-select {
 		min-height: 2.9rem;

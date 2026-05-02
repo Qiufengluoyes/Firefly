@@ -19,6 +19,7 @@ interface Props {
 	class?: string;
 	headings?: MarkdownHeading[];
 	side?: "left" | "right" | "bottom";
+	isPostPage?: boolean;
 }
 
 // 侧边栏位置常量
@@ -53,6 +54,7 @@ const componentMap = {
 const side = (Astro.props.side ||
 	SIDEBAR_SIDE.LEFT) as (typeof SIDEBAR_SIDE)[keyof typeof SIDEBAR_SIDE];
 const className = Astro.props.class;
+const isPostPage = Astro.props.isPostPage ?? false;
 
 // 根据 side 属性获取对应的组件列表
 const getComponents = (): (
@@ -71,7 +73,7 @@ const getComponents = (): (
 	return [];
 };
 
-// 过滤并排序组件（不再进行 showOnPostPage 过滤，交由客户端处理）
+// 过滤并排序组件；页面类型只影响初始显隐，不影响组件渲染。
 const filterAndSortComponents = (
 	components: (WidgetComponentConfig | MobileBottomComponentConfig)[],
 ) => {
@@ -109,9 +111,15 @@ const getComponentProps = (
 	// 添加 showOnPostPage 和 showOnNonPostPage 标记class（仅WidgetComponentConfig有这些属性）
 	if ("showOnPostPage" in config && config.showOnPostPage === false) {
 		baseProps.class = `${baseProps.class} widget-hide-on-post`;
+		if (isPostPage) {
+			baseProps.class = `${baseProps.class} hidden`;
+		}
 	}
 	if ("showOnNonPostPage" in config && config.showOnNonPostPage === false) {
 		baseProps.class = `${baseProps.class} widget-hide-on-non-post`;
+		if (!isPostPage) {
+			baseProps.class = `${baseProps.class} hidden`;
+		}
 	}
 
 	// 特殊处理 SidebarTOC 组件

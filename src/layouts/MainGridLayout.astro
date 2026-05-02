@@ -743,6 +743,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                         side={sidebarConfig.isBothSidebars ? "left" : undefined}
                         class={`${sidebarClass} ${transparentClass}`}
                         headings={headings}
+                        isPostPage={isPostPage}
                     />
                 )}
             </div>
@@ -750,7 +751,12 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             {/* 主内容区 - 始终渲染，确保 Swup 容器存在 */}
             <main id="swup-container" class={`${mainContentClass} transition-main`}>
                 {/* 携带网格布局类名，用于JS更新父容器 */}
-                <div id="grid-class-carrier" data-grid-class={gridCols} class="hidden"></div>
+                <div
+                    id="grid-class-carrier"
+                    data-grid-class={gridCols}
+                    data-is-post-page={isPostPage ? "true" : "false"}
+                    class="hidden"
+                ></div>
                 <div
                     id="banner-overlay-source"
                     class="hidden"
@@ -783,7 +789,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 <>
                     <div id="right-sidebar-static" class="contents">
                         {effectiveIsBothSidebars && effectiveHasRightComponents && (
-                            <SideBar side="right" class={`${rightSidebarClass} ${transparentClass}`} headings={headings}></SideBar>
+                            <SideBar side="right" class={`${rightSidebarClass} ${transparentClass}`} headings={headings} isPostPage={isPostPage}></SideBar>
                         )}
                     </div>
                     <div id="right-sidebar-dynamic" class="hidden transition-swup-fade"></div>
@@ -791,7 +797,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             ) : (
                 <div id="right-sidebar-dynamic" class="contents transition-swup-fade">
                     {effectiveIsBothSidebars && effectiveHasRightComponents && (
-                        <SideBar side="right" class={`${rightSidebarClass} ${transparentClass}`} headings={headings}></SideBar>
+                        <SideBar side="right" class={`${rightSidebarClass} ${transparentClass}`} headings={headings} isPostPage={isPostPage}></SideBar>
                     )}
                 </div>
             )}
@@ -799,7 +805,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             {/* 移动端底部组件 - 768px及以下显示 */}
             {sidebarLayoutConfig.mobileBottomComponents && sidebarLayoutConfig.mobileBottomComponents.length > 0 && (
                 <div id="mobile-bottom-sidebar" class="col-span-1 block md:hidden mt-4">
-                    <SideBar side="bottom" class={`${transparentClass}`} headings={headings}></SideBar>
+                    <SideBar side="bottom" class={`${transparentClass}`} headings={headings} isPostPage={isPostPage}></SideBar>
                 </div>
             )}
 

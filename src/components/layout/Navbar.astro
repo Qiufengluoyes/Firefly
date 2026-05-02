@@ -230,7 +230,6 @@ if (document.readyState === 'loading') {
 {
     import.meta.env.PROD && (
         <script is:inline define:vars={{ scriptUrl: url('/pagefind/pagefind.js') }}>
-            {/* 你的 loadPagefind 函数的完整内容放在这里 */}
             async function loadPagefind() {
                 try {
                     const response = await fetch(scriptUrl, { method: 'HEAD' });
@@ -243,7 +242,6 @@ if (document.readyState === 'loading') {
                     });
                     window.pagefind = pagefind;
                     document.dispatchEvent(new CustomEvent('pagefindready'));
-                    console.log('Pagefind loaded and initialized successfully, event dispatched.');
                 } catch (error) {
                     console.error('Failed to load Pagefind:', error);
                     window.pagefind = {
@@ -251,7 +249,6 @@ if (document.readyState === 'loading') {
                         options: () => Promise.resolve(),
                     };
                     document.dispatchEvent(new CustomEvent('pagefindloaderror'));
-                    console.log('Pagefind load error, event dispatched.');
                 }
             }
 

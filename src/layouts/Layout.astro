@@ -938,8 +938,21 @@ const siteLang = lang.replace("_", "-");
   }
 
   // 检查当前页面是否为文章详情页
-  const isCurrentPagePost = () =>
-    window.location.pathname.includes("/posts/") || window.location.pathname.includes("/post/");
+  const isCurrentPagePost = () => {
+    const swupPageFlag = document
+      .getElementById("grid-class-carrier")
+      ?.getAttribute("data-is-post-page");
+    if (swupPageFlag === "true") return true;
+    if (swupPageFlag === "false") return false;
+
+    const overlayPageType = document
+      .getElementById("banner-overlay-source")
+      ?.getAttribute("data-banner-overlay-type");
+    if (overlayPageType) return overlayPageType === "post";
+
+    const path = window.location.pathname.replace(/\/+$/, "");
+    return /^\/posts\/[^/]+$/.test(path) || /^\/post\/[^/]+$/.test(path);
+  };
 
   // 更新主网格的网格列数
   function updateMainGridCols() {
@@ -978,6 +991,17 @@ const siteLang = lang.replace("_", "-");
     document.querySelectorAll(".widget-hide-on-non-post").forEach((widget) => {
       !isPostPage ? widget.classList.add("hidden") : widget.classList.remove("hidden");
     });
+
+    // The sidebar TOC is meaningful only on article detail pages.
+    document.querySelectorAll('widget-layout[data-id="sidebar-toc"]').forEach((widget) => {
+      !isPostPage ? widget.classList.add("hidden") : widget.classList.remove("hidden");
+    });
+
+    if (isPostPage && typeof (window as any).fireflyInitSidebarTOC === "function") {
+      requestAnimationFrame(() => {
+        (window as any).fireflyInitSidebarTOC();
+      });
+    }
   }
 
   // Initialize wallpaper mode
