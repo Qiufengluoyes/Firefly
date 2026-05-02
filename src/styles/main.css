@@ -221,8 +221,8 @@ html.is-scroll-to-top-animating.is-leaving {
 
     /* 导航栏样式适配 */
     .enable-card-border #navbar > div:not(.absolute) {
-        @apply transition-all duration-300 border shadow-sm;
-        border-color: var(--line-divider) !important;
+        @apply transition-all duration-300;
+        border: 0 !important;
     }
     
     /* 全屏壁纸模式下的半透明效果 */
@@ -236,7 +236,8 @@ html.is-scroll-to-top-animating.is-leaving {
     
     .wallpaper-transparent #navbar > div {
     @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
-    border-radius: 0 0 var(--radius-large) var(--radius-large) !important;
+    border: 0 !important;
+    border-radius: var(--radius-large) !important;
 }
     
     .wallpaper-transparent .btn-card {

@@ -441,7 +441,7 @@ const siteLang = lang.replace("_", "-");
     #sidebar-sticky,
     #left-sidebar-sticky,
     #right-sidebar-sticky {
-      top: 5.15rem;
+      top: var(--sidebar-sticky-top);
     }
 
     .enable-banner #banner-wrapper {
@@ -457,13 +457,13 @@ const siteLang = lang.replace("_", "-");
       @apply h-[calc(var(--banner-height-home)_-_4.3rem)] transition-all duration-300;
     }
     .enable-banner #sidebar-sticky {
-      top: calc(5.15rem - var(--banner-height-extend));
+      top: calc(var(--sidebar-sticky-top) - var(--banner-height-extend));
     }
     .enable-banner #left-sidebar-sticky {
-      top: calc(5.15rem - var(--banner-height-extend));
+      top: calc(var(--sidebar-sticky-top) - var(--banner-height-extend));
     }
     .enable-banner #right-sidebar-sticky {
-      top: calc(5.15rem - var(--banner-height-extend));
+      top: calc(var(--sidebar-sticky-top) - var(--banner-height-extend));
     }
     .navbar-hidden {
       @apply opacity-0 -translate-y-16;
