@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
 import tailwind from "@astrojs/tailwind";
@@ -33,6 +34,11 @@ import remarkImageCaption from "./src/plugins/remark-image-caption.ts";
 import remarkImageWidth from './src/plugins/remark-image-width.js';
 import rehypeEmailProtection from "./src/plugins/rehype-email-protection.mjs";
 import { rehypeResponsiveImages } from "./src/plugins/rehype-responsive-images.mjs";
+
+const rehypeCalloutsTheme =
+	siteConfig.rehypeCallouts.theme === "vitepress"
+		? fileURLToPath(new URL("./src/styles/rehype-callouts-vitepress.css", import.meta.url))
+		: `rehype-callouts/theme/${siteConfig.rehypeCallouts.theme}`;
 
 // https://astro.build/config
 export default defineConfig({
@@ -214,7 +220,7 @@ export default defineConfig({
 		},
 		resolve: {
 			alias: {
-				"@rehype-callouts-theme": `rehype-callouts/theme/${siteConfig.rehypeCallouts.theme}`,
+				"@rehype-callouts-theme": rehypeCalloutsTheme,
 			},
 		},
 		build: {
