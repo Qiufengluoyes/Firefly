@@ -115,6 +115,32 @@
     z-index: 2;
 }
 
+/* Chromium backdrop-filter can flicker while scrolling; keep glass surfaces on stable compositor layers. */
+@supports (-webkit-backdrop-filter: blur(1px)) {
+    #navbar-wrapper,
+    #navbar,
+    #navbar>div {
+        -webkit-transform: translate3d(0, 0, 0);
+        -webkit-backface-visibility: hidden;
+        -webkit-font-smoothing: antialiased;
+        isolation: isolate;
+    }
+
+    #navbar>div::before,
+    #navbar :is(#display-setting, #search-panel, #nav-menu-panel, .navbar-dropdown-menu),
+    #navbar :is(#theme-mode-panel, #wallpaper-mode-panel) {
+        -webkit-transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        -webkit-perspective: 1000px;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+    }
+
+    #navbar>div::before {
+        contain: paint;
+    }
+}
+
 :root.dark #navbar>div {
     --navbar-glass-bg: rgba(16, 16, 20, 0.62);
     --navbar-glass-border: rgba(255, 255, 255, 0.14);

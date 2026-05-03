@@ -743,14 +743,14 @@ if (document.readyState === "loading") {
 	--ff-md3-loader-track: color-mix(in oklch, var(--primary) 24%, transparent 76%);
 	--ff-md3-loader-indicator-start: color-mix(in oklch, var(--primary) 60%, white 40%);
 	--ff-md3-loader-indicator-end: color-mix(in oklch, var(--primary) 90%, white 10%);
-	--ff-md3-page-loader-glow: color-mix(in oklch, var(--primary) 45%, white 55%);
+	--ff-md3-page-loader-glow: color-mix(in oklch, var(--primary) 58%, white 42%);
 }
 
 :root.dark {
 	--ff-md3-loader-track: color-mix(in oklch, var(--primary) 38%, transparent 62%);
 	--ff-md3-loader-indicator-start: color-mix(in oklch, var(--primary) 68%, white 32%);
 	--ff-md3-loader-indicator-end: color-mix(in oklch, var(--primary) 88%, white 12%);
-	--ff-md3-page-loader-glow: color-mix(in oklch, var(--primary) 70%, white 30%);
+	--ff-md3-page-loader-glow: color-mix(in oklch, var(--primary) 78%, white 22%);
 }
 
 .ff-md3-loader-host {
@@ -860,8 +860,9 @@ img.ff-theme-responsive-image:not(.ff-md3-image-fade--ready) {
 		var(--ff-md3-loader-indicator-end) 100%
 	);
 	box-shadow:
-		0 0 10px color-mix(in oklch, var(--ff-md3-page-loader-glow) 30%, transparent 70%),
-		0 1px 8px color-mix(in oklch, var(--ff-md3-page-loader-glow) 26%, transparent 74%);
+		0 0 14px color-mix(in oklch, var(--ff-md3-page-loader-glow) 44%, transparent 56%),
+		0 2px 12px color-mix(in oklch, var(--ff-md3-page-loader-glow) 34%, transparent 66%),
+		0 0 24px color-mix(in oklch, var(--ff-md3-page-loader-glow) 22%, transparent 78%);
 }
 
 .ff-md3-page-loader--active {
