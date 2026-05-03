@@ -707,18 +707,6 @@ const siteLang = lang.replace("_", "-");
         behavior: "smooth",
       });
 
-      // Control banner text visibility based on page
-     
- 
-      const bannerTextOverlay = document.querySelector(".banner-text-overlay");
-      if (bannerTextOverlay) {
-        if (isHomePage) {
-          bannerTextOverlay.classList.remove("hidden");
-        } else {
-          bannerTextOverlay.classList.add("hidden");
-        }
-      }
-
       // Control navbar transparency based on page
       const navbar = document.getElementById("navbar");
       if (navbar) 

@@ -255,8 +255,8 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
     </div>
     
     <!-- Home page text overlay - 始终渲染以便切换模式时控制显示 -->
-    {(isWallpaperSwitchable || showHomeText) && homeTextEnable && (
-        <div class={`banner-text-overlay absolute inset-0 z-20 flex items-center justify-center ${!showHomeText ? 'hidden' : ''}`}>
+    {homeTextEnable && (isWallpaperSwitchable || isBannerMode) && (
+        <div class={`banner-text-overlay absolute inset-0 z-20 flex items-center justify-center pointer-events-none ${showHomeText ? 'is-visible' : 'hidden'}`}>
             <div class="w-4/5 lg:w-3/4 text-center mb-0">
                 <div class="flex flex-col">
                     {backgroundWallpaper.banner?.homeText?.title && (
@@ -345,6 +345,10 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         let bannerOverlayRevealTimer = 0;
         let bannerOverlaySyncRaf = 0;
         let bannerOverlaySyncCleanup = null;
+        let bannerHomeOverlayHideTimer = 0;
+        let bannerHomeOverlayRevealTimer = 0;
+        let bannerHomeOverlaySyncRaf = 0;
+        let bannerHomeOverlaySyncCleanup = null;
 
         function cleanupBannerOverlaySync() {
             if (bannerOverlaySyncRaf) {
@@ -354,6 +358,18 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             if (bannerOverlaySyncCleanup) {
                 const cleanup = bannerOverlaySyncCleanup;
                 bannerOverlaySyncCleanup = null;
+                cleanup();
+            }
+        }
+
+        function cleanupBannerHomeOverlaySync() {
+            if (bannerHomeOverlaySyncRaf) {
+                window.cancelAnimationFrame(bannerHomeOverlaySyncRaf);
+                bannerHomeOverlaySyncRaf = 0;
+            }
+            if (bannerHomeOverlaySyncCleanup) {
+                const cleanup = bannerHomeOverlaySyncCleanup;
+                bannerHomeOverlaySyncCleanup = null;
                 cleanup();
             }
         }
@@ -429,6 +445,68 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             doReveal();
         }
 
+        function hideBannerHomeOverlay(forceHidden = false) {
+            const overlay = document.querySelector('.banner-text-overlay');
+            if (!overlay) return;
+            if (bannerHomeOverlayHideTimer) {
+                window.clearTimeout(bannerHomeOverlayHideTimer);
+                bannerHomeOverlayHideTimer = 0;
+            }
+            if (bannerHomeOverlayRevealTimer) {
+                window.clearTimeout(bannerHomeOverlayRevealTimer);
+                bannerHomeOverlayRevealTimer = 0;
+            }
+            cleanupBannerHomeOverlaySync();
+            overlay.classList.remove('is-visible');
+
+            if (forceHidden) {
+                overlay.classList.add('hidden');
+                overlay.dataset.pendingShow = 'false';
+                return;
+            }
+
+            bannerHomeOverlayHideTimer = window.setTimeout(() => {
+                const stillOverlay = document.querySelector('.banner-text-overlay');
+                if (!stillOverlay) return;
+                if (!stillOverlay.classList.contains('is-visible')) {
+                    stillOverlay.classList.add('hidden');
+                }
+                bannerHomeOverlayHideTimer = 0;
+            }, BANNER_OVERLAY_FADE_MS);
+        }
+
+        function revealBannerHomeOverlay(delayed = false) {
+            const overlay = document.querySelector('.banner-text-overlay');
+            if (!overlay) return;
+            if (overlay.dataset.pendingShow !== 'true') return;
+            if (bannerHomeOverlayHideTimer) {
+                window.clearTimeout(bannerHomeOverlayHideTimer);
+                bannerHomeOverlayHideTimer = 0;
+            }
+            if (bannerHomeOverlayRevealTimer) {
+                window.clearTimeout(bannerHomeOverlayRevealTimer);
+                bannerHomeOverlayRevealTimer = 0;
+            }
+            cleanupBannerHomeOverlaySync();
+
+            const doReveal = () => {
+                overlay.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    overlay.classList.add('is-visible');
+                });
+            };
+
+            if (delayed) {
+                bannerHomeOverlayRevealTimer = window.setTimeout(() => {
+                    doReveal();
+                    bannerHomeOverlayRevealTimer = 0;
+                }, 0);
+                return;
+            }
+
+            doReveal();
+        }
+
         function revealBannerOverlayWhenContentStarts() {
             const overlay = document.getElementById('banner-page-overlay');
             const swupContainer = document.getElementById('swup-container');
@@ -488,6 +566,65 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             bannerOverlaySyncRaf = window.requestAnimationFrame(syncReveal);
         }
 
+        function revealBannerHomeOverlayWhenContentStarts() {
+            const overlay = document.querySelector('.banner-text-overlay');
+            const swupContainer = document.getElementById('swup-container');
+            const contentWrapper = document.getElementById('content-wrapper');
+            const target = swupContainer || contentWrapper;
+            if (!overlay) return;
+            if (overlay.dataset.pendingShow !== 'true') return;
+            if (!target) {
+                revealBannerHomeOverlay(false);
+                return;
+            }
+
+            cleanupBannerHomeOverlaySync();
+
+            let attempts = 0;
+            const maxAttempts = 24;
+            let revealed = false;
+
+            const revealOnce = () => {
+                if (revealed) return;
+                revealed = true;
+                cleanupBannerHomeOverlaySync();
+                revealBannerHomeOverlay(false);
+            };
+
+            const onTransitionStart = (event) => {
+                if (event.target === target && event.propertyName === 'opacity') {
+                    revealOnce();
+                }
+            };
+
+            target.addEventListener('transitionstart', onTransitionStart);
+            bannerHomeOverlaySyncCleanup = () => {
+                target.removeEventListener('transitionstart', onTransitionStart);
+            };
+
+            const syncReveal = () => {
+                if (revealed) return;
+                if (overlay.dataset.pendingShow !== 'true') {
+                    cleanupBannerHomeOverlaySync();
+                    return;
+                }
+
+                const currentOpacity = parseFloat(
+                    window.getComputedStyle(target).opacity || '1'
+                );
+
+                if ((currentOpacity > 0.01 && currentOpacity < 0.99) || attempts >= maxAttempts) {
+                    revealOnce();
+                    return;
+                }
+
+                attempts += 1;
+                bannerHomeOverlaySyncRaf = window.requestAnimationFrame(syncReveal);
+            };
+
+            bannerHomeOverlaySyncRaf = window.requestAnimationFrame(syncReveal);
+        }
+
         function hideBannerOverlayWhenContentStartsLeaving() {
             const overlay = document.getElementById('banner-page-overlay');
             const swupContainer = document.getElementById('swup-container');
@@ -526,6 +663,46 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             };
 
             bannerOverlaySyncRaf = window.requestAnimationFrame(syncHide);
+        }
+
+        function hideBannerHomeOverlayWhenContentStartsLeaving() {
+            const overlay = document.querySelector('.banner-text-overlay');
+            const swupContainer = document.getElementById('swup-container');
+            if (!overlay || !overlay.classList.contains('is-visible')) {
+                hideBannerHomeOverlay(false);
+                return;
+            }
+            if (!swupContainer) {
+                hideBannerHomeOverlay(false);
+                return;
+            }
+
+            cleanupBannerHomeOverlaySync();
+
+            let attempts = 0;
+            const maxAttempts = 24;
+
+            const syncHide = () => {
+                if (!overlay.classList.contains('is-visible')) {
+                    bannerHomeOverlaySyncRaf = 0;
+                    return;
+                }
+
+                const currentOpacity = parseFloat(
+                    window.getComputedStyle(swupContainer).opacity || '1'
+                );
+
+                if (currentOpacity < 0.97 || attempts >= maxAttempts) {
+                    bannerHomeOverlaySyncRaf = 0;
+                    hideBannerHomeOverlay(false);
+                    return;
+                }
+
+                attempts += 1;
+                bannerHomeOverlaySyncRaf = window.requestAnimationFrame(syncHide);
+            };
+
+            bannerHomeOverlaySyncRaf = window.requestAnimationFrame(syncHide);
         }
 
         function applyBannerPageOverlay(options = { deferReveal: false }) {
@@ -580,6 +757,29 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             revealBannerPageOverlay(false);
         }
 
+        function applyBannerHomeOverlay(options = { deferReveal: false }) {
+            const overlay = document.querySelector('.banner-text-overlay');
+            const source = document.getElementById('banner-overlay-source');
+            if (!overlay) return;
+
+            const wallpaperMode = document.documentElement.getAttribute('data-wallpaper-mode');
+            const pageType = source?.getAttribute('data-banner-overlay-type') || 'page';
+            if (!source || wallpaperMode !== 'banner' || pageType !== 'home') {
+                hideBannerHomeOverlay(true);
+                return;
+            }
+
+            overlay.dataset.pendingShow = 'true';
+
+            if (options.deferReveal || !canRevealBannerPageOverlayNow()) {
+                overlay.classList.remove('is-visible');
+                overlay.classList.remove('hidden');
+                return;
+            }
+
+            revealBannerHomeOverlay(false);
+        }
+
         function bindBannerPageOverlayHooks() {
             if (window.fireflyBannerOverlayHooksBound) return;
             window.fireflyBannerOverlayHooksBound = true;
@@ -588,15 +788,19 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 if (!window.swup || !window.swup.hooks) return;
                 window.swup.hooks.on('animation:out:start', () => {
                     hideBannerOverlayWhenContentStartsLeaving();
+                    hideBannerHomeOverlayWhenContentStartsLeaving();
                 });
                 window.swup.hooks.on('content:replace', () => {
                     requestAnimationFrame(() => {
                         applyBannerPageOverlay({ deferReveal: true });
+                        applyBannerHomeOverlay({ deferReveal: true });
                     });
                 });
                 window.swup.hooks.on('animation:in:start', () => {
                     applyBannerPageOverlay({ deferReveal: true });
+                    applyBannerHomeOverlay({ deferReveal: true });
                     revealBannerOverlayWhenContentStarts();
+                    revealBannerHomeOverlayWhenContentStarts();
                 });
             };
 
@@ -612,6 +816,9 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                         applyBannerPageOverlay({
                             deferReveal: !canRevealBannerPageOverlayNow(),
                         });
+                        applyBannerHomeOverlay({
+                            deferReveal: !canRevealBannerPageOverlayNow(),
+                        });
                     });
                 });
                 observer.observe(document.documentElement, {
@@ -625,10 +832,12 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 applyBannerPageOverlay({ deferReveal: false });
+                applyBannerHomeOverlay({ deferReveal: false });
                 bindBannerPageOverlayHooks();
             });
         } else {
             applyBannerPageOverlay({ deferReveal: false });
+            applyBannerHomeOverlay({ deferReveal: false });
             bindBannerPageOverlayHooks();
         }
     </script>
@@ -841,13 +1050,32 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
     }
   }
 
-  /* 横幅文字阴影 - 更柔和的扩散效果 */
-  .banner-title {
-    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  :root {
+    --banner-title-text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+    --banner-subtitle-text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
   }
 
-  .banner-subtitle {
-    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+  /* 横幅文字阴影由外层 overlay 统一控制动画，避免刷新时子元素动画抢渲染层 */
+  .banner-text-overlay .banner-title {
+    animation: none !important;
+    text-shadow: var(--banner-title-text-shadow) !important;
+  }
+
+  .banner-text-overlay .banner-subtitle {
+    animation: none !important;
+    text-shadow: var(--banner-subtitle-text-shadow) !important;
+  }
+
+  .banner-text-overlay {
+    opacity: 0;
+    transform: none;
+    transition: opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-sizing: border-box;
+  }
+
+  .banner-text-overlay.is-visible {
+    opacity: 1;
+    transform: none;
   }
 
   .banner-page-overlay {
@@ -864,7 +1092,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
   }
 
   .banner-page-overlay-title {
-    text-shadow: 0 8px 28px rgba(0, 0, 0, 0.78);
+    text-shadow: var(--banner-title-text-shadow) !important;
   }
 
   .banner-page-overlay-meta {
@@ -872,6 +1100,12 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
   }
 
   html.is-leaving .banner-page-overlay.is-visible {
+    transition: opacity 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    opacity: 0;
+    transform: none;
+  }
+
+  html.is-leaving .banner-text-overlay.is-visible {
     transition: opacity 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
     opacity: 0;
     transform: none;
