@@ -824,7 +824,7 @@ img.ff-theme-responsive-image:not(.ff-md3-image-fade--ready) {
 	box-shadow:
 		0 0 5px color-mix(in oklch, var(--ff-md3-loader-indicator-end) 30%, transparent 70%),
 		0 0 9px color-mix(in oklch, var(--ff-md3-loader-indicator-start) 18%, transparent 82%);
-	animation: ff-apple-loader-indeterminate 1.08s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+	animation: ff-apple-loader-indeterminate 0.96s linear infinite;
 	will-change: transform;
 }
 
@@ -876,16 +876,10 @@ img.ff-theme-responsive-image:not(.ff-md3-image-fade--ready) {
 
 @keyframes ff-apple-loader-indeterminate {
 	0% {
-		transform: translate3d(-115%, 0, 0) scaleX(0.62);
-	}
-	28% {
-		transform: translate3d(-42%, 0, 0) scaleX(0.9);
-	}
-	62% {
-		transform: translate3d(92%, 0, 0) scaleX(1);
+		transform: translate3d(-122%, 0, 0) scaleX(0.92);
 	}
 	100% {
-		transform: translate3d(252%, 0, 0) scaleX(0.64);
+		transform: translate3d(258%, 0, 0) scaleX(0.92);
 	}
 }
 
