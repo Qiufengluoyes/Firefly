@@ -743,14 +743,18 @@ if (document.readyState === "loading") {
 	--ff-md3-loader-track: color-mix(in oklch, var(--primary) 24%, transparent 76%);
 	--ff-md3-loader-indicator-start: color-mix(in oklch, var(--primary) 60%, white 40%);
 	--ff-md3-loader-indicator-end: color-mix(in oklch, var(--primary) 90%, white 10%);
-	--ff-md3-page-loader-glow: color-mix(in oklch, var(--primary) 58%, white 42%);
+	--ff-md3-page-loader-accent-start: oklch(0.78 0.19 var(--hue));
+	--ff-md3-page-loader-accent-end: oklch(0.68 0.24 var(--hue));
+	--ff-md3-page-loader-glow: color-mix(in oklch, var(--ff-md3-page-loader-accent-end) 78%, white 22%);
 }
 
 :root.dark {
 	--ff-md3-loader-track: color-mix(in oklch, var(--primary) 38%, transparent 62%);
 	--ff-md3-loader-indicator-start: color-mix(in oklch, var(--primary) 68%, white 32%);
 	--ff-md3-loader-indicator-end: color-mix(in oklch, var(--primary) 88%, white 12%);
-	--ff-md3-page-loader-glow: color-mix(in oklch, var(--primary) 78%, white 22%);
+	--ff-md3-page-loader-accent-start: oklch(0.84 0.18 var(--hue));
+	--ff-md3-page-loader-accent-end: oklch(0.76 0.24 var(--hue));
+	--ff-md3-page-loader-glow: color-mix(in oklch, var(--ff-md3-page-loader-accent-end) 88%, white 12%);
 }
 
 .ff-md3-loader-host {
@@ -856,8 +860,9 @@ img.ff-theme-responsive-image:not(.ff-md3-image-fade--ready) {
 	will-change: transform;
 	background: linear-gradient(
 		90deg,
-		var(--ff-md3-loader-indicator-start) 0%,
-		var(--ff-md3-loader-indicator-end) 100%
+		var(--ff-md3-page-loader-accent-start) 0%,
+		color-mix(in oklch, var(--ff-md3-page-loader-accent-end) 72%, white 28%) 48%,
+		var(--ff-md3-page-loader-accent-end) 100%
 	);
 	box-shadow:
 		0 0 14px color-mix(in oklch, var(--ff-md3-page-loader-glow) 44%, transparent 56%),
