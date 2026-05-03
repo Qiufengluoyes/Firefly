@@ -1,7 +1,7 @@
 ---
 title: 欧洲卡车模拟2：1.59版本公开测试
 published: 2026-04-16
-description: 我们很高兴地分享，欧洲卡车模拟2 1.59 版本更新开放测试现已可供玩家们体验与测试。如果你们选择参与此次开放测试，请在我们官方论坛的相应版块报告遇到的任何问题或 BUG，我们将不胜感激。
+description: 我们很高兴地分享，欧洲卡车模拟2 1.59 版本更新开放测试现已可供玩家们体验与测试。
 image: 'https://clan.akamai.steamstatic.com/images//4036972/e0d5b479ce5e137c98080ffb54df8eb54e08a7aa.jpg'
 tags: [欧卡, 公开测试]
 category: '欧卡资讯'

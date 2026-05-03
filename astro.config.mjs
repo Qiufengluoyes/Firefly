@@ -40,6 +40,91 @@ const rehypeCalloutsTheme =
 		? fileURLToPath(new URL("./src/styles/rehype-callouts-vitepress.css", import.meta.url))
 		: `rehype-callouts/theme/${siteConfig.rehypeCallouts.theme}`;
 
+const astroIconInclude = {
+	"fa6-brands": ["creative-commons"],
+	"fa6-regular": ["address-card"],
+	"fa6-solid": [
+		"arrow-right",
+		"arrow-rotate-left",
+		"arrow-up-right-from-square",
+		"chevron-left",
+		"chevron-right",
+		"rocket",
+		"xmark",
+	],
+	ic: ["round-mail-outline"],
+	majesticons: ["status-online"],
+	"material-symbols": [
+		"archive",
+		"arrow-outward-rounded",
+		"article",
+		"article-outline",
+		"article-outline-rounded",
+		"book-2-outline-rounded",
+		"brightness-auto-outline-rounded",
+		"calendar-clock-outline",
+		"calendar-today-outline-rounded",
+		"chat",
+		"check",
+		"chevron-left-rounded",
+		"chevron-right-rounded",
+		"close",
+		"copyright-outline-rounded",
+		"dark-mode-outline-rounded",
+		"download",
+		"ecg-heart-outline",
+		"edit-calendar-outline-rounded",
+		"emoji-people-rounded",
+		"error-outline",
+		"favorite",
+		"folder-outline",
+		"format-list-bulleted",
+		"group",
+		"help-outline",
+		"hide-image-outline",
+		"history-rounded",
+		"home",
+		"home-outline-rounded",
+		"home-pin-outline",
+		"image-outline",
+		"info",
+		"info-outline",
+		"keyboard-arrow-down-rounded",
+		"keyboard-arrow-up-rounded",
+		"label-outline",
+		"link",
+		"menu-rounded",
+		"more-horiz",
+		"movie",
+		"notes-rounded",
+		"palette-outline",
+		"person",
+		"pinboard",
+		"rss-feed",
+		"schedule-outline-rounded",
+		"search",
+		"search-off",
+		"sentiment-sad",
+		"settings",
+		"share",
+		"tag-rounded",
+		"text-ad-outline-rounded",
+		"visibility-outline-rounded",
+		"wallpaper",
+		"wb-sunny-outline-rounded",
+	],
+	mdi: [
+		"calendar-month-outline",
+		"clock-time-eight-outline",
+		"file-document-outline",
+		"pin",
+		"steam",
+		"train",
+	],
+	mingcute: ["bilibili-line"],
+	tabler: ["brand-github"],
+};
+
 // https://astro.build/config
 export default defineConfig({
 	site: siteConfig.site_url,
@@ -77,13 +162,7 @@ export default defineConfig({
 			},
 		}),
 		icon({
-			include: {
-				"preprocess: vitePreprocess(),": ["*"],
-				"fa6-brands": ["*"],
-				"fa6-regular": ["*"],
-				"fa6-solid": ["*"],
-				mdi: ["*"],
-			},
+			include: astroIconInclude,
 		}),
 		expressiveCode({
 			themes: [expressiveCodeConfig.darkTheme, expressiveCodeConfig.lightTheme],
@@ -206,6 +285,9 @@ export default defineConfig({
 		],
 	},
 	vite: {
+		esbuild: {
+			drop: ["debugger"],
+		},
 		server: {
 			watch: {
 				ignored: [
@@ -224,18 +306,8 @@ export default defineConfig({
 			},
 		},
 		build: {
-			// 启用资源压缩和优化
-			minify: "terser",
-			terserOptions: {
-				compress: {
-					drop_console: false, // 生产环境可改为true移除console
-					drop_debugger: true,
-				},
-				mangle: true,
-				format: {
-					comments: false,
-				},
-			},
+			// 使用 esbuild 压缩，减少 Vercel 构建耗时
+			minify: "esbuild",
 			rollupOptions: {
 				onwarn(warning, warn) {
 					// temporarily suppress this warning

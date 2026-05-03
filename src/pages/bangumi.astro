@@ -27,8 +27,8 @@ const bangumiConfig = {
 	username: siteConfig.bangumi?.userId, // 在这里配置你的Bangumi用户名
 	apiUrl: "https://api.bgm.tv",
 	categories: {
-		book: true,
 		anime: true,
+		book: true,
 		music: true,
 		game: true,
 		real: false,
@@ -38,6 +38,7 @@ const bangumiConfig = {
 		limit: 50, // 每页获取数量
 		delay: 50, // 请求间隔毫秒数，避免频率限制
 		maxTotal: 1000, // 最大获取总数，防止无限循环（0=无限制）
+		requestTimeout: 10000, // 构建期接口超时，避免外部 API 异常时串行拖慢部署
 	},
 };
 //////////////////////////////////////////////////
@@ -62,7 +63,7 @@ const categoryMap = {
 // 获取Bangumi数据的函数 - 支持分页获取所有数据
 async function fetchBangumiData(username: string, subjectType: number) {
 	try {
-		const { limit, delay, maxTotal } = bangumiConfig.pagination;
+		const { limit, delay, maxTotal, requestTimeout } = bangumiConfig.pagination;
 		let offset = 0;
 		let allData: UserSubjectCollection[] = [];
 		let hasMore = true;
@@ -92,12 +93,21 @@ async function fetchBangumiData(username: string, subjectType: number) {
 
 			console.log(`[Bangumi] 正在获取数据: ${url} (已获取: ${allData.length})`);
 
-			const response = await fetch(url, {
-				headers: {
-					"User-Agent": "YuuOuRou Blog",
-					Accept: "application/json",
-				},
-			});
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), requestTimeout);
+			let response: Response;
+
+			try {
+				response = await fetch(url, {
+					headers: {
+						"User-Agent": "YuuOuRou Blog",
+						Accept: "application/json",
+					},
+					signal: controller.signal,
+				});
+			} finally {
+				clearTimeout(timeoutId);
+			}
 
 			if (!response.ok) {
 				console.warn(
@@ -152,12 +162,15 @@ if (!isUserIdConfigured) {
 	console.log("[Bangumi] 🌐 从 API 获取数据");
 }
 
-for (const [categoryKey, enabled] of Object.entries(bangumiConfig.categories)) {
-	// 如果未配置用户ID，跳过数据获取
-	if (!isUserIdConfigured) {
-		break;
-	}
-	if (enabled && categoryMap[categoryKey as keyof typeof categoryMap]) {
+const enabledCategories = isUserIdConfigured
+	? Object.entries(bangumiConfig.categories).filter(
+			([categoryKey, enabled]) =>
+				enabled && categoryMap[categoryKey as keyof typeof categoryMap],
+		)
+	: [];
+
+const categoryResults = await Promise.all(
+	enabledCategories.map(async ([categoryKey]) => {
 		const categoryInfo = categoryMap[categoryKey as keyof typeof categoryMap];
 		try {
 			const data = await fetchBangumiData(
@@ -165,22 +178,33 @@ for (const [categoryKey, enabled] of Object.entries(bangumiConfig.categories)) {
 				bangumiConfig.username!,
 				categoryInfo.subjectType,
 			);
-			bangumiData[categoryKey] = data;
-			tabs.push({
+			return {
+				categoryKey,
 				id: categoryKey,
 				name: categoryInfo.name,
+				data,
 				count: data.length,
-			});
+			};
 		} catch (error) {
 			console.error(`[Bangumi] 获取 ${categoryInfo.name} 数据失败:`, error);
-			bangumiData[categoryKey] = [];
-			tabs.push({
+			return {
+				categoryKey,
 				id: categoryKey,
 				name: categoryInfo.name,
+				data: [],
 				count: 0,
-			});
+			};
 		}
-	}
+	}),
+);
+
+for (const result of categoryResults) {
+	bangumiData[result.categoryKey] = result.data;
+	tabs.push({
+		id: result.id,
+		name: result.name,
+		count: result.count,
+	});
 }
 
 const activeTab = tabs[0]?.id || "anime";

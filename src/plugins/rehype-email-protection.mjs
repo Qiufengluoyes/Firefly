@@ -4,11 +4,15 @@ import { visit } from "unist-util-visit";
 // 来自霞葉： https://kasuha.com/posts/fuwari-enhance-ep1/
 
 /**
+ * @typedef {Object} RehypeEmailProtectionOptions
+ * @property {"base64" | "rot13"} [method="base64"] - 编码方式
+ */
+
+/**
  * 加密 mailto 链接以保护邮箱地址免受爬虫抓取的 rehype 插件
  *
- * @param {Object} options - 插件选项
- * @param {string} [options.method='base64'] - 编码方式: 'base64' or 'rot13'
- * @returns {Function} A transformer function for the rehype plugin
+ * @param {RehypeEmailProtectionOptions} [options] - 插件选项
+ * @returns {import("unified").Transformer<import("hast").Root, import("hast").Root>} A transformer function for the rehype plugin
  */
 export default function rehypeEmailProtection(options = {}) {
 	const { method = "base64" } = options;

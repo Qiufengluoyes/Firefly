@@ -4,7 +4,11 @@ import { pathToFileURL } from "node:url";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import * as astroJsxRuntime from "astro/jsx-runtime";
 import mdxServerRenderer from "@astrojs/mdx/server.js";
-import { createMarkdownProcessor } from "@astrojs/markdown-remark";
+import {
+	createMarkdownProcessor,
+	type RehypePlugins,
+	type RemarkPlugins,
+} from "@astrojs/markdown-remark";
 import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -49,7 +53,7 @@ let markdownProcessorPromise: ReturnType<typeof createMarkdownProcessor> | null 
 let mdxEvaluatePromise: Promise<EvaluateFunction> | null = null;
 let mdxContainerPromise: Promise<AstroContainerInstance> | null = null;
 
-function createRemarkPlugins() {
+function createRemarkPlugins(): RemarkPlugins {
 	return [
 		remarkMath,
 		remarkReadingTime,
@@ -63,7 +67,7 @@ function createRemarkPlugins() {
 	];
 }
 
-function createRehypePlugins() {
+function createRehypePlugins(): RehypePlugins {
 	return [
 		[
 			rehypeExpressiveCode,
