@@ -313,6 +313,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
     </div>
     
     <script is:inline>
+        (() => {
         function setRandomSubtitle() {
             const subtitleElement = document.getElementById('banner-subtitle');
             if (!subtitleElement) return;
@@ -840,6 +841,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             applyBannerHomeOverlay({ deferReveal: false });
             bindBannerPageOverlayHooks();
         }
+        })();
     </script>
     
     <!-- Water waves effect - 始终渲染以便动态切换 -->
