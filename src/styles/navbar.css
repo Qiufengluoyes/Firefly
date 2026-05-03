@@ -24,9 +24,15 @@
 :root {
     --navbar-height: 4.3rem;
     --navbar-floating-offset: 0.75rem;
-    --navbar-floating-inline-offset: 0.75rem;
+    --navbar-floating-inline-offset: 0.5rem;
     --sidebar-sticky-safe-gap: 0.85rem;
     --sidebar-sticky-top: calc(var(--navbar-floating-offset) + var(--navbar-height) + var(--sidebar-sticky-safe-gap));
+}
+
+@media (min-width: 768px) {
+    :root {
+        --navbar-floating-inline-offset: 1rem;
+    }
 }
 
 #navbar>div {
