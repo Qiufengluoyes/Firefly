@@ -43,6 +43,7 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.45);
     --navbar-glass-filter: saturate(180%) blur(max(var(--navbar-glass-blur, 28px), 24px));
     --navbar-glass-stabilizer: saturate(170%) blur(max(var(--navbar-glass-blur, 28px), 22px));
+    --navbar-glass-tint: linear-gradient(color-mix(in srgb, var(--primary) 4%, transparent), color-mix(in srgb, var(--primary) 4%, transparent));
     --navbar-glass-veil:
         linear-gradient(135deg,
             rgba(255, 255, 255, 0.22),
@@ -120,6 +121,7 @@
     --navbar-glass-shadow:
         0 14px 34px rgba(0, 0, 0, 0.34),
         inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    --navbar-glass-tint: linear-gradient(color-mix(in srgb, var(--primary) 3%, transparent), color-mix(in srgb, var(--primary) 3%, transparent));
     --navbar-glass-veil:
         linear-gradient(135deg,
             rgba(255, 255, 255, 0.055),
@@ -414,7 +416,7 @@ body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur
 body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
 body.wallpaper-transparent #navbar>div::before {
     opacity: 1;
-    background: var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
+    background: var(--navbar-glass-tint), var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
     box-shadow: var(--navbar-glass-inner-veil);
@@ -424,7 +426,7 @@ body.wallpaper-transparent #navbar>div::before {
 #navbar :is(#display-setting, #search-panel, #nav-menu-panel) {
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
-    background: var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
+    background: var(--navbar-glass-tint), var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
     border: 1px solid var(--navbar-glass-border) !important;
     box-shadow: var(--navbar-glass-shadow), var(--navbar-glass-inner-veil) !important;
     background-clip: padding-box;
@@ -438,6 +440,7 @@ body.wallpaper-transparent #navbar>div::before {
 /* Theme/color control panels stay glassy even while theme switching disables generic float-panel blur. */
 #navbar #display-setting {
     background:
+        var(--navbar-glass-tint),
         var(--navbar-glass-veil),
         var(--navbar-control-panel-bg) !important;
 }
@@ -446,18 +449,18 @@ body.wallpaper-transparent #navbar>div::before {
 #navbar .navbar-dropdown-menu {
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
-    background: var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
+    background: var(--navbar-glass-tint), var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
     border: 1px solid var(--navbar-glass-border) !important;
     border-radius: var(--radius-large) !important;
     box-shadow: var(--navbar-glass-shadow), var(--navbar-glass-inner-veil) !important;
     background-clip: padding-box;
     overflow: visible;
-    transition-property: opacity, transform, visibility !important;
-    transition-duration: 140ms, 140ms, 0ms !important;
-    transition-timing-function: var(--ease-standard), var(--ease-standard), step-end !important;
-    transition-delay: 0ms, 0ms, 140ms !important;
-    will-change: opacity, transform;
-    transform: translate3d(0, -8px, 0) !important;
+    transition-property: opacity, visibility !important;
+    transition-duration: 140ms, 0ms !important;
+    transition-timing-function: var(--ease-standard), step-end !important;
+    transition-delay: 0ms, 140ms !important;
+    will-change: opacity;
+    transform: translate3d(0, 0, 0) !important;
     backface-visibility: hidden;
 }
 
@@ -479,7 +482,7 @@ body.wallpaper-transparent #navbar>div::before {
 
 #navbar .dropdown-container:hover .navbar-dropdown-menu,
 #navbar .dropdown-container:focus-within .navbar-dropdown-menu {
-    transition-delay: 28ms, 28ms, 0ms !important;
+    transition-delay: 0ms, 0ms !important;
     transform: translate3d(0, 0, 0) !important;
 }
 
@@ -504,6 +507,7 @@ body.wallpaper-transparent #navbar>div::before {
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
     background:
+        var(--navbar-glass-tint),
         var(--navbar-glass-veil),
         var(--navbar-control-panel-bg) !important;
     border: 1px solid var(--navbar-glass-border) !important;

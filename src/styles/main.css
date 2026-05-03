@@ -188,6 +188,7 @@ html.is-scroll-to-top-animating.is-leaving {
         -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
         backdrop-filter: var(--navbar-glass-filter) !important;
         background:
+            var(--navbar-glass-tint),
             var(--navbar-glass-veil),
             var(--navbar-control-panel-bg) !important;
     }
