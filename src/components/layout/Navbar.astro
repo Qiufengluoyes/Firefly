@@ -183,11 +183,12 @@ function initSemifullScrollDetection() {
 
     function updateNavbarState() {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const threshold = 50; // 滚动阈值，可以根据需要调整
+        const showThreshold = 72;
+        const hideThreshold = 24;
         // 使用批量DOM操作优化性能
-        if (scrollTop > threshold) {
+        if (scrollTop > showThreshold) {
             navbar!.classList.add('scrolled');
-        } else {
+        } else if (scrollTop < hideThreshold) {
             navbar!.classList.remove('scrolled');
         }
 
