@@ -5,8 +5,8 @@ description: 是的，你没看错，我们的网站正式更新了站内文章�
 image: 'https://image.091026.xyz/update.webp'
 tags: [更新日志]
 category: '公告'
-draft: false
-pinned: true
+draft: true
+pinned: false
 lang: zh_CN
 ---
 
