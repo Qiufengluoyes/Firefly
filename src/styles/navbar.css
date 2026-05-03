@@ -43,6 +43,14 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.45);
     --navbar-glass-filter: saturate(180%) blur(max(var(--navbar-glass-blur, 28px), 24px));
     --navbar-glass-stabilizer: saturate(170%) blur(max(var(--navbar-glass-blur, 28px), 22px));
+    --navbar-glass-veil:
+        linear-gradient(135deg,
+            rgba(255, 255, 255, 0.22),
+            rgba(255, 255, 255, 0.06) 42%,
+            rgba(255, 255, 255, 0.12));
+    --navbar-glass-inner-veil:
+        inset 0 1px 0 rgba(255, 255, 255, 0.34),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.12);
     width: calc(100% - var(--navbar-floating-inline-offset) - var(--navbar-floating-inline-offset));
     margin-top: var(--navbar-floating-offset);
     background: var(--card-bg);
@@ -108,6 +116,14 @@
     --navbar-glass-shadow:
         0 14px 34px rgba(0, 0, 0, 0.34),
         inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    --navbar-glass-veil:
+        linear-gradient(135deg,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.015) 42%,
+            rgba(255, 255, 255, 0.05));
+    --navbar-glass-inner-veil:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.04);
 }
 
 #navbar[data-enable-blur="true"]>div,
@@ -387,9 +403,10 @@ body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur
 body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
 body.wallpaper-transparent #navbar>div::before {
     opacity: 1;
-    background: var(--navbar-glass-bg) !important;
+    background: var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
+    box-shadow: var(--navbar-glass-inner-veil);
 }
 
 /* Navbar panels use the same blur strength and glass color as the navbar itself. */
@@ -397,9 +414,9 @@ body.wallpaper-transparent #navbar>div::before {
 #navbar :is(#theme-mode-panel, #wallpaper-mode-panel)>.float-panel {
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
-    background: var(--navbar-glass-bg) !important;
+    background: var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
     border: 1px solid var(--navbar-glass-border) !important;
-    box-shadow: var(--navbar-glass-shadow) !important;
+    box-shadow: var(--navbar-glass-shadow), var(--navbar-glass-inner-veil) !important;
     background-clip: padding-box;
     overflow: hidden !important;
 }
@@ -408,10 +425,10 @@ body.wallpaper-transparent #navbar>div::before {
 #navbar .navbar-dropdown-menu {
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
-    background: var(--navbar-glass-bg) !important;
+    background: var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
     border: 1px solid var(--navbar-glass-border) !important;
     border-radius: var(--radius-large) !important;
-    box-shadow: var(--navbar-glass-shadow) !important;
+    box-shadow: var(--navbar-glass-shadow), var(--navbar-glass-inner-veil) !important;
     background-clip: padding-box;
     overflow: visible;
     transition-property: opacity, transform, visibility !important;
