@@ -8,21 +8,21 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 背景图片配置
 	src: {
 		// 桌面背景图片
-		desktop: "https://image.091026.xyz/i/2026/04/27/o4uz-hh.webp",
+		desktop: "https://img.091026.xyz/i/2026/05/03/pbdjwf-zf95.webp",
 		// 移动背景图片
-		mobile: "https://image.091026.xyz/i/2026/04/27/o4uz-hh.webp",
+		mobile: "https://img.091026.xyz/i/2026/05/03/pbdjwf-zf95.webp",
 	},
 	// Banner模式特有配置
 	banner: {
 		// 图片位置
 		// 支持所有CSS object-position值，如: 'top', 'center', 'bottom', 'left top', 'right bottom', '25% 75%', '10px 20px'..
 		// 如果不知道怎么配置百分百之类的配置，推荐直接使用：'center'居中，'top'顶部居中，'bottom' 底部居中，'left'左侧居中，'right'右侧居中
-		position: "75% 50%",
+		position: "75% 30%",
 
 		// 主页横幅文字
 		homeText: {
 			// 是否启用主页横幅文字
-			enable: false,
+			enable: true,
 			// 主页横幅主标题
 			title: "枫落丰源",
 			// 主页横幅主标题字体大小
@@ -58,15 +58,15 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			},
 			text: {
 				// 桌面端要显示的来源文本
-				desktop: "和你的日常，就是奇迹",
+				desktop: "绪山真寻",
 				// 移动端要显示的来源文本
-				mobile: "和你的日常，就是奇迹",
+				mobile: "绪山真寻",
 			},
 			url: {
 				// 桌面端原始艺术品或艺术家页面的 URL 链接
-				desktop: "",
+				desktop: "https://www.bilibili.com/opus/1197501482733142035",
 				// 移动端原始艺术品或艺术家页面的 URL 链接
-				mobile: "",
+				mobile: "https://www.bilibili.com/opus/1197501482733142035",
 			},
 		},
 		// 横幅导航栏配置
