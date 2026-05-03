@@ -182,6 +182,21 @@ html.is-scroll-to-top-animating.is-leaving {
         transition: none !important;
         backdrop-filter: none !important;
     }
+
+    .is-theme-transitioning #navbar #display-setting,
+    .is-theme-transitioning #navbar :is(#theme-mode-panel, #wallpaper-mode-panel) {
+        -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
+        backdrop-filter: var(--navbar-glass-filter) !important;
+        background:
+            var(--navbar-glass-veil),
+            var(--navbar-control-panel-bg) !important;
+    }
+
+    .is-theme-transitioning #navbar :is(#theme-mode-panel, #wallpaper-mode-panel) > .float-panel {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        background: transparent !important;
+    }
     
     /* 波浪容器的颜色传递 */
     .is-theme-transitioning #header-waves {

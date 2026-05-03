@@ -48,6 +48,7 @@
             rgba(255, 255, 255, 0.22),
             rgba(255, 255, 255, 0.06) 42%,
             rgba(255, 255, 255, 0.12));
+    --navbar-control-panel-bg: rgba(255, 255, 255, 0.72);
     --navbar-glass-inner-veil:
         inset 0 1px 0 rgba(255, 255, 255, 0.34),
         inset 0 -1px 0 rgba(255, 255, 255, 0.12);
@@ -62,7 +63,9 @@
     isolation: isolate;
     position: relative;
     transform: translate3d(0, 0, 0);
-    transition: all var(--duration-medium) var(--ease-standard);
+    transition-property: transform, background-color, border-color, box-shadow;
+    transition-duration: var(--duration-medium);
+    transition-timing-function: var(--ease-standard);
     will-change: transform, background-color, border-color, box-shadow;
 }
 
@@ -93,7 +96,8 @@
     backdrop-filter: var(--navbar-glass-stabilizer);
     transform: translate3d(0, 0, 0);
     transition: opacity var(--duration-medium) var(--ease-standard);
-    will-change: opacity, backdrop-filter;
+    backface-visibility: hidden;
+    will-change: opacity;
 }
 
 #navbar>div>.flex {
@@ -118,18 +122,25 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.10);
     --navbar-glass-veil:
         linear-gradient(135deg,
-            rgba(255, 255, 255, 0.08),
-            rgba(255, 255, 255, 0.015) 42%,
-            rgba(255, 255, 255, 0.05));
+            rgba(255, 255, 255, 0.055),
+            rgba(255, 255, 255, 0.012) 42%,
+            rgba(255, 255, 255, 0.035));
+    --navbar-control-panel-bg: rgba(16, 16, 20, 0.72);
     --navbar-glass-inner-veil:
-        inset 0 1px 0 rgba(255, 255, 255, 0.12),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.025);
 }
 
 #navbar[data-enable-blur="true"]>div,
 body.wallpaper-transparent #navbar>div {
-    -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
-    backdrop-filter: var(--navbar-glass-filter) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: transparent !important;
+}
+
+#navbar[data-enable-blur="true"]>div::before,
+body.wallpaper-transparent #navbar>div::before {
+    opacity: 1;
 }
 
 #banner-wrapper~* #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div::before,
@@ -410,8 +421,7 @@ body.wallpaper-transparent #navbar>div::before {
 }
 
 /* Navbar panels use the same blur strength and glass color as the navbar itself. */
-#navbar :is(#display-setting, #search-panel, #nav-menu-panel),
-#navbar :is(#theme-mode-panel, #wallpaper-mode-panel)>.float-panel {
+#navbar :is(#display-setting, #search-panel, #nav-menu-panel) {
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
     background: var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
@@ -419,6 +429,17 @@ body.wallpaper-transparent #navbar>div::before {
     box-shadow: var(--navbar-glass-shadow), var(--navbar-glass-inner-veil) !important;
     background-clip: padding-box;
     overflow: hidden !important;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    transition-property: opacity, transform, visibility !important;
+    will-change: opacity, transform;
+}
+
+/* Theme/color control panels stay glassy even while theme switching disables generic float-panel blur. */
+#navbar #display-setting {
+    background:
+        var(--navbar-glass-veil),
+        var(--navbar-control-panel-bg) !important;
 }
 
 /* Desktop link dropdowns keep padding as hover hit-area; glass starts below it. */
@@ -437,6 +458,7 @@ body.wallpaper-transparent #navbar>div::before {
     transition-delay: 0ms, 0ms, 140ms !important;
     will-change: opacity, transform;
     transform: translate3d(0, -8px, 0) !important;
+    backface-visibility: hidden;
 }
 
 #navbar .navbar-dropdown-menu::before {
@@ -479,12 +501,27 @@ body.wallpaper-transparent #navbar>div::before {
 }
 
 #navbar :is(#theme-mode-panel, #wallpaper-mode-panel) {
-    -webkit-backdrop-filter: var(--navbar-glass-filter);
-    backdrop-filter: var(--navbar-glass-filter);
-    background: rgba(255, 255, 255, 0.001);
+    -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
+    backdrop-filter: var(--navbar-glass-filter) !important;
+    background:
+        var(--navbar-glass-veil),
+        var(--navbar-control-panel-bg) !important;
+    border: 1px solid var(--navbar-glass-border) !important;
     border-radius: var(--radius-large);
+    box-shadow: var(--navbar-glass-shadow), var(--navbar-glass-inner-veil) !important;
+    background-clip: padding-box;
+    overflow: hidden !important;
     transform: translateZ(0);
-    will-change: opacity, transform, backdrop-filter;
+    transition-property: opacity, transform, visibility !important;
+    will-change: opacity, transform;
+}
+
+#navbar :is(#theme-mode-panel, #wallpaper-mode-panel)>.float-panel {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
 }
 
 /* Navbar buttons: keep accent text, replace hover fill with a fading accent outline. */
