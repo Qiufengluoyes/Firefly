@@ -17,17 +17,20 @@ export const siteConfig: SiteConfig = {
 
 	// 站点描述
 	description:
-		"和你的日常，就是奇迹 - 枫落丰源的个人技术博客，分享编程、技术和生活点滴，使用Astro构建的静态博客网站。",
+		"枫落丰源的个人博客，记录编程开发、前端与 Astro 实践、折腾笔记、生活随想和 ACG 兴趣，分享 Qiufengluoye 在技术与日常中的探索。",
 
 	// 站点关键词
 	keywords: [
 		"枫落丰源",
-    	"qiufengluoye",
-    	"Fuwari",
-    	"Astro",
+		"Qiufengluoye",
+		"个人博客",
 		"博客",
 		"技术博客",
-		"静态博客",
+		"编程开发",
+		"前端开发",
+		"折腾笔记",
+		"生活随想",
+		"ACG",
 	],
 
 	// 主题色
@@ -50,7 +53,7 @@ export const siteConfig: SiteConfig = {
 	favicon: [
 		{
 			// 图标文件路径
-			src: "/favicon/favicon.png",
+			src: "/favicon/favicon1.png",
 			// 可选，指定主题 'light' | 'dark'
 			// theme: "light",
 			// 可选，图标大小
@@ -88,7 +91,7 @@ export const siteConfig: SiteConfig = {
 	// 提醒框（Admonitions）配置，修改后需要重启开发服务器才能生效
 	// 主题：'github' | 'obsidian' | 'vitepress'，每个主题风格和语法不同，可根据喜好选择
 	rehypeCallouts: {
-		theme: "github",
+		theme: "vitepress",
 	},
 
 	// 文章页底部的"上次编辑时间"卡片开关
