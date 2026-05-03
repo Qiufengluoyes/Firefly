@@ -8,6 +8,9 @@ declare global {
 	interface Window {
 		// biome-ignore lint/suspicious/noExplicitAny: External library
 		swup: any;
+		fireflyIsHomePageUrl?: (rawUrl?: string) => boolean;
+		fireflyKeepHomeBannerOverlay?: boolean;
+		fireflyBannerOverlayHooksVersion?: number;
 		live2dModelInitialized?: boolean;
 		spineModelInitialized?: boolean;
 		floatingTOCListenersInitialized?: boolean;

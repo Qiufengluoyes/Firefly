@@ -169,6 +169,32 @@ const siteLang = lang.replace("_", "-");
       const LIGHT_MODE = "light";
       const DARK_MODE = "dark";
       const SYSTEM_MODE = "system";
+      window.fireflyIsHomePageUrl = (rawUrl) => {
+        const getPathname = (value) => {
+          try {
+            return new URL(value || "/", window.location.origin).pathname || "/";
+          } catch {
+            return `${value || "/"}`.split(/[?#]/)[0] || "/";
+          }
+        };
+        const normalizePath = (value) => {
+          const pathname = getPathname(value);
+          if (pathname === "/") return "/";
+          return pathname.replace(/\/+$/, "") || "/";
+        };
+        const pathname = normalizePath(rawUrl);
+        const basePath = normalizePath(baseUrl || "/");
+        const basePrefix = basePath === "/" ? "" : basePath;
+
+        if (pathname === "/" || pathname === basePath) return true;
+
+        const pathInsideBase =
+          basePrefix && pathname.startsWith(`${basePrefix}/`)
+            ? pathname.slice(basePrefix.length)
+            : pathname;
+
+        return /^\/[1-9]\d*$/.test(pathInsideBase);
+      };
 
       // 获取存储的主题，如果没有则使用默认值
       const theme = localStorage.getItem("theme") || defaultMode;
@@ -360,9 +386,11 @@ const siteLang = lang.replace("_", "-");
           );
           if (bannerTextOverlay) {
             const isHomePage =
-              window.location.pathname === baseUrl ||
-              (baseUrl !== '/' && window.location.pathname === baseUrl.replace(/\/$/, '')) ||
-              window.location.pathname === "/";
+              typeof window.fireflyIsHomePageUrl === "function"
+                ? window.fireflyIsHomePageUrl(window.location.href)
+                : window.location.pathname === baseUrl ||
+                  (baseUrl !== '/' && window.location.pathname === baseUrl.replace(/\/$/, '')) ||
+                  window.location.pathname === "/";
             if (wallpaperMode === WALLPAPER_BANNER && isHomePage) {
               bannerTextOverlay.classList.remove("hidden");
             } else {
@@ -500,6 +528,31 @@ const siteLang = lang.replace("_", "-");
   // 	}
   // })();
   const bannerEnabled = !!document.getElementById("banner-wrapper");
+  function isHomeNavigationTarget(rawUrl: string): boolean {
+    const helper = (window as any).fireflyIsHomePageUrl;
+    if (typeof helper === "function") {
+      return helper(rawUrl);
+    }
+
+    const normalizedPath = rawUrl.replace(/[?#].*$/, "").replace(/\/+$/, "") || "/";
+    return pathsEqual(rawUrl, url("/")) || /^\/[1-9]\d*$/.test(normalizedPath);
+  }
+
+  function setKeepHomeBannerOverlayDuringNavigation(shouldKeep: boolean) {
+    (window as any).fireflyKeepHomeBannerOverlay = shouldKeep;
+    document.documentElement.classList.toggle(
+      "keep-home-banner-overlay",
+      shouldKeep
+    );
+  }
+
+  function isCurrentHomeNavigationSource(): boolean {
+    const source = document.getElementById("banner-overlay-source");
+    const pageType = source?.getAttribute("data-banner-overlay-type");
+    if (pageType) return pageType === "home";
+    return isHomeNavigationTarget(window.location.href);
+  }
+
   function setClickOutsideToClose(panel: string, ignores: string[]) {
       document.addEventListener("click", (event) => {
           let panelDom = document.getElementById(panel);
@@ -635,16 +688,21 @@ const siteLang = lang.replace("_", "-");
 		}
 	})
 */
-    window.swup.hooks.on("link:click", () => {
-      // Remove the delay for the first time page load
-      document.documentElement.style.setProperty("--content-delay", "0ms");
+    window.swup.hooks.on(
+      "link:click",
+      (_visit: unknown, args?: { el?: HTMLAnchorElement }) => {
+        const targetUrl = args?.el?.href || "";
+        setKeepHomeBannerOverlayDuringNavigation(
+          isCurrentHomeNavigationSource() && isHomeNavigationTarget(targetUrl)
+        );
 
-      // 添加页面切换保护，防止导航栏闪烁
-      document.documentElement.classList.add("is-page-transitioning");
+        // Remove the delay for the first time page load
+        document.documentElement.style.setProperty("--content-delay", "0ms");
 
-      
- 
-    });
+        // 添加页面切换保护，防止导航栏闪烁
+        document.documentElement.classList.add("is-page-transitioning");
+      }
+    );
     window.swup.hooks.on("content:replace", () => {
       // 更新侧边栏组件的可见性（根据新页面的 URL）
       updateSidebarComponentsVisibility();
@@ -692,7 +750,10 @@ const siteLang = lang.replace("_", "-");
     window.swup.hooks.on("visit:start", (visit: { to: { url: string } }) => {
       // change banner height immediately when a link is clicked
       const bodyElement = document.querySelector("body");
-      const isHomePage = pathsEqual(visit.to.url, url("/"));
+      const isHomePage = isHomeNavigationTarget(visit.to.url);
+      setKeepHomeBannerOverlayDuringNavigation(
+        isCurrentHomeNavigationSource() && isHomePage
+      );
 
       if (isHomePage) {
         bodyElement!.classList.add("lg:is-home");

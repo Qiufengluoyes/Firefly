@@ -350,6 +350,72 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         let bannerHomeOverlayRevealTimer = 0;
         let bannerHomeOverlaySyncRaf = 0;
         let bannerHomeOverlaySyncCleanup = null;
+        let keepHomeBannerOverlay = false;
+
+        function isHomeBannerPath(rawUrl) {
+            if (typeof window.fireflyIsHomePageUrl === 'function') {
+                return window.fireflyIsHomePageUrl(rawUrl);
+            }
+
+            let pathname = '/';
+            try {
+                pathname = new URL(rawUrl || '/', window.location.origin).pathname || '/';
+            } catch {
+                pathname = `${rawUrl || '/'}`.split(/[?#]/)[0] || '/';
+            }
+
+            const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/+$/, '') || '/';
+            return normalizedPath === '/' || /^\/[1-9]\d*$/.test(normalizedPath);
+        }
+
+        function getVisitTargetUrl(visit) {
+            return visit?.to?.url || visit?.to || '';
+        }
+
+        function isCurrentHomeBanner() {
+            const source = document.getElementById('banner-overlay-source');
+            const pageType = source?.getAttribute('data-banner-overlay-type');
+            if (pageType) return pageType === 'home';
+            return isHomeBannerPath(window.location.href);
+        }
+
+        function shouldKeepHomeBannerOverlay() {
+            return (
+                keepHomeBannerOverlay ||
+                window.fireflyKeepHomeBannerOverlay === true ||
+                document.documentElement.classList.contains('keep-home-banner-overlay')
+            );
+        }
+
+        function keepBannerHomeOverlayVisible() {
+            const overlay = document.querySelector('.banner-text-overlay');
+            if (!overlay) return;
+
+            if (bannerHomeOverlayHideTimer) {
+                window.clearTimeout(bannerHomeOverlayHideTimer);
+                bannerHomeOverlayHideTimer = 0;
+            }
+            if (bannerHomeOverlayRevealTimer) {
+                window.clearTimeout(bannerHomeOverlayRevealTimer);
+                bannerHomeOverlayRevealTimer = 0;
+            }
+            cleanupBannerHomeOverlaySync();
+
+            overlay.dataset.pendingShow = 'true';
+            overlay.classList.remove('hidden');
+            overlay.classList.add('is-visible');
+            hideBannerPageOverlay(true);
+        }
+
+        function setKeepHomeBannerOverlay(shouldKeep) {
+            keepHomeBannerOverlay = shouldKeep;
+            window.fireflyKeepHomeBannerOverlay = shouldKeep;
+            document.documentElement.classList.toggle('keep-home-banner-overlay', shouldKeep);
+
+            if (shouldKeep) {
+                keepBannerHomeOverlayVisible();
+            }
+        }
 
         function cleanupBannerOverlaySync() {
             if (bannerOverlaySyncRaf) {
@@ -447,6 +513,11 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         }
 
         function hideBannerHomeOverlay(forceHidden = false) {
+            if (!forceHidden && shouldKeepHomeBannerOverlay()) {
+                keepBannerHomeOverlayVisible();
+                return;
+            }
+
             const overlay = document.querySelector('.banner-text-overlay');
             if (!overlay) return;
             if (bannerHomeOverlayHideTimer) {
@@ -667,6 +738,11 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         }
 
         function hideBannerHomeOverlayWhenContentStartsLeaving() {
+            if (shouldKeepHomeBannerOverlay()) {
+                keepBannerHomeOverlayVisible();
+                return;
+            }
+
             const overlay = document.querySelector('.banner-text-overlay');
             const swupContainer = document.getElementById('swup-container');
             if (!overlay || !overlay.classList.contains('is-visible')) {
@@ -782,26 +858,54 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         }
 
         function bindBannerPageOverlayHooks() {
-            if (window.fireflyBannerOverlayHooksBound) return;
+            const hooksVersion = 2;
+            if (window.fireflyBannerOverlayHooksVersion === hooksVersion) return;
+            window.fireflyBannerOverlayHooksVersion = hooksVersion;
             window.fireflyBannerOverlayHooksBound = true;
 
             const bindSwupHooks = () => {
                 if (!window.swup || !window.swup.hooks) return;
+                window.swup.hooks.on('visit:start', (visit) => {
+                    setKeepHomeBannerOverlay(
+                        isCurrentHomeBanner() && isHomeBannerPath(getVisitTargetUrl(visit))
+                    );
+                });
                 window.swup.hooks.on('animation:out:start', () => {
                     hideBannerOverlayWhenContentStartsLeaving();
-                    hideBannerHomeOverlayWhenContentStartsLeaving();
+                    if (shouldKeepHomeBannerOverlay()) {
+                        keepBannerHomeOverlayVisible();
+                    } else {
+                        hideBannerHomeOverlayWhenContentStartsLeaving();
+                    }
                 });
                 window.swup.hooks.on('content:replace', () => {
                     requestAnimationFrame(() => {
-                        applyBannerPageOverlay({ deferReveal: true });
-                        applyBannerHomeOverlay({ deferReveal: true });
+                        const keepHomeOverlay = shouldKeepHomeBannerOverlay();
+                        applyBannerPageOverlay({ deferReveal: !keepHomeOverlay });
+                        applyBannerHomeOverlay({ deferReveal: !keepHomeOverlay });
+                        if (keepHomeOverlay) {
+                            keepBannerHomeOverlayVisible();
+                        }
                     });
                 });
                 window.swup.hooks.on('animation:in:start', () => {
-                    applyBannerPageOverlay({ deferReveal: true });
-                    applyBannerHomeOverlay({ deferReveal: true });
+                    const keepHomeOverlay = shouldKeepHomeBannerOverlay();
+                    applyBannerPageOverlay({ deferReveal: !keepHomeOverlay });
+                    applyBannerHomeOverlay({ deferReveal: !keepHomeOverlay });
+
+                    if (keepHomeOverlay) {
+                        keepBannerHomeOverlayVisible();
+                        return;
+                    }
+
                     revealBannerOverlayWhenContentStarts();
                     revealBannerHomeOverlayWhenContentStarts();
+                });
+                window.swup.hooks.on('animation:in:end', () => {
+                    if (shouldKeepHomeBannerOverlay()) {
+                        keepBannerHomeOverlayVisible();
+                        setKeepHomeBannerOverlay(false);
+                    }
                 });
             };
 
@@ -1111,6 +1215,18 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
     transition: opacity 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
     opacity: 0;
     transform: none;
+  }
+
+  html.keep-home-banner-overlay.is-leaving .banner-text-overlay.is-visible {
+    display: flex !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  html.keep-home-banner-overlay .banner-text-overlay {
+    display: flex !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   @media (max-width: 1023px) {

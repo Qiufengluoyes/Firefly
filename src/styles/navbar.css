@@ -181,7 +181,7 @@ body.wallpaper-transparent #navbar>div::before {
 
 #navbar[data-transparent-mode="full"]>div::before,
 #navbar[data-transparent-mode="semifull"]:not(.scrolled)>div::before {
-    opacity: 0;
+    opacity: 0.001;
 }
 
 /* ============================================
@@ -659,6 +659,9 @@ body.wallpaper-transparent #navbar>div::before {
     transform: translate3d(0, 0, 0) scale(1) !important;
     transform-origin: center center;
     line-height: 1;
+    contain: paint;
+    isolation: isolate;
+    backface-visibility: hidden;
     transition-property: transform, color, fill, stroke !important;
     transition-duration: var(--navbar-button-release-duration), var(--navbar-button-hover-duration), var(--navbar-button-hover-duration), var(--navbar-button-hover-duration) !important;
     transition-timing-function: var(--navbar-button-release-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease), var(--navbar-button-hover-ease) !important;

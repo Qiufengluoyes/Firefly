@@ -66,10 +66,26 @@ export const isHomePage = (pathname: string): boolean => {
 	// 获取 base URL
 	const baseUrl = import.meta.env.BASE_URL || "/";
 	const baseUrlNoSlash = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+	const normalizePath = (path: string): string => {
+		const cleanPath = path.split(/[?#]/)[0] || "/";
+		if (cleanPath === "/") return "/";
+		return cleanPath.replace(/\/+$/, "");
+	};
+	const normalizedPath = normalizePath(pathname);
+	const normalizedBase = normalizePath(baseUrl);
+	const normalizedBaseNoSlash = baseUrlNoSlash ? normalizePath(baseUrlNoSlash) : "/";
+	const basePrefix = normalizedBase === "/" ? "" : normalizedBase;
 
-	if (pathname === baseUrl) return true;
-	if (pathname === baseUrlNoSlash) return true;
-	if (pathname === "/") return true;
+	if (normalizedPath === normalizedBase) return true;
+	if (normalizedPath === normalizedBaseNoSlash) return true;
+	if (normalizedPath === "/") return true;
+
+	const pathInsideBase =
+		basePrefix && normalizedPath.startsWith(`${basePrefix}/`)
+			? normalizedPath.slice(basePrefix.length)
+			: normalizedPath;
+
+	if (/^\/[1-9]\d*$/.test(pathInsideBase)) return true;
 
 	return false;
 };
