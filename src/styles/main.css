@@ -14,6 +14,7 @@
 /* 确保平滑滚动 */
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--navbar-floating-offset, 0.75rem) + var(--navbar-height, 4.3rem) + 1rem);
 }
 
 /* 页面切换期间禁用平滑滚动，避免出现整块向上滚动的过渡感 */
@@ -443,6 +444,10 @@ html.is-scroll-to-top-animating.is-leaving {
 
 .custom-md img, #post-cover img {
     @apply cursor-zoom-in
+}
+
+.custom-md :is(h1, h2, h3, h4, h5, h6) {
+    scroll-margin-top: calc(var(--navbar-floating-offset, 0.75rem) + var(--navbar-height, 4.3rem) + 1rem);
 }
 
 ::selection {

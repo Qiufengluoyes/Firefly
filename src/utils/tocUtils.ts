@@ -27,6 +27,27 @@ export class TOCManager {
 		this.scrollOffset = config.scrollOffset || 80;
 	}
 
+	private getScrollOffset(targetElement: HTMLElement): number {
+		const scrollMarginTop = Number.parseFloat(
+			getComputedStyle(targetElement).scrollMarginTop,
+		);
+
+		if (Number.isFinite(scrollMarginTop) && scrollMarginTop > 0) {
+			return scrollMarginTop;
+		}
+
+		const navbar =
+			document.getElementById("navbar-wrapper") ||
+			document.getElementById("navbar");
+		const navbarBottom = navbar?.getBoundingClientRect().bottom ?? 0;
+
+		if (Number.isFinite(navbarBottom) && navbarBottom > 0) {
+			return Math.max(this.scrollOffset, navbarBottom + 16);
+		}
+
+		return this.scrollOffset;
+	}
+
 	/**
 	 * 查找文章内容容器
 	 */
@@ -310,6 +331,9 @@ export class TOCManager {
 	 */
 	public handleClick(event: Event): void {
 		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+
 		const target = event.currentTarget as HTMLAnchorElement;
 		const id = decodeURIComponent(
 			target.getAttribute("href")?.substring(1) || "",
@@ -320,7 +344,7 @@ export class TOCManager {
 			const targetTop =
 				targetElement.getBoundingClientRect().top +
 				window.pageYOffset -
-				this.scrollOffset;
+				this.getScrollOffset(targetElement);
 
 			window.scrollTo({
 				top: targetTop,
