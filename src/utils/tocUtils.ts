@@ -10,6 +10,254 @@ export interface TOCConfig {
 	scrollOffset?: number;
 }
 
+const RESPONSIVE_IMAGE_SELECTOR =
+	"img.md3-responsive-image, img.ff-theme-responsive-image";
+const HEADING_ANCHOR_NAVIGATION_EVENT = "firefly:heading-anchor-navigation";
+const HEADING_IMAGE_WAIT_TIMEOUT = 2200;
+const HEADING_RELOAD_IMAGE_WAIT_TIMEOUT = 10000;
+const HEADING_SCROLL_SETTLE_FALLBACK = 1400;
+const HEADING_POST_SCROLL_IMAGE_MONITOR_TIMEOUT = 12000;
+const ARTICLE_SCROLL_RESTORE_KEY = "firefly:article-scroll-restore";
+const ARTICLE_SCROLL_RESTORE_MAX_AGE = 5 * 60 * 1000;
+const USER_NAVIGATION_CANCEL_EVENTS = [
+	"wheel",
+	"touchstart",
+	"pointerdown",
+	"keydown",
+] as const;
+
+interface HeadingNavigationOptions {
+	behavior?: ScrollBehavior;
+	lockActive?: boolean;
+	targetDelta?: number;
+}
+
+interface StoredArticleScroll {
+	path: string;
+	headingId: string;
+	delta: number;
+	scrollY: number;
+	createdAt: number;
+}
+
+let headingAnchorClickEventsBound = false;
+let articleScrollRestoreEventsBound = false;
+let initialNavigationKey = "";
+
+function bindGlobalHeadingAnchorClickEvents(): void {
+	if (headingAnchorClickEventsBound) {
+		return;
+	}
+
+	document.addEventListener("click", (event) => {
+		if (
+			event instanceof MouseEvent &&
+			(event.button !== 0 ||
+				event.metaKey ||
+				event.ctrlKey ||
+				event.shiftKey ||
+				event.altKey)
+		) {
+			return;
+		}
+
+		const target = event.target as Element | null;
+		const anchor = target?.closest(
+			".custom-md .anchor[href^='#']",
+		) as HTMLAnchorElement | null;
+		if (!anchor) {
+			return;
+		}
+
+		const id = decodeURIComponent(anchor.getAttribute("href")?.slice(1) || "");
+		if (!id || !document.getElementById(id)) {
+			return;
+		}
+
+		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+		document.dispatchEvent(
+			new CustomEvent(HEADING_ANCHOR_NAVIGATION_EVENT, {
+				detail: { id },
+				cancelable: true,
+			}),
+		);
+	});
+
+	headingAnchorClickEventsBound = true;
+}
+
+function isReloadNavigation(): boolean {
+	const navigationEntry = performance.getEntriesByType("navigation")[0] as
+		| PerformanceNavigationTiming
+		| undefined;
+	return navigationEntry?.type === "reload";
+}
+
+function getHeadingImageWaitTimeout(): number {
+	return isReloadNavigation()
+		? HEADING_RELOAD_IMAGE_WAIT_TIMEOUT
+		: HEADING_IMAGE_WAIT_TIMEOUT;
+}
+
+function getPageRestorePath(): string {
+	return `${window.location.pathname}${window.location.search}`;
+}
+
+function getHeadingScrollOffset(
+	targetElement: HTMLElement,
+	fallbackOffset: number,
+): number {
+	const scrollMarginTop = Number.parseFloat(
+		getComputedStyle(targetElement).scrollMarginTop,
+	);
+
+	if (Number.isFinite(scrollMarginTop) && scrollMarginTop > 0) {
+		return scrollMarginTop;
+	}
+
+	const navbar =
+		document.getElementById("navbar-wrapper") || document.getElementById("navbar");
+	const navbarBottom = navbar?.getBoundingClientRect().bottom ?? 0;
+
+	if (Number.isFinite(navbarBottom) && navbarBottom > 0) {
+		return Math.max(fallbackOffset, navbarBottom + 16);
+	}
+
+	return fallbackOffset;
+}
+
+function getContentContainer(): Element | null {
+	return (
+		document.querySelector(".custom-md") ||
+		document.querySelector(".prose") ||
+		document.querySelector(".markdown-content")
+	);
+}
+
+function getArticleHeadings(): HTMLElement[] {
+	return Array.from(
+		(getContentContainer() || document).querySelectorAll<HTMLElement>(
+			"h1, h2, h3, h4, h5, h6",
+		),
+	).filter((heading) => Boolean(heading.id));
+}
+
+function getCurrentHashTargetId(): string {
+	const rawHash = window.location.hash.slice(1);
+	if (!rawHash) {
+		return "";
+	}
+
+	try {
+		return decodeURIComponent(rawHash);
+	} catch {
+		return rawHash;
+	}
+}
+
+function findScrollRestoreHeading(fallbackOffset: number): HTMLElement | null {
+	const headings = getArticleHeadings();
+	if (headings.length === 0) {
+		return null;
+	}
+
+	let restoreHeading = headings[0];
+	for (const heading of headings) {
+		const offset = getHeadingScrollOffset(heading, fallbackOffset);
+		if (heading.getBoundingClientRect().top - offset <= 1) {
+			restoreHeading = heading;
+			continue;
+		}
+		break;
+	}
+
+	return restoreHeading;
+}
+
+function readStoredArticleScroll(): StoredArticleScroll | null {
+	try {
+		const raw = window.sessionStorage.getItem(ARTICLE_SCROLL_RESTORE_KEY);
+		if (!raw) {
+			return null;
+		}
+
+		const parsed = JSON.parse(raw) as Partial<StoredArticleScroll>;
+		if (
+			typeof parsed.path !== "string" ||
+			typeof parsed.headingId !== "string" ||
+			typeof parsed.delta !== "number" ||
+			typeof parsed.scrollY !== "number" ||
+			typeof parsed.createdAt !== "number"
+		) {
+			return null;
+		}
+
+		if (Date.now() - parsed.createdAt > ARTICLE_SCROLL_RESTORE_MAX_AGE) {
+			return null;
+		}
+
+		return parsed as StoredArticleScroll;
+	} catch {
+		return null;
+	}
+}
+
+function writeStoredArticleScroll(fallbackOffset: number): void {
+	if (!window.location.pathname.includes("/posts/")) {
+		return;
+	}
+
+	if (window.scrollY <= 1) {
+		try {
+			window.sessionStorage.removeItem(ARTICLE_SCROLL_RESTORE_KEY);
+		} catch {
+			// Ignore storage failures in private browsing modes.
+		}
+		return;
+	}
+
+	const heading = findScrollRestoreHeading(fallbackOffset);
+	if (!heading?.id) {
+		return;
+	}
+
+	const offset = getHeadingScrollOffset(heading, fallbackOffset);
+	const payload: StoredArticleScroll = {
+		path: getPageRestorePath(),
+		headingId: heading.id,
+		delta: heading.getBoundingClientRect().top - offset,
+		scrollY: window.scrollY,
+		createdAt: Date.now(),
+	};
+
+	try {
+		window.sessionStorage.setItem(
+			ARTICLE_SCROLL_RESTORE_KEY,
+			JSON.stringify(payload),
+		);
+	} catch {
+		// Ignore storage failures in private browsing modes.
+	}
+}
+
+function bindArticleScrollRestoreEvents(fallbackOffset: number): void {
+	if (articleScrollRestoreEventsBound) {
+		return;
+	}
+
+	const save = () => writeStoredArticleScroll(fallbackOffset);
+	window.addEventListener("pagehide", save);
+	window.addEventListener("beforeunload", save);
+	document.addEventListener("visibilitychange", () => {
+		if (document.visibilityState === "hidden") {
+			save();
+		}
+	});
+	articleScrollRestoreEventsBound = true;
+}
+
 export class TOCManager {
 	private tocItems: HTMLElement[] = [];
 	private observer: IntersectionObserver | null = null;
@@ -19,6 +267,24 @@ export class TOCManager {
 	private contentId: string;
 	private indicatorId: string;
 	private scrollOffset: number;
+	private activeHeadingKey = "";
+	private programmaticScrollTargetId: string | null = null;
+	private programmaticScrollTimeout: number | null = null;
+	private navigationToken = 0;
+	private handleHeadingAnchorNavigation = (event: Event) => {
+		if (event.defaultPrevented) {
+			return;
+		}
+
+		const id = (event as CustomEvent<{ id?: string }>).detail?.id;
+		const targetElement = id ? document.getElementById(id) : null;
+		if (!targetElement) {
+			return;
+		}
+
+		event.preventDefault();
+		this.navigateToHeading(targetElement);
+	};
 
 	constructor(config: TOCConfig) {
 		this.contentId = config.contentId;
@@ -28,24 +294,458 @@ export class TOCManager {
 	}
 
 	private getScrollOffset(targetElement: HTMLElement): number {
-		const scrollMarginTop = Number.parseFloat(
-			getComputedStyle(targetElement).scrollMarginTop,
+		return getHeadingScrollOffset(targetElement, this.scrollOffset);
+	}
+
+	private getHeadingTargetTop(
+		targetElement: HTMLElement,
+		targetDelta = 0,
+	): number {
+		return (
+			targetElement.getBoundingClientRect().top +
+			window.pageYOffset -
+			this.getScrollOffset(targetElement) -
+			targetDelta
+		);
+	}
+
+	private scrollToHeading(
+		targetElement: HTMLElement,
+		behavior: ScrollBehavior = "smooth",
+		targetDelta = 0,
+	): void {
+		window.scrollTo({
+			top: this.getHeadingTargetTop(targetElement, targetDelta),
+			behavior,
+		});
+	}
+
+	private isResponsiveImageReady(img: HTMLImageElement): boolean {
+		return img.dataset.ffMd3ImageReady === "true" || img.complete;
+	}
+
+	private isBeforeTarget(element: Element, targetElement: HTMLElement): boolean {
+		return Boolean(
+			element.compareDocumentPosition(targetElement) &
+				Node.DOCUMENT_POSITION_FOLLOWING,
+		);
+	}
+
+	private getPendingImagesBeforeHeading(targetElement: HTMLElement) {
+		return this.getImagesBeforeHeading(targetElement).filter(
+			(img) => !this.isResponsiveImageReady(img),
+		);
+	}
+
+	private getImagesBeforeHeading(targetElement: HTMLElement) {
+		const contentContainer =
+			targetElement.closest(".custom-md") || document.documentElement;
+
+		return Array.from(
+			contentContainer.querySelectorAll<HTMLImageElement>(
+				RESPONSIVE_IMAGE_SELECTOR,
+			),
+		).filter((img) => this.isBeforeTarget(img, targetElement));
+	}
+
+	private waitForImagesBeforeHeading(targetElement: HTMLElement): Promise<void> {
+		const pendingImages = this.getPendingImagesBeforeHeading(targetElement);
+		if (pendingImages.length === 0) {
+			return Promise.resolve();
+		}
+
+		const pending = new Set(pendingImages);
+		return new Promise((resolve) => {
+			let timeoutId: number | null = null;
+			let finished = false;
+
+			const cleanup = () => {
+				if (timeoutId) {
+					window.clearTimeout(timeoutId);
+					timeoutId = null;
+				}
+				pendingImages.forEach((img) => {
+					img.removeEventListener("load", handleImageDone);
+					img.removeEventListener("error", handleImageDone);
+				});
+			};
+
+			const finish = () => {
+				if (finished) {
+					return;
+				}
+				finished = true;
+				cleanup();
+				window.requestAnimationFrame(() => {
+					window.requestAnimationFrame(() => resolve());
+				});
+			};
+
+			function handleImageDone(event: Event) {
+				pending.delete(event.currentTarget as HTMLImageElement);
+				if (pending.size === 0) {
+					finish();
+				}
+			}
+
+			timeoutId = window.setTimeout(finish, getHeadingImageWaitTimeout());
+
+			pendingImages.forEach((img) => {
+				img.loading = "eager";
+				img.addEventListener("load", handleImageDone);
+				img.addEventListener("error", handleImageDone);
+				if (this.isResponsiveImageReady(img)) {
+					pending.delete(img);
+				}
+			});
+
+			if (pending.size === 0) {
+				finish();
+			}
+		});
+	}
+
+	private prepareImagesBeforeHeading(targetElement: HTMLElement): void {
+		const pendingImages = this.getPendingImagesBeforeHeading(targetElement);
+		pendingImages.forEach((img) => {
+			img.loading = "eager";
+		});
+	}
+
+	private correctHeadingScrollToTarget(
+		targetElement: HTMLElement,
+		targetDelta = 0,
+	): boolean {
+		const delta =
+			targetElement.getBoundingClientRect().top -
+			this.getScrollOffset(targetElement) -
+			targetDelta;
+		if (Math.abs(delta) < 0.5) {
+			return false;
+		}
+
+		window.scrollBy({
+			top: delta,
+			behavior: "auto",
+		});
+		return true;
+	}
+
+	private correctHeadingAfterScrollSettles(
+		targetElement: HTMLElement,
+		token: number,
+		targetDelta = 0,
+	): void {
+		let timeoutId = 0;
+		let settled = false;
+
+		const cleanup = () => {
+			if (settled) {
+				return;
+			}
+
+			settled = true;
+			if (timeoutId) {
+				window.clearTimeout(timeoutId);
+				timeoutId = 0;
+			}
+			window.removeEventListener("scrollend", finish);
+			USER_NAVIGATION_CANCEL_EVENTS.forEach((eventName) => {
+				window.removeEventListener(eventName, cancel, { capture: true });
+			});
+		};
+
+		const finish = () => {
+			if (settled) {
+				return;
+			}
+			cleanup();
+
+			window.requestAnimationFrame(() => {
+				if (
+					token !== this.navigationToken ||
+					!document.contains(targetElement)
+				) {
+					return;
+				}
+
+				window.requestAnimationFrame(() => {
+					if (
+						token !== this.navigationToken ||
+						!document.contains(targetElement)
+					) {
+						return;
+					}
+					this.correctHeadingScrollToTarget(targetElement, targetDelta);
+				});
+			});
+		};
+
+		const cancel = () => {
+			if (token === this.navigationToken) {
+				this.navigationToken++;
+			}
+			cleanup();
+		};
+
+		timeoutId = window.setTimeout(finish, HEADING_SCROLL_SETTLE_FALLBACK);
+		window.addEventListener("scrollend", finish, { once: true });
+		USER_NAVIGATION_CANCEL_EVENTS.forEach((eventName) => {
+			window.addEventListener(eventName, cancel, {
+				capture: true,
+				passive: true,
+			});
+		});
+	}
+
+	private waitForImagesAfterHeadingScroll(
+		targetElement: HTMLElement,
+		token: number,
+		targetDelta = 0,
+	): void {
+		const pendingImages = this.getPendingImagesBeforeHeading(targetElement);
+		if (pendingImages.length === 0) {
+			return;
+		}
+
+		const pending = new Set(pendingImages);
+		let correctionTimer = 0;
+		let timeoutId = 0;
+		const cleanup = () => {
+			if (timeoutId) {
+				window.clearTimeout(timeoutId);
+				timeoutId = 0;
+			}
+			pendingImages.forEach((img) => {
+				img.removeEventListener("load", handleImageDone);
+				img.removeEventListener("error", handleImageDone);
+			});
+		};
+
+		const scheduleCorrection = () => {
+			if (correctionTimer) {
+				return;
+			}
+
+			correctionTimer = window.setTimeout(() => {
+				correctionTimer = 0;
+				if (
+					token !== this.navigationToken ||
+					!document.contains(targetElement)
+				) {
+					cleanup();
+					return;
+				}
+
+				this.correctHeadingAfterScrollSettles(
+					targetElement,
+					token,
+					targetDelta,
+				);
+			}, 80);
+		};
+
+		const handleImageDone = (event: Event) => {
+			pending.delete(event.currentTarget as HTMLImageElement);
+			scheduleCorrection();
+			if (pending.size === 0) {
+				cleanup();
+			}
+		};
+
+		pendingImages.forEach((img) => {
+			img.loading = "eager";
+			img.addEventListener("load", handleImageDone);
+			img.addEventListener("error", handleImageDone);
+			if (this.isResponsiveImageReady(img)) {
+				pending.delete(img);
+				scheduleCorrection();
+			}
+		});
+		if (pending.size === 0) {
+			cleanup();
+			return;
+		}
+		timeoutId = window.setTimeout(
+			cleanup,
+			Math.max(
+				getHeadingImageWaitTimeout(),
+				HEADING_POST_SCROLL_IMAGE_MONITOR_TIMEOUT,
+			),
+		);
+	}
+
+	private bindNavigationCancel(token: number): () => void {
+		const cancel = () => {
+			if (token === this.navigationToken) {
+				this.navigationToken++;
+			}
+			USER_NAVIGATION_CANCEL_EVENTS.forEach((eventName) => {
+				window.removeEventListener(eventName, cancel, { capture: true });
+			});
+		};
+
+		USER_NAVIGATION_CANCEL_EVENTS.forEach((eventName) => {
+			window.addEventListener(eventName, cancel, {
+				capture: true,
+				passive: true,
+			});
+		});
+
+		return () => {
+			USER_NAVIGATION_CANCEL_EVENTS.forEach((eventName) => {
+				window.removeEventListener(eventName, cancel, { capture: true });
+			});
+		};
+	}
+
+	private async navigateToHeading(
+		targetElement: HTMLElement,
+		options: HeadingNavigationOptions = {},
+	): Promise<void> {
+		const {
+			behavior = "smooth",
+			lockActive = true,
+			targetDelta = 0,
+		} = options;
+		const token = ++this.navigationToken;
+		const releaseCancel = this.bindNavigationCancel(token);
+		this.prepareImagesBeforeHeading(targetElement);
+		await this.waitForImagesBeforeHeading(targetElement);
+		releaseCancel();
+		if (token !== this.navigationToken || !document.contains(targetElement)) {
+			return;
+		}
+		window.requestAnimationFrame(() => {
+			if (token !== this.navigationToken || !document.contains(targetElement)) {
+				return;
+			}
+
+			window.requestAnimationFrame(() => {
+				if (
+					token !== this.navigationToken ||
+					!document.contains(targetElement)
+				) {
+					return;
+				}
+				if (lockActive) {
+					this.lockProgrammaticScrollTarget(targetElement);
+				}
+				this.scrollToHeading(targetElement, behavior, targetDelta);
+				this.correctHeadingAfterScrollSettles(
+					targetElement,
+					token,
+					targetDelta,
+				);
+				this.waitForImagesAfterHeadingScroll(
+					targetElement,
+					token,
+					targetDelta,
+				);
+			});
+		});
+	}
+
+	private scheduleInitialNavigation(): void {
+		const hashTargetId = getCurrentHashTargetId();
+		if (hashTargetId) {
+			const targetElement = document.getElementById(hashTargetId);
+			if (!targetElement) {
+				return;
+			}
+
+			const key = `${getPageRestorePath()}#${hashTargetId}`;
+			if (initialNavigationKey === key) {
+				return;
+			}
+			initialNavigationKey = key;
+
+			window.requestAnimationFrame(() => {
+				this.navigateToHeading(targetElement, {
+					behavior: "auto",
+					lockActive: false,
+				});
+			});
+			return;
+		}
+
+		if (!isReloadNavigation()) {
+			return;
+		}
+
+		const stored = readStoredArticleScroll();
+		if (!stored || stored.path !== getPageRestorePath()) {
+			return;
+		}
+
+		const targetElement = document.getElementById(stored.headingId);
+		if (!targetElement) {
+			return;
+		}
+
+		const key = `${stored.path}:${stored.headingId}:${Math.round(stored.scrollY)}`;
+		if (initialNavigationKey === key) {
+			return;
+		}
+		initialNavigationKey = key;
+
+		window.requestAnimationFrame(() => {
+			this.navigateToHeading(targetElement, {
+				behavior: "auto",
+				lockActive: false,
+				targetDelta: stored.delta,
+			});
+		});
+	}
+
+	private lockProgrammaticScrollTarget(targetElement: HTMLElement): void {
+		if (!targetElement.id) {
+			return;
+		}
+
+		this.programmaticScrollTargetId = targetElement.id;
+		this.applyActiveItems(
+			this.tocItems.filter((item) => item.dataset.headingId === targetElement.id),
 		);
 
-		if (Number.isFinite(scrollMarginTop) && scrollMarginTop > 0) {
-			return scrollMarginTop;
+		if (this.programmaticScrollTimeout) {
+			window.clearTimeout(this.programmaticScrollTimeout);
+			this.programmaticScrollTimeout = null;
 		}
 
-		const navbar =
-			document.getElementById("navbar-wrapper") ||
-			document.getElementById("navbar");
-		const navbarBottom = navbar?.getBoundingClientRect().bottom ?? 0;
+		const release = () => {
+			if (this.programmaticScrollTimeout) {
+				window.clearTimeout(this.programmaticScrollTimeout);
+				this.programmaticScrollTimeout = null;
+			}
+			if (this.programmaticScrollTargetId === targetElement.id) {
+				this.programmaticScrollTargetId = null;
+				this.updateActiveState();
+			}
+			window.removeEventListener("scrollend", release);
+		};
 
-		if (Number.isFinite(navbarBottom) && navbarBottom > 0) {
-			return Math.max(this.scrollOffset, navbarBottom + 16);
+		window.addEventListener("scrollend", release, { once: true });
+		this.programmaticScrollTimeout = window.setTimeout(release, 4200);
+	}
+
+	private applyActiveItems(activeItems: HTMLElement[]): void {
+		const nextActiveHeadingKey = activeItems
+			.map((item) => item.dataset.headingId || "")
+			.join("|");
+
+		if (nextActiveHeadingKey === this.activeHeadingKey) {
+			return;
 		}
 
-		return this.scrollOffset;
+		this.activeHeadingKey = nextActiveHeadingKey;
+		this.tocItems.forEach((item) => {
+			item.classList.remove("visible");
+		});
+		activeItems.forEach((item) => {
+			item.classList.add("visible");
+		});
+		this.updateActiveIndicator(activeItems);
 	}
 
 	/**
@@ -175,6 +875,7 @@ export class TOCManager {
 		this.tocItems = Array.from(
 			document.querySelectorAll(`#${this.contentId} a`),
 		);
+		this.activeHeadingKey = "";
 	}
 
 	/**
@@ -226,10 +927,14 @@ export class TOCManager {
 	public updateActiveState(): void {
 		if (!this.tocItems || this.tocItems.length === 0) return;
 
-		// 移除所有活动状态
-		this.tocItems.forEach((item) => {
-			item.classList.remove("visible");
-		});
+		if (this.programmaticScrollTargetId) {
+			this.applyActiveItems(
+				this.tocItems.filter(
+					(item) => item.dataset.headingId === this.programmaticScrollTargetId,
+				),
+			);
+			return;
+		}
 
 		const visibleHeadingIds = this.getVisibleHeadingIds();
 
@@ -239,13 +944,7 @@ export class TOCManager {
 			return headingId && visibleHeadingIds.includes(headingId);
 		});
 
-		// 添加活动状态
-		activeItems.forEach((item) => {
-			item.classList.add("visible");
-		});
-
-		// 更新活动指示器
-		this.updateActiveIndicator(activeItems);
+		this.applyActiveItems(activeItems);
 	}
 
 	/**
@@ -341,15 +1040,7 @@ export class TOCManager {
 		const targetElement = document.getElementById(id);
 
 		if (targetElement) {
-			const targetTop =
-				targetElement.getBoundingClientRect().top +
-				window.pageYOffset -
-				this.getScrollOffset(targetElement);
-
-			window.scrollTo({
-				top: targetTop,
-				behavior: "smooth",
-			});
+			this.navigateToHeading(targetElement);
 		}
 	}
 
@@ -401,16 +1092,32 @@ export class TOCManager {
 			clearTimeout(this.scrollTimeout);
 			this.scrollTimeout = null;
 		}
+		if (this.programmaticScrollTimeout) {
+			window.clearTimeout(this.programmaticScrollTimeout);
+			this.programmaticScrollTimeout = null;
+		}
+		this.programmaticScrollTargetId = null;
+		document.removeEventListener(
+			HEADING_ANCHOR_NAVIGATION_EVENT,
+			this.handleHeadingAnchorNavigation,
+		);
 	}
 
 	/**
 	 * 初始化
 	 */
 	public init(): void {
+		bindGlobalHeadingAnchorClickEvents();
+		bindArticleScrollRestoreEvents(this.scrollOffset);
+		document.addEventListener(
+			HEADING_ANCHOR_NAVIGATION_EVENT,
+			this.handleHeadingAnchorNavigation,
+		);
 		this.updateTOCContent();
 		this.bindClickEvents();
 		this.setupObserver();
 		this.updateActiveState();
+		this.scheduleInitialNavigation();
 	}
 }
 
