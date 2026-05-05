@@ -814,6 +814,10 @@ img.md3-responsive-image:not(.ff-md3-image-fade--ready) {
 	min-height: var(--ff-md3-placeholder-min-height, min(56.25vw, 420px));
 }
 
+.custom-md :where(p, li, blockquote) > img.md3-responsive-image:not([width]):not(.ff-md3-image-fade--ready) {
+	width: 100%;
+}
+
 figure.image-caption img.md3-responsive-image:not(.ff-md3-image-fade--ready) {
 	min-height: var(--ff-md3-placeholder-min-height, 84px);
 }
