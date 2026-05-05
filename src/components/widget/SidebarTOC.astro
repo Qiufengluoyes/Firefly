@@ -96,11 +96,8 @@ const { headings: _headings = [], class: className, style } = Astro.props;
     setTimeout(initSidebarTOC, 200);
   });
   
-  // 监听 hashchange（但排除 TOC 内部导航）
+  // 监听 hashchange
   window.addEventListener("hashchange", () => {
-    if (!window.tocInternalNavigation) {
-      setTimeout(initSidebarTOC, 100);
-    }
-    window.tocInternalNavigation = false;
+    setTimeout(initSidebarTOC, 100);
   });
 </script>

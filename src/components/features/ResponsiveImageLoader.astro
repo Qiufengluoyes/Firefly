@@ -605,16 +605,12 @@ function markImagePending(img: HTMLImageElement) {
 	img.dataset.ffMd3ImageReadyQueued = "false";
 	delete img.dataset.ffMd3ImageReadyQueueToken;
 	img.dataset.ffMd3ImageReady = "false";
-	img.classList.add("ff-md3-image-fade");
 	img.classList.remove("ff-md3-image-fade--ready");
-	img.classList.add("ff-md3-image-fade--pending");
 	syncImagePlaceholderSizing(img);
 }
 
 function markImageReady(img: HTMLImageElement) {
 	img.dataset.ffMd3ImageReady = "true";
-	img.classList.add("ff-md3-image-fade");
-	img.classList.remove("ff-md3-image-fade--pending");
 	img.classList.add("ff-md3-image-fade--ready");
 	syncImagePlaceholderSizing(img);
 }
@@ -841,23 +837,6 @@ img.ff-theme-responsive-image {
 	transform: translateZ(0);
 }
 
-img.md3-responsive-image.ff-md3-image-fade--pending,
-img.ff-theme-responsive-image.ff-md3-image-fade--pending {
-	opacity: 1;
-}
-
-.ff-md3-image-fade {
-	transition:
-		opacity 280ms cubic-bezier(0.2, 0, 0, 1),
-		filter 320ms cubic-bezier(0.2, 0, 0, 1);
-	will-change: opacity, filter;
-}
-
-.ff-md3-image-fade--pending {
-	opacity: 1;
-	filter: none;
-}
-
 .ff-md3-image-fade--ready {
 	opacity: 1;
 	filter: none;
@@ -959,20 +938,6 @@ img.ff-theme-responsive-image.ff-md3-image-fade--pending {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ff-md3-image-fade {
-		transition: none;
-	}
-
-	.ff-md3-image-fade--pending {
-		opacity: 0;
-		filter: none;
-	}
-
-	.ff-md3-image-fade--ready {
-		opacity: 1;
-		filter: none;
-	}
-
 	.ff-md3-loader-indicator {
 		animation: none;
 		left: 50%;

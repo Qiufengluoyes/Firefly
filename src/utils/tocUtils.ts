@@ -405,13 +405,6 @@ export class TOCManager {
 		});
 	}
 
-	private prepareImagesBeforeHeading(targetElement: HTMLElement): void {
-		const pendingImages = this.getPendingImagesBeforeHeading(targetElement);
-		pendingImages.forEach((img) => {
-			img.loading = "eager";
-		});
-	}
-
 	private correctHeadingScrollToTarget(
 		targetElement: HTMLElement,
 		targetDelta = 0,
@@ -568,10 +561,7 @@ export class TOCManager {
 		}
 		timeoutId = window.setTimeout(
 			cleanup,
-			Math.max(
-				getHeadingImageWaitTimeout(),
-				HEADING_POST_SCROLL_IMAGE_MONITOR_TIMEOUT,
-			),
+			HEADING_POST_SCROLL_IMAGE_MONITOR_TIMEOUT,
 		);
 	}
 
@@ -610,7 +600,6 @@ export class TOCManager {
 		} = options;
 		const token = ++this.navigationToken;
 		const releaseCancel = this.bindNavigationCancel(token);
-		this.prepareImagesBeforeHeading(targetElement);
 		await this.waitForImagesBeforeHeading(targetElement);
 		releaseCancel();
 		if (token !== this.navigationToken || !document.contains(targetElement)) {
@@ -749,21 +738,10 @@ export class TOCManager {
 	}
 
 	/**
-	 * 查找文章内容容器
-	 */
-	private getContentContainer(): Element | null {
-		return (
-			document.querySelector(".custom-md") ||
-			document.querySelector(".prose") ||
-			document.querySelector(".markdown-content")
-		);
-	}
-
-	/**
 	 * 查找所有标题
 	 */
 	private getAllHeadings(): NodeListOf<HTMLElement> {
-		const contentContainer = this.getContentContainer();
+		const contentContainer = getContentContainer();
 		if (contentContainer) {
 			return contentContainer.querySelectorAll("h1, h2, h3, h4, h5, h6");
 		}

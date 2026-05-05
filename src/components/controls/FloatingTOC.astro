@@ -190,12 +190,9 @@ const sidebarPosition = sidebarLayoutConfig.position;
     document.addEventListener("astro:page-load", closeTOC);
     document.addEventListener("astro:before-preparation", closeTOC);
 
-    // 监听 hashchange（排除TOC内部导航）
+    // 监听 hashchange
     window.addEventListener("hashchange", () => {
-      if (!window.tocInternalNavigation) {
-        closeTOC();
-      }
-      window.tocInternalNavigation = false;
+      closeTOC();
     });
 
     // 监听外部链接点击
@@ -207,7 +204,7 @@ const sidebarPosition = sidebarLayoutConfig.position;
       const href = link.getAttribute("href");
       const isExternalLink = href && !href.startsWith("#") && !href.startsWith("javascript:");
       
-      if (isExternalLink && !window.tocInternalNavigation) {
+      if (isExternalLink) {
         const tocPanel = document.getElementById("floating-toc-panel");
         if (!tocPanel || !tocPanel.contains(link)) {
           closeTOC();
@@ -296,18 +293,6 @@ const sidebarPosition = sidebarLayoutConfig.position;
 
       // 初始化
       window.FloatingTOC.manager.init();
-
-      // 设置点击事件 - 标记为 TOC 内部导航
-      const tocContent = document.getElementById("floating-toc-content");
-      if (tocContent) {
-        tocContent.addEventListener("click", (e) => {
-          const target = e.target as Element | null;
-          const anchor = target?.closest('a[href^="#"]');
-          if (anchor) {
-            window.tocInternalNavigation = true;
-          }
-        }, { capture: true });
-      }
 
       // 设置自动关闭
       setupAutoClose();
