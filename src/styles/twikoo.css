@@ -159,7 +159,7 @@ html.dark {
   align-items: center !important;
   justify-content: flex-end !important;
   gap: 0.75rem !important;
-  margin: 1rem 0 1.25rem !important;
+  margin: 0.5rem 0 0.75rem !important;
   color: var(--content-meta) !important;
   font-size: 0.875rem !important;
 }
@@ -179,7 +179,7 @@ html.dark {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  gap: 0.4rem !important;
+  gap: 0.2rem !important;
   margin-left: auto !important;
   min-width: 0;
   line-height: 1 !important;
@@ -237,7 +237,7 @@ html.dark {
 
 #tcomment .twikoo .tk-sort-item:active,
 #twikoo .tk-sort-item:active {
-  transform: scale(0.96);
+  transform: none !important;
 }
 
 #tcomment .twikoo .tk-sort-item.__active,
@@ -278,7 +278,12 @@ html.dark #twikoo .tk-sort-item.__active {
 
 #tcomment .twikoo .tk-comments-actions > .tk-icon.__comments:active,
 #twikoo .tk-comments-actions > .tk-icon.__comments:active {
-  transform: scale(0.94);
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comments-actions > .tk-icon.__comments:active svg,
+#twikoo .tk-comments-actions > .tk-icon.__comments:active svg {
+  transform: none !important;
 }
 
 #tcomment .twikoo .tk-comments-actions > .tk-icon.__comments svg,
