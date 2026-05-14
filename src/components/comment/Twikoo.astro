@@ -38,6 +38,222 @@ const config = {
     };
   }
 
+  const MARKDOWN_GUIDE_URL =
+    "https://guides.github.com/features/mastering-markdown/";
+  const MARKDOWN_TRIGGER_SELECTOR =
+    "#tcomment .tk-row.actions .__markdown, #twikoo .tk-row.actions .__markdown";
+  const MARKDOWN_POPOVER_SELECTOR = ".tk-markdown-guide-popover";
+  const MARKDOWN_POPOVER_OPEN_CLASS = "is-open";
+  const MARKDOWN_POPOVER_CLOSING_CLASS = "is-closing";
+
+  function getClosestElement(target, selector) {
+    return target instanceof Element ? target.closest(selector) : null;
+  }
+
+  function getMarkdownGuideUrl(trigger) {
+    return (
+      trigger.getAttribute("href") ||
+      trigger.dataset.href ||
+      MARKDOWN_GUIDE_URL
+    );
+  }
+
+  function removeMarkdownGuidePopover(popover) {
+    if (popover) popover.remove();
+  }
+
+  function closeMarkdownGuidePopover(immediate = false) {
+    const popover = document.querySelector(MARKDOWN_POPOVER_SELECTOR);
+    if (!popover) return;
+
+    const trigger = window.fireflyTwikooMarkdownGuideTrigger;
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", "false");
+    }
+
+    if (typeof window.fireflyTwikooMarkdownGuideCleanup === "function") {
+      window.fireflyTwikooMarkdownGuideCleanup();
+    }
+
+    window.fireflyTwikooMarkdownGuideTrigger = null;
+    window.fireflyTwikooMarkdownGuideCleanup = null;
+
+    const shouldAnimate =
+      !immediate &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!shouldAnimate) {
+      removeMarkdownGuidePopover(popover);
+      return;
+    }
+
+    popover.classList.remove(MARKDOWN_POPOVER_OPEN_CLASS);
+    popover.classList.add(MARKDOWN_POPOVER_CLOSING_CLASS);
+
+    const fallbackTimer = setTimeout(() => {
+      removeMarkdownGuidePopover(popover);
+    }, 260);
+
+    popover.addEventListener(
+      "transitionend",
+      function (event) {
+        if (event.target !== popover) return;
+        clearTimeout(fallbackTimer);
+        removeMarkdownGuidePopover(popover);
+      },
+      { once: true },
+    );
+  }
+
+  function positionMarkdownGuidePopover(popover, trigger) {
+    const triggerRect = trigger.getBoundingClientRect();
+    const icon = trigger.querySelector("svg");
+    const anchorRect = icon ? icon.getBoundingClientRect() : triggerRect;
+    const anchorCenter = anchorRect.left + anchorRect.width / 2;
+    const gap = 10;
+    const margin = 8;
+    const boundaryEl = trigger.closest(".twikoo") || document.getElementById("tcomment");
+    const boundaryRect = boundaryEl
+      ? boundaryEl.getBoundingClientRect()
+      : { left: 0, right: window.innerWidth };
+    const boundaryLeft = Math.max(margin, boundaryRect.left + margin);
+    const boundaryRight = Math.min(window.innerWidth - margin, boundaryRect.right - margin);
+
+    popover.style.visibility = "hidden";
+    popover.style.left = "0px";
+    popover.style.top = "0px";
+
+    const popoverRect = popover.getBoundingClientRect();
+    const availableWidth = Math.max(0, boundaryRight - boundaryLeft);
+    if (popoverRect.width > availableWidth) {
+      popover.style.width = `${Math.floor(availableWidth)}px`;
+    } else {
+      popover.style.width = "";
+    }
+
+    const nextPopoverRect = popover.getBoundingClientRect();
+    const popoverWidth = Math.min(nextPopoverRect.width, availableWidth);
+    const maxLeft = boundaryRight - popoverWidth;
+    const preferredLeft =
+      anchorCenter - popoverWidth / 2;
+    const left = Math.max(boundaryLeft, Math.min(preferredLeft, maxLeft));
+
+    let placement = "top";
+    let top = triggerRect.top - nextPopoverRect.height - gap;
+    if (top < margin) {
+      placement = "bottom";
+      top = triggerRect.bottom + gap;
+    }
+
+    const minArrowOffset = 14;
+    const maxArrowOffset = popoverWidth - minArrowOffset;
+    const arrowLeft = Math.max(
+      minArrowOffset,
+      Math.min(anchorCenter - left, maxArrowOffset),
+    );
+    popover.dataset.placement = placement;
+    popover.style.left = `${Math.round(left)}px`;
+    popover.style.top = `${Math.round(top)}px`;
+    popover.style.setProperty(
+      "--tk-markdown-popover-arrow-left",
+      `${Math.round(arrowLeft)}px`,
+    );
+    popover.style.visibility = "visible";
+  }
+
+  function showMarkdownGuidePopover(trigger) {
+    const currentTrigger = window.fireflyTwikooMarkdownGuideTrigger;
+    const existingPopover = document.querySelector(MARKDOWN_POPOVER_SELECTOR);
+    if (existingPopover && currentTrigger === trigger) {
+      closeMarkdownGuidePopover();
+      return;
+    }
+
+    closeMarkdownGuidePopover(true);
+
+    const guideUrl = getMarkdownGuideUrl(trigger);
+    const popover = document.createElement("div");
+    const urlText = document.createElement("span");
+    const visitLink = document.createElement("a");
+
+    popover.className = "tk-markdown-guide-popover";
+    popover.setAttribute("role", "dialog");
+    popover.setAttribute("aria-label", "Markdown 帮助链接");
+
+    urlText.className = "tk-markdown-guide-url";
+    urlText.textContent = guideUrl;
+
+    visitLink.className = "tk-markdown-guide-visit";
+    visitLink.href = guideUrl;
+    visitLink.target = "_blank";
+    visitLink.rel = "noopener noreferrer";
+    visitLink.textContent = "访问";
+
+    popover.append(urlText, visitLink);
+    document.body.append(popover);
+
+    trigger.setAttribute("aria-haspopup", "dialog");
+    trigger.setAttribute("aria-expanded", "true");
+    window.fireflyTwikooMarkdownGuideTrigger = trigger;
+
+    const updatePosition = () => positionMarkdownGuidePopover(popover, trigger);
+    window.addEventListener("resize", updatePosition, { passive: true });
+    window.addEventListener("scroll", updatePosition, {
+      passive: true,
+      capture: true,
+    });
+    window.fireflyTwikooMarkdownGuideCleanup = () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, { capture: true });
+    };
+
+    requestAnimationFrame(() => {
+      updatePosition();
+      requestAnimationFrame(() => {
+        popover.classList.add(MARKDOWN_POPOVER_OPEN_CLASS);
+      });
+    });
+  }
+
+  function bindMarkdownGuidePopover() {
+    if (window.fireflyTwikooMarkdownGuideBound) return;
+    window.fireflyTwikooMarkdownGuideBound = true;
+
+    document.addEventListener(
+      "click",
+      function (event) {
+        const visitLink = getClosestElement(
+          event.target,
+          ".tk-markdown-guide-visit",
+        );
+        if (visitLink) {
+          setTimeout(closeMarkdownGuidePopover, 0);
+          return;
+        }
+
+        const trigger = getClosestElement(
+          event.target,
+          MARKDOWN_TRIGGER_SELECTOR,
+        );
+        if (trigger) {
+          event.preventDefault();
+          event.stopPropagation();
+          showMarkdownGuidePopover(trigger);
+          return;
+        }
+
+        const popover = document.querySelector(MARKDOWN_POPOVER_SELECTOR);
+        if (popover && !popover.contains(event.target)) {
+          closeMarkdownGuidePopover();
+        }
+      },
+      true,
+    );
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closeMarkdownGuidePopover();
+    });
+  }
+
   // 初始化 Twikoo
   function initTwikoo() {
     if (typeof twikoo !== "undefined") {
@@ -52,6 +268,7 @@ const config = {
           .init(dynamicConfig)
           .then(() => {
             console.log("[Twikoo] 初始化完成");
+            bindMarkdownGuidePopover();
           })
           .catch((error) => {
             console.error("[Twikoo] 初始化失败:", error);

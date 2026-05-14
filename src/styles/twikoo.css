@@ -2,6 +2,24 @@
   --tk-text: #000;
   --tk-input-text: #000;
   --tk-count-text: #000;
+  --tk-border-subtle: var(--line-divider);
+  --tk-border-control: var(--line-divider);
+  --tk-border-accent: var(--line-divider);
+  --tk-sort-border: color-mix(in oklch, var(--primary) 24%, transparent);
+  --tk-panel-muted: color-mix(in oklch, var(--btn-plain-bg-hover) 18%, var(--card-bg));
+  --tk-control-label-bg: color-mix(in oklch, var(--btn-regular-bg) 82%, var(--primary) 18%);
+  --tk-markdown-color: var(--content-meta);
+  --tk-markdown-hover-color: var(--primary);
+  --tk-markdown-visit-width: 3.5rem;
+  --tk-markdown-visit-bg: var(--btn-regular-bg);
+  --tk-markdown-visit-bg-hover: var(--btn-regular-bg-hover);
+  --tk-line-width: 1.5px;
+  --tk-line-divider-width: 1px;
+  --tk-line-accent-width: 1.5px;
+  --tk-radius-panel: var(--radius-large);
+  --tk-radius-nested: max(var(--radius-xl), calc(var(--radius-large) - 0.125rem));
+  --tk-radius-control: max(var(--radius-xl), calc(var(--radius-large) - 0.25rem));
+  --tk-radius-action: max(var(--radius-lg), calc(var(--radius-large) - 0.375rem));
   --code-block-text: #333; /* 调整为深色但在浅色背景下仍然舒适的值 */
 }
 
@@ -28,10 +46,11 @@ html.dark {
     @apply flex-col-reverse;
     .tk-input {
       textarea {
-        @apply rounded-[var(--radius-large)] py-4 px-6 !min-h-[150px] focus:border-[var(--primary)]
-               border-[var(--line-divider)] bg-[var(--card-bg)] text-[var(--tk-input-text)]
-               placeholder:text-[var(--content-meta)] transition-all duration-300
-               focus:ring-2 focus:ring-[var(--primary)] focus:ring-opacity-20;
+        @apply rounded-[var(--tk-radius-panel)] py-4 px-6 !min-h-[150px] focus:border-[var(--tk-border-control)]
+                border-[var(--tk-border-control)] bg-[var(--card-bg)] text-[var(--tk-input-text)]
+                placeholder:text-[var(--content-meta)] transition-all duration-300
+                focus:ring-1 focus:ring-[var(--tk-border-control)] focus:ring-opacity-35;
+        border-width: var(--tk-line-width) !important;
         color: var(--tk-input-text) !important;
         resize: vertical;
       }
@@ -51,34 +70,43 @@ html.dark {
 /* 表情和图片按钮样式优化 */
 .tk-owo,
 .tk-upload {
-  @apply rounded-lg p-2 hover:bg-[var(--btn-plain-bg-hover)] transition-colors duration-200
-         border border-[var(--line-divider)] bg-[var(--card-bg)] text-[var(--btn-content)]
-         hover:border-[var(--primary)] hover:shadow-sm;
+  @apply rounded-[var(--tk-radius-action)] p-2 hover:bg-[var(--btn-plain-bg-hover)] transition-colors duration-200
+         border border-[var(--tk-border-control)] bg-[var(--card-bg)] text-[var(--btn-content)]
+         hover:border-[var(--tk-border-accent)];
+  border-width: var(--tk-line-width) !important;
 }
 
 .tk-owo:hover,
 .tk-upload:hover {
-  @apply bg-[var(--btn-plain-bg-hover)] border-[var(--primary)] shadow-sm;
+  @apply bg-[var(--btn-plain-bg-hover)] border-[var(--tk-border-accent)];
 }
 
 /* Meta */
 .tk-meta-input {
   @apply relative mt-4;
-  div {
-    @apply min-h-12 rounded-lg border border-[var(--line-divider)] bg-[var(--card-bg)] overflow-hidden
-           hover:border-[var(--primary)] hover:shadow-sm transition-all duration-200 flex items-center;
+  > div {
+    @apply min-h-12 rounded-[var(--tk-radius-control)] border border-[var(--tk-border-control)] bg-[var(--card-bg)] overflow-hidden
+           hover:border-[var(--tk-border-accent)] transition-all duration-200 flex items-stretch;
+    border-width: var(--tk-line-width) !important;
 
     .el-input-group__prepend {
-      @apply !bg-[var(--btn-regular-bg)] !text-[var(--btn-content)] px-4 font-medium text-sm
-             border-r border-[var(--line-divider)] flex items-center justify-center min-w-[80px] flex-shrink-0
-             rounded-l-lg rounded-r-none;
+      @apply !bg-[var(--tk-control-label-bg)] !text-[var(--btn-content)] px-4 font-medium text-sm
+             border-r border-[var(--tk-border-control)] flex items-center justify-center min-w-[80px] flex-shrink-0
+             rounded-none;
+      align-self: stretch !important;
+      height: auto !important;
       min-height: inherit;
+      border-width: 0 var(--tk-line-divider-width) 0 0 !important;
+      border-style: solid !important;
+      border-color: var(--tk-border-control) !important;
     }
 
     input {
       @apply px-4 bg-transparent text-[var(--btn-content)] placeholder:text-[var(--content-meta)]
-             focus:!border-[var(--primary)] transition-all duration-200 flex-1
-             rounded-r-lg rounded-l-none;
+             transition-all duration-200 flex-1
+             rounded-r-[var(--tk-radius-control)] rounded-l-none;
+      border: 0 !important;
+      box-shadow: none !important;
       min-height: inherit;
 
       &::placeholder {
@@ -90,8 +118,14 @@ html.dark {
       }
     }
 
+    .el-input__wrapper {
+      border: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+
     &:focus-within {
-      @apply border-[var(--primary)] shadow-md;
+      @apply border-[var(--tk-border-control)];
     }
   }
 }
@@ -100,56 +134,352 @@ html.dark {
 .tk-row.actions {
   @apply w-full !ml-0 !mt-6 flex gap-3 justify-end;
   .__markdown {
-    @apply !hidden;
+    @apply inline-flex items-center justify-center text-[var(--content-meta)] transition-colors duration-200 shadow-none;
+    width: 2.25rem !important;
+    min-width: 2.25rem !important;
+    height: 2.75rem !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
+  .tk-preview,
   .tk-send,
   .tk-cancel {
-    @apply border-none rounded-lg px-6 py-2 h-10 font-medium transition-all duration-300
+    @apply rounded-[var(--tk-radius-control)] px-6 py-2 h-11 font-medium transition-all duration-200
            !bg-[var(--btn-regular-bg)] hover:!bg-[var(--btn-regular-bg-hover)]
            active:!bg-[var(--btn-regular-bg-active)] disabled:!bg-[var(--btn-regular-bg)]
            !text-[var(--btn-content)] disabled:!text-[var(--content-meta)]
-           hover:scale-105 active:scale-95 shadow-sm hover:shadow-md;
+           shadow-none;
   }
 }
 
-/* 隐藏预览按钮 */
-.tk-preview {
-  display: none !important;
-}
-
 /* 强制统一按钮样式 */
+.tk-preview,
 .tk-send,
 .tk-cancel {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 5.25rem !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  font-size: 0.95rem !important;
   background: var(--btn-regular-bg) !important;
   color: var(--btn-content) !important;
-  border: none !important;
-  border-radius: 0.5rem !important;
-  padding: 0.5rem 1.5rem !important;
-  height: 2.5rem !important;
-  font-weight: 500 !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  border: var(--tk-line-width) solid var(--tk-border-control) !important;
+  border-radius: var(--tk-radius-control) !important;
+  padding: 0 1.5rem !important;
+  height: 2.75rem !important;
+  font-weight: 600 !important;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease !important;
+  box-shadow: none !important;
 }
 
+#tcomment .twikoo .tk-row.actions .__markdown,
+#twikoo .tk-row.actions .__markdown,
+.tk-row.actions .__markdown {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 2.25rem !important;
+  color: var(--tk-markdown-color) !important;
+  fill: var(--tk-markdown-color) !important;
+  stroke: none !important;
+  opacity: 1 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-row.actions .__markdown svg,
+#tcomment .twikoo .tk-row.actions .__markdown svg path,
+#twikoo .tk-row.actions .__markdown svg,
+#twikoo .tk-row.actions .__markdown svg path,
+.tk-row.actions .__markdown svg,
+.tk-row.actions .__markdown svg path {
+  color: inherit !important;
+  fill: currentColor !important;
+  stroke: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+#tcomment .twikoo .tk-row.actions .__markdown svg,
+#twikoo .tk-row.actions .__markdown svg,
+.tk-row.actions .__markdown svg {
+  width: 1.55rem !important;
+  height: 1.55rem !important;
+}
+
+#tcomment .twikoo .tk-row.actions .__markdown:hover,
+#tcomment .twikoo .tk-row.actions .__markdown:focus-visible,
+#twikoo .tk-row.actions .__markdown:hover,
+#twikoo .tk-row.actions .__markdown:focus-visible,
+.tk-row.actions .__markdown:hover,
+.tk-row.actions .__markdown:focus-visible {
+  color: var(--tk-markdown-hover-color) !important;
+  fill: var(--tk-markdown-hover-color) !important;
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+#tcomment .twikoo .tk-row.actions .__markdown:active,
+#twikoo .tk-row.actions .__markdown:active,
+.tk-row.actions .__markdown:active {
+  color: var(--tk-markdown-hover-color) !important;
+  fill: var(--tk-markdown-hover-color) !important;
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.tk-preview {
+  min-width: 5.25rem !important;
+}
+
+.tk-preview:hover,
 .tk-send:hover,
 .tk-cancel:hover {
   background: var(--btn-regular-bg-hover) !important;
-  transform: scale(1.05) !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  border-color: var(--tk-border-control) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
+.tk-preview:active,
 .tk-send:active,
 .tk-cancel:active {
   background: var(--btn-regular-bg-active) !important;
-  transform: scale(0.95) !important;
+  transform: none !important;
 }
 
+.tk-row.actions .__markdown:disabled,
+.tk-preview:disabled,
 .tk-send:disabled,
 .tk-cancel:disabled {
   background: var(--btn-regular-bg) !important;
   color: var(--content-meta) !important;
+  opacity: 0.68 !important;
   transform: none !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+.tk-preview > span,
+.tk-send > span,
+.tk-cancel > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  line-height: 1 !important;
+}
+
+@media (min-width: 641px) {
+  #tcomment .twikoo .tk-row.actions,
+  #twikoo .tk-row.actions,
+  .tk-row.actions {
+    gap: 0.75rem !important;
+  }
+
+  #tcomment .twikoo .tk-row.actions .__markdown,
+  #twikoo .tk-row.actions .__markdown,
+  .tk-row.actions .__markdown {
+    flex-basis: 2rem !important;
+    width: 2rem !important;
+    min-width: 2rem !important;
+    height: 2.35rem !important;
+  }
+
+  #tcomment .twikoo .tk-row.actions .__markdown svg,
+  #twikoo .tk-row.actions .__markdown svg,
+  .tk-row.actions .__markdown svg {
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+  }
+
+  .tk-preview,
+  .tk-send,
+  .tk-cancel {
+    min-width: 4.75rem !important;
+    height: 2.35rem !important;
+    padding: 0 1.15rem !important;
+    font-size: 0.875rem !important;
+    border-radius: var(--tk-radius-action) !important;
+  }
+}
+
+.tk-markdown-guide-popover {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(calc(100vw - 1rem), 34rem);
+  min-width: 0;
+  overflow: visible;
+  border: var(--tk-line-width) solid var(--tk-border-control);
+  border-radius: var(--tk-radius-control);
+  background:
+    linear-gradient(
+      to right,
+      var(--card-bg) 0,
+      var(--card-bg) calc(100% - var(--tk-markdown-visit-width)),
+      var(--tk-markdown-visit-bg) calc(100% - var(--tk-markdown-visit-width)),
+      var(--tk-markdown-visit-bg) 100%
+    );
+  color: var(--tk-text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transform: translateY(0.45rem) scale(0.98);
+  transform-origin: var(--tk-markdown-popover-arrow-left, 50%) 100%;
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.tk-markdown-guide-popover:has(.tk-markdown-guide-visit:hover) {
+  --tk-markdown-visit-bg: var(--tk-markdown-visit-bg-hover);
+}
+
+.tk-markdown-guide-popover.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.tk-markdown-guide-popover.is-closing {
+  opacity: 0;
+  transform: translateY(0.35rem) scale(0.98);
+  pointer-events: none;
+}
+
+.tk-markdown-guide-popover::after {
+  content: "";
+  position: absolute;
+  left: var(--tk-markdown-popover-arrow-left, 50%);
+  bottom: -0.375rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-right: var(--tk-line-width) solid var(--tk-border-control);
+  border-bottom: var(--tk-line-width) solid var(--tk-border-control);
+  background: var(--card-bg);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tk-markdown-guide-popover[data-placement="bottom"]::after {
+  top: -0.375rem;
+  bottom: auto;
+  border: 0;
+  border-top: var(--tk-line-width) solid var(--tk-border-control);
+  border-left: var(--tk-line-width) solid var(--tk-border-control);
+}
+
+.tk-markdown-guide-popover[data-placement="bottom"] {
+  transform: translateY(-0.45rem) scale(0.98);
+  transform-origin: var(--tk-markdown-popover-arrow-left, 50%) 0;
+}
+
+.tk-markdown-guide-popover[data-placement="bottom"].is-open {
+  transform: translateY(0) scale(1);
+}
+
+.tk-markdown-guide-popover[data-placement="bottom"].is-closing {
+  transform: translateY(-0.35rem) scale(0.98);
+}
+
+.tk-markdown-guide-url {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: min(28rem, calc(100vw - 6rem));
+  padding: 0.65rem 0.95rem;
+  color: var(--content-meta);
+  font-size: 0.875rem;
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.tk-markdown-guide-visit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 var(--tk-markdown-visit-width);
+  box-sizing: border-box;
+  width: var(--tk-markdown-visit-width);
+  min-width: var(--tk-markdown-visit-width);
+  padding: 0 0.75rem;
+  border-left: var(--tk-line-width) solid var(--tk-border-control);
+  border-radius: 0;
+  background: transparent !important;
+  color: var(--btn-content) !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none !important;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.tk-markdown-guide-visit:hover {
+  background: transparent !important;
+  color: var(--primary) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tk-markdown-guide-popover {
+    transition: none;
+    transform: none;
+  }
+
+  .tk-markdown-guide-popover.is-open,
+  .tk-markdown-guide-popover.is-closing,
+  .tk-markdown-guide-popover[data-placement="bottom"],
+  .tk-markdown-guide-popover[data-placement="bottom"].is-open,
+  .tk-markdown-guide-popover[data-placement="bottom"].is-closing {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .tk-markdown-guide-popover {
+    width: calc(100vw - 1rem);
+    max-width: calc(100vw - 1rem);
+  }
+
+  .tk-markdown-guide-url {
+    max-width: none;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+
+  .tk-markdown-guide-visit {
+    flex-basis: var(--tk-markdown-visit-width);
+    width: var(--tk-markdown-visit-width);
+    min-width: var(--tk-markdown-visit-width);
+  }
 }
 
 /* Comment title & sort */
@@ -214,7 +544,7 @@ html.dark {
   height: 1.75rem !important;
   padding: 0.35rem 0.75rem !important;
   border: 0 !important;
-  border-radius: 0.5rem !important;
+  border-radius: var(--tk-radius-action) !important;
   background: transparent !important;
   color: var(--primary) !important;
   font-size: 0.875rem !important;
@@ -244,7 +574,7 @@ html.dark {
 #twikoo .tk-sort-item.__active {
   background: var(--btn-plain-bg-hover) !important;
   color: var(--primary) !important;
-  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 24%, transparent) !important;
+  box-shadow: inset 0 0 0 var(--tk-line-width) var(--tk-sort-border) !important;
 }
 
 html.dark #tcomment .twikoo .tk-sort-item.__active,
@@ -262,7 +592,7 @@ html.dark #twikoo .tk-sort-item.__active {
   height: 2.25rem !important;
   margin: 0 !important;
   padding: 0 !important;
-  border-radius: 0.65rem !important;
+  border-radius: var(--tk-radius-action) !important;
   color: var(--primary) !important;
   cursor: pointer;
   transition:
@@ -319,17 +649,46 @@ html.dark #twikoo .tk-sort-item.__active {
   color: var(--primary) !important;
 }
 
-.tk-comment {
-  @apply border-[1px] border-[var(--line-divider)] p-4 rounded-2xl hover:border-[var(--primary)] transition-all duration-300;
-  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(var(--primary), 0.02) 100%);
+#tcomment .twikoo .tk-comment,
+#twikoo .tk-comment {
+  position: relative;
+  padding: 1.15rem !important;
+  overflow: visible !important;
+  border: var(--tk-line-width) solid var(--tk-border-subtle) !important;
+  border-radius: var(--tk-radius-panel) !important;
+  background: var(--card-bg) !important;
+  box-shadow: none !important;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease !important;
+}
 
-  .tk-action-icon svg {
-    @apply fill-[var(--primary)] hover:scale-110 transition-transform duration-200;
-  }
+#tcomment .twikoo .tk-comment::before,
+#twikoo .tk-comment::before {
+  display: none !important;
+}
 
-  &:hover {
-    z-index: 2;
-  }
+#tcomment .twikoo .tk-comment:hover,
+#twikoo .tk-comment:hover {
+  border-color: var(--tk-border-subtle) !important;
+  box-shadow: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-icon svg,
+#twikoo .tk-comment .tk-action-icon svg {
+  @apply fill-[var(--primary)] transition-colors duration-200;
+}
+
+html.dark #tcomment .twikoo .tk-comment,
+html.dark #twikoo .tk-comment {
+  background: var(--card-bg) !important;
+  box-shadow: none !important;
+}
+
+html.dark #tcomment .twikoo .tk-comment:hover,
+html.dark #twikoo .tk-comment:hover {
+  box-shadow: none !important;
 }
 
 .tk-meta {
@@ -370,22 +729,63 @@ html.dark #twikoo .tk-sort-item.__active {
 }
 
 /* Replies */
-.tk-replies {
+#tcomment .twikoo .tk-replies,
+#twikoo .tk-replies {
+  position: relative;
+  margin-top: 0.9rem !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
 
+#tcomment .twikoo .tk-replies::before,
+#twikoo .tk-replies::before {
+  display: none !important;
+}
 
-  .tk-comment {
-    @apply border-l-4 border-l-[var(--btn-regular-bg)] p-3 border-opacity-30 hover:border-[var(--primary)] transition-all duration-300;
-    .tk-content {
-      > span:first-of-type {
-        @apply text-xs text-[var(--content-meta)];
-      }
-    }
+#tcomment .twikoo .tk-replies .tk-comment,
+#twikoo .tk-replies .tk-comment {
+  margin-left: 0 !important;
+  padding: 1rem !important;
+  border: var(--tk-line-width) solid var(--tk-border-subtle) !important;
+  border-left: var(--tk-line-accent-width) solid var(--tk-border-accent) !important;
+  border-radius: var(--tk-radius-nested) !important;
+  background: var(--tk-panel-muted) !important;
+  box-shadow: none !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment::before,
+#twikoo .tk-replies .tk-comment::before {
+  display: none !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment:hover,
+#twikoo .tk-replies .tk-comment:hover {
+  border-color: var(--tk-border-subtle) !important;
+  border-left-color: var(--tk-border-accent) !important;
+  box-shadow: none !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment .tk-content > span:first-of-type,
+#twikoo .tk-replies .tk-comment .tk-content > span:first-of-type {
+  @apply text-xs text-[var(--content-meta)];
+}
+
+html.dark #tcomment .twikoo .tk-replies .tk-comment,
+html.dark #twikoo .tk-replies .tk-comment {
+  background: var(--tk-panel-muted) !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-comment,
+  #twikoo .tk-comment,
+  #tcomment .twikoo .tk-replies .tk-comment,
+  #twikoo .tk-replies .tk-comment {
+    padding: 0.9rem !important;
   }
 
-  /* 回复层级指示器 */
-  &::before {
-    content: '';
-    @apply absolute left-0 top-0 w-0.5 h-full bg-gradient-to-b  to-transparent opacity-30;
+  #tcomment .twikoo .tk-replies,
+  #twikoo .tk-replies {
+    padding-left: 0 !important;
   }
 }
 
@@ -407,7 +807,8 @@ html.dark #twikoo .tk-sort-item.__active {
 
 .tk-expand-wrap .tk-expand,
 .tk-collapse-wrap .tk-expand {
-  @apply border-[1px]  border-[var(--line-divider)] rounded-lg mt-1 bg-[var(--btn-regular-bg)] text-[var(--btn-content)] hover:text-[var(--primary)] hover:bg-[var(--btn-regular-bg-hover)];
+  @apply border-[1px] border-[var(--tk-border-control)] rounded-[var(--tk-radius-control)] mt-1 bg-[var(--btn-regular-bg)] text-[var(--btn-content)] hover:text-[var(--primary)] hover:bg-[var(--btn-regular-bg-hover)];
+  border-width: var(--tk-line-width) !important;
 }
 
 /* by @SirTamago
