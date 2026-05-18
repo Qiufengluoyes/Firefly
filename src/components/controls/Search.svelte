@@ -157,7 +157,8 @@ $: if (initialized && (keywordMobile || keywordMobile === "")) {
 </button>
 
 <!-- search panel -->
-<div id="search-panel" class="float-panel float-panel-closed search-panel absolute md:w-[30rem]
+<div id="search-panel" class="float-panel float-panel-closed search-panel fixed md:absolute
+w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] md:w-[30rem] md:max-w-[30rem]
 top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
 
     <!-- search bar inside panel for phone/tablet -->
@@ -168,8 +169,8 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
         <Icon icon="material-symbols:search"
               class="absolute text-[1.25rem] pointer-events-none ml-3 transition my-auto text-black/30 dark:text-white/30"></Icon>
         <input placeholder={i18n(I18nKey.search)} bind:value={keywordMobile}
-               class="pl-10 absolute inset-0 text-sm bg-transparent outline-0
-               focus:w-60 text-black/50 dark:text-white/50"
+               class="h-full w-full min-w-0 pl-10 pr-3 text-sm bg-transparent outline-0
+               text-black/50 dark:text-white/50"
         >
     </div>
 
@@ -239,8 +240,25 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
     }
 
     .search-panel {
+        box-sizing: border-box;
         max-height: calc(100vh - 100px);
         overflow-y: auto;
+    }
+
+    :global(#navbar #search-panel.search-panel) {
+        width: min(30rem, calc(100vw - 2rem));
+        max-width: calc(100vw - 2rem);
+    }
+
+    @media (max-width: 767px) {
+        :global(#navbar #search-panel.search-panel) {
+            position: fixed !important;
+            top: var(--navbar-fixed-panel-top) !important;
+            right: 1rem !important;
+            left: 1rem !important;
+            width: auto !important;
+            max-width: calc(100vw - 2rem);
+        }
     }
 
     .search-result-card {

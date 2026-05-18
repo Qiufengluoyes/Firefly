@@ -10,9 +10,16 @@
   --tk-control-label-bg: color-mix(in oklch, var(--btn-regular-bg) 82%, var(--primary) 18%);
   --tk-markdown-color: var(--content-meta);
   --tk-markdown-hover-color: var(--primary);
+  --tk-markdown-popover-offset-x: -6px;
   --tk-markdown-visit-width: 3.5rem;
   --tk-markdown-visit-bg: var(--btn-regular-bg);
   --tk-markdown-visit-bg-hover: var(--btn-regular-bg-hover);
+  --tk-comment-text: rgba(0, 0, 0, 0.88);
+  --tk-comment-title: rgba(0, 0, 0, 0.92);
+  --tk-list-avatar-size: 3rem;
+  --tk-list-reply-avatar-size: 2.35rem;
+  --tk-list-column-gap: 0.85rem;
+  --tk-list-action-width: 8.75rem;
   --tk-line-width: 1.5px;
   --tk-line-divider-width: 1px;
   --tk-line-accent-width: 1.5px;
@@ -20,6 +27,7 @@
   --tk-radius-nested: max(var(--radius-xl), calc(var(--radius-large) - 0.125rem));
   --tk-radius-control: max(var(--radius-xl), calc(var(--radius-large) - 0.25rem));
   --tk-radius-action: max(var(--radius-lg), calc(var(--radius-large) - 0.375rem));
+  --tk-radius-avatar: max(var(--radius-lg), calc(var(--radius-large) - 0.375rem));
   --code-block-text: #333; /* 调整为深色但在浅色背景下仍然舒适的值 */
 }
 
@@ -27,6 +35,8 @@ html.dark {
   --tk-text: #fff;
   --tk-input-text: #fff;
   --tk-count-text: #fff;
+  --tk-comment-text: rgba(255, 255, 255, 0.9);
+  --tk-comment-title: rgba(255, 255, 255, 0.94);
   --code-block-text: #d1d5db; /* 在深色模式下使用更亮的颜色 */
 }
 
@@ -326,37 +336,21 @@ html.dark {
 .tk-markdown-guide-popover {
   position: fixed;
   z-index: 1000;
-  display: flex;
-  align-items: stretch;
+  display: block;
   box-sizing: border-box;
   width: max-content;
-  max-width: min(calc(100vw - 1rem), 34rem);
+  max-width: min(calc(100vw - 1rem), 30rem);
   min-width: 0;
   overflow: visible;
-  border: var(--tk-line-width) solid var(--tk-border-control);
-  border-radius: var(--tk-radius-control);
-  background:
-    linear-gradient(
-      to right,
-      var(--card-bg) 0,
-      var(--card-bg) calc(100% - var(--tk-markdown-visit-width)),
-      var(--tk-markdown-visit-bg) calc(100% - var(--tk-markdown-visit-width)),
-      var(--tk-markdown-visit-bg) 100%
-    );
   color: var(--tk-text);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
   opacity: 0;
   transform: translateY(0.45rem) scale(0.98);
-  transform-origin: var(--tk-markdown-popover-arrow-left, 50%) 100%;
+  transform-origin: 50% 100%;
   pointer-events: none;
   transition:
     opacity 0.18s ease,
     transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1);
   will-change: opacity, transform;
-}
-
-.tk-markdown-guide-popover:has(.tk-markdown-guide-visit:hover) {
-  --tk-markdown-visit-bg: var(--tk-markdown-visit-bg-hover);
 }
 
 .tk-markdown-guide-popover.is-open {
@@ -371,10 +365,21 @@ html.dark {
   pointer-events: none;
 }
 
-.tk-markdown-guide-popover::after {
-  content: "";
+.tk-markdown-guide-surface {
+  display: flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+  border: var(--tk-line-width) solid var(--tk-border-control);
+  border-radius: var(--tk-radius-control);
+  background: var(--card-bg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.tk-markdown-guide-arrow {
   position: absolute;
-  left: var(--tk-markdown-popover-arrow-left, 50%);
+  left: 50%;
   bottom: -0.375rem;
   width: 0.75rem;
   height: 0.75rem;
@@ -384,7 +389,7 @@ html.dark {
   transform: translateX(-50%) rotate(45deg);
 }
 
-.tk-markdown-guide-popover[data-placement="bottom"]::after {
+.tk-markdown-guide-popover[data-placement="bottom"] .tk-markdown-guide-arrow {
   top: -0.375rem;
   bottom: auto;
   border: 0;
@@ -394,7 +399,7 @@ html.dark {
 
 .tk-markdown-guide-popover[data-placement="bottom"] {
   transform: translateY(-0.45rem) scale(0.98);
-  transform-origin: var(--tk-markdown-popover-arrow-left, 50%) 0;
+  transform-origin: 50% 0;
 }
 
 .tk-markdown-guide-popover[data-placement="bottom"].is-open {
@@ -410,7 +415,7 @@ html.dark {
   align-items: center;
   flex: 1 1 auto;
   min-width: 0;
-  max-width: min(28rem, calc(100vw - 6rem));
+  max-width: min(24rem, calc(100vw - 6rem));
   padding: 0.65rem 0.95rem;
   color: var(--content-meta);
   font-size: 0.875rem;
@@ -430,7 +435,7 @@ html.dark {
   padding: 0 0.75rem;
   border-left: var(--tk-line-width) solid var(--tk-border-control);
   border-radius: 0;
-  background: transparent !important;
+  background: var(--tk-markdown-visit-bg) !important;
   color: var(--btn-content) !important;
   font-size: 0.875rem;
   font-weight: 600;
@@ -443,7 +448,7 @@ html.dark {
 }
 
 .tk-markdown-guide-visit:hover {
-  background: transparent !important;
+  background: var(--tk-markdown-visit-bg-hover) !important;
   color: var(--primary) !important;
 }
 
@@ -649,6 +654,218 @@ html.dark #twikoo .tk-sort-item.__active {
   color: var(--primary) !important;
 }
 
+#tcomment .twikoo .tk-comment .tk-row:not(.actions),
+#twikoo .tk-comment .tk-row:not(.actions) {
+  display: flex !important;
+  align-items: flex-start !important;
+  column-gap: 0.75rem !important;
+  row-gap: 0 !important;
+  min-width: 0;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) .tk-meta,
+#twikoo .tk-comment .tk-row:not(.actions) .tk-meta {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#tcomment .twikoo .tk-comment .tk-main,
+#twikoo .tk-comment .tk-main {
+  position: relative;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+#twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  flex-wrap: wrap !important;
+  flex: 0 0 auto;
+  margin-left: auto !important;
+  min-width: 7rem;
+  max-width: min(13rem, 46%);
+  column-gap: 0.45rem !important;
+  row-gap: 0.15rem !important;
+  line-height: 1 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action > :not(.tk-admin-actions),
+#twikoo .tk-comment .tk-row:not(.actions) > .tk-action > :not(.tk-admin-actions) {
+  order: 1;
+  flex: 0 0 auto;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions,
+#twikoo .tk-comment .tk-admin-actions {
+  order: 2;
+  position: relative;
+  top: 0;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex: 0 0 100%;
+  gap: 0.45rem;
+  min-height: 1.4em;
+  margin-top: 0.1rem;
+  line-height: 1.4 !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  text-decoration-line: none !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions,
+#twikoo .tk-comment .tk-meta > .tk-actions {
+  position: absolute !important;
+  top: auto;
+  bottom: 0;
+  right: 0;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.45rem;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+  z-index: 1;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  text-decoration-line: none !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment .tk-meta > .tk-actions,
+#twikoo .tk-replies .tk-comment .tk-meta > .tk-actions {
+  bottom: 0;
+}
+
+#tcomment .twikoo .tk-comment .tk-action > .tk-admin-actions,
+#twikoo .tk-comment .tk-action > .tk-admin-actions {
+  margin-left: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-extras > .tk-admin-actions,
+#twikoo .tk-comment .tk-extras > .tk-admin-actions {
+  order: 20;
+  flex: 0 0 auto;
+  margin-top: 0;
+  margin-left: auto !important;
+  min-height: 1.25rem;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-extras,
+#twikoo .tk-comment .tk-admin-extras {
+  justify-content: flex-end !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions:empty,
+#twikoo .tk-comment .tk-admin-actions:empty {
+  display: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions > a,
+#tcomment .twikoo .tk-comment .tk-admin-actions .tk-admin,
+#tcomment .twikoo .tk-comment .tk-admin-actions > button,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions > button,
+#twikoo .tk-comment .tk-admin-actions > a,
+#twikoo .tk-comment .tk-admin-actions .tk-admin,
+#twikoo .tk-comment .tk-admin-actions > button,
+#twikoo .tk-comment .tk-meta > .tk-actions > button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 1.4em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: var(--primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  text-decoration-line: none !important;
+  text-underline-offset: 0 !important;
+  opacity: 0.9;
+  transform: none !important;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions > a:hover,
+#tcomment .twikoo .tk-comment .tk-admin-actions > a:focus-visible,
+#tcomment .twikoo .tk-comment .tk-admin-actions .tk-admin:hover,
+#tcomment .twikoo .tk-comment .tk-admin-actions .tk-admin:focus-visible,
+#tcomment .twikoo .tk-comment .tk-admin-actions > button:hover,
+#tcomment .twikoo .tk-comment .tk-admin-actions > button:focus-visible,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions > button:hover,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions > button:focus-visible,
+#twikoo .tk-comment .tk-admin-actions > a:hover,
+#twikoo .tk-comment .tk-admin-actions > a:focus-visible,
+#twikoo .tk-comment .tk-admin-actions .tk-admin:hover,
+#twikoo .tk-comment .tk-admin-actions .tk-admin:focus-visible,
+#twikoo .tk-comment .tk-admin-actions > button:hover,
+#twikoo .tk-comment .tk-admin-actions > button:focus-visible,
+#twikoo .tk-comment .tk-meta > .tk-actions > button:hover,
+#twikoo .tk-comment .tk-meta > .tk-actions > button:focus-visible {
+  color: var(--primary) !important;
+  opacity: 1;
+  background: transparent !important;
+  background-image: none !important;
+  border-bottom: 0 !important;
+  text-decoration: none !important;
+  text-decoration-line: none !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions > a:active,
+#tcomment .twikoo .tk-comment .tk-admin-actions .tk-admin:active,
+#tcomment .twikoo .tk-comment .tk-admin-actions > button:active,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions > button:active,
+#twikoo .tk-comment .tk-admin-actions > a:active,
+#twikoo .tk-comment .tk-admin-actions .tk-admin:active,
+#twikoo .tk-comment .tk-admin-actions > button:active,
+#twikoo .tk-comment .tk-meta > .tk-actions > button:active {
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions > button::before,
+#tcomment .twikoo .tk-comment .tk-admin-actions > button::after,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions > button::before,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions > button::after,
+#tcomment .twikoo .tk-comment .tk-admin-actions::before,
+#tcomment .twikoo .tk-comment .tk-admin-actions::after,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions::before,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions::after,
+#twikoo .tk-comment .tk-admin-actions > button::before,
+#twikoo .tk-comment .tk-admin-actions > button::after,
+#twikoo .tk-comment .tk-meta > .tk-actions > button::before,
+#twikoo .tk-comment .tk-meta > .tk-actions > button::after,
+#twikoo .tk-comment .tk-admin-actions::before,
+#twikoo .tk-comment .tk-admin-actions::after,
+#twikoo .tk-comment .tk-meta > .tk-actions::before,
+#twikoo .tk-comment .tk-meta > .tk-actions::after {
+  display: none !important;
+}
+
 #tcomment .twikoo .tk-comment,
 #twikoo .tk-comment {
   position: relative;
@@ -692,12 +909,137 @@ html.dark #twikoo .tk-comment:hover {
 }
 
 .tk-meta {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  column-gap: 0.5rem !important;
+  row-gap: 0 !important;
+  min-width: 0;
+  line-height: 1.35 !important;
+
   .tk-tag {
     @apply border-none rounded-lg text-[var(--btn-content)];
+    white-space: nowrap !important;
   }
 
   .tk-tag-green {
     @apply bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)] dark:text-[var(--deep-text)];
+  }
+}
+
+#tcomment .twikoo .tk-meta .tk-time,
+#twikoo .tk-meta .tk-time {
+  color: var(--content-meta) !important;
+  opacity: 0.82;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+}
+
+#tcomment .twikoo .tk-extras,
+#twikoo .tk-extras {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  column-gap: 0.75rem !important;
+  row-gap: 0.1rem !important;
+  min-width: 0;
+  margin-top: 0 !important;
+  color: var(--content-meta) !important;
+}
+
+#tcomment .twikoo .tk-extra,
+#twikoo .tk-extra {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  max-width: 100%;
+  min-width: 0;
+  color: var(--content-meta) !important;
+  opacity: 0.82;
+  line-height: 1.4 !important;
+}
+
+#tcomment .twikoo .tk-extra-text,
+#twikoo .tk-extra-text {
+  color: var(--content-meta) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  overflow-wrap: anywhere;
+}
+
+#tcomment .twikoo .tk-extra svg,
+#twikoo .tk-extra svg {
+  fill: currentColor !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-comment .tk-row:not(.actions),
+  #twikoo .tk-comment .tk-row:not(.actions) {
+    column-gap: 0.5rem !important;
+    row-gap: 0 !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+  #twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+    min-width: 5.75rem;
+    max-width: min(8rem, 42%);
+    column-gap: 0.35rem !important;
+    row-gap: 0.1rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-admin-actions,
+  #twikoo .tk-comment .tk-admin-actions {
+    top: 0;
+    gap: 0.35rem;
+    min-height: 1.4em;
+    margin-top: 0.05rem;
+    transform: none !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-meta > .tk-actions,
+  #twikoo .tk-comment .tk-meta > .tk-actions {
+    top: auto;
+    bottom: 0;
+    gap: 0.35rem;
+    transform: none !important;
+  }
+
+  #tcomment .twikoo .tk-replies .tk-comment .tk-meta > .tk-actions,
+  #twikoo .tk-replies .tk-comment .tk-meta > .tk-actions {
+    bottom: 0;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-extras > .tk-admin-actions,
+  #twikoo .tk-comment .tk-extras > .tk-admin-actions {
+    flex-basis: auto;
+    margin-top: 0;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-admin-actions > a,
+  #tcomment .twikoo .tk-comment .tk-admin-actions .tk-admin,
+  #tcomment .twikoo .tk-comment .tk-admin-actions > button,
+  #tcomment .twikoo .tk-comment .tk-meta > .tk-actions > button,
+  #twikoo .tk-comment .tk-admin-actions > a,
+  #twikoo .tk-comment .tk-admin-actions .tk-admin,
+  #twikoo .tk-comment .tk-admin-actions > button,
+  #twikoo .tk-comment .tk-meta > .tk-actions > button {
+    height: 1.4em !important;
+    font-size: 0.8125rem !important;
+  }
+
+  #tcomment .twikoo .tk-meta .tk-time,
+  #twikoo .tk-meta .tk-time,
+  #tcomment .twikoo .tk-extra-text,
+  #twikoo .tk-extra-text {
+    font-size: 0.8125rem !important;
+  }
+
+  #tcomment .twikoo .tk-extras,
+  #twikoo .tk-extras {
+    column-gap: 0.55rem !important;
+    row-gap: 0.1rem !important;
   }
 }
 
@@ -789,6 +1131,227 @@ html.dark #twikoo .tk-replies .tk-comment {
   }
 }
 
+/* List-style Twikoo comments */
+#tcomment .twikoo .tk-comments,
+#twikoo .tk-comments {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment,
+#twikoo .tk-comment,
+html.dark #tcomment .twikoo .tk-comment,
+html.dark #twikoo .tk-comment,
+#tcomment .twikoo .tk-replies .tk-comment,
+#twikoo .tk-replies .tk-comment,
+html.dark #tcomment .twikoo .tk-replies .tk-comment,
+html.dark #twikoo .tk-replies .tk-comment {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: var(--tk-list-column-gap) !important;
+  margin: 0 !important;
+  padding: 0.45rem 0 0.95rem !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#tcomment .twikoo .tk-comment:hover,
+#twikoo .tk-comment:hover,
+#tcomment .twikoo .tk-replies .tk-comment:hover,
+#twikoo .tk-replies .tk-comment:hover {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#tcomment .twikoo .tk-comment > .tk-avatar,
+#twikoo .tk-comment > .tk-avatar {
+  flex: 0 0 var(--tk-list-avatar-size) !important;
+  width: var(--tk-list-avatar-size) !important;
+  height: var(--tk-list-avatar-size) !important;
+  margin: 0 !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment > .tk-avatar,
+#twikoo .tk-replies .tk-comment > .tk-avatar {
+  flex-basis: var(--tk-list-reply-avatar-size) !important;
+  width: var(--tk-list-reply-avatar-size) !important;
+  height: var(--tk-list-reply-avatar-size) !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-avatar-img,
+#twikoo .tk-comment .tk-avatar-img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  object-fit: cover;
+}
+
+#tcomment .twikoo .tk-comment .tk-main,
+#twikoo .tk-comment .tk-main {
+  flex: 1 1 auto !important;
+  min-width: 0;
+  padding-right: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions),
+#twikoo .tk-comment .tk-row:not(.actions) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) var(--tk-list-action-width);
+  align-items: start !important;
+  column-gap: 0.75rem !important;
+  row-gap: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) .tk-meta,
+#twikoo .tk-comment .tk-row:not(.actions) .tk-meta {
+  grid-column: 1;
+  align-items: baseline !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+#twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+  grid-column: 2;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  flex-wrap: wrap !important;
+  width: var(--tk-list-action-width) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  column-gap: 0.45rem !important;
+  row-gap: 0.25rem !important;
+  line-height: 1 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action > :not(.tk-admin-actions),
+#twikoo .tk-comment .tk-action > :not(.tk-admin-actions) {
+  order: 1;
+  flex: 0 0 auto;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions,
+#twikoo .tk-comment .tk-admin-actions,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions,
+#twikoo .tk-comment .tk-meta > .tk-actions {
+  position: static !important;
+  inset: auto !important;
+  order: 2;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  gap: 0.45rem !important;
+  min-height: 1.25rem !important;
+  margin: 0.15rem 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  line-height: 1.35 !important;
+  text-align: right !important;
+  text-decoration: none !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions > a,
+#tcomment .twikoo .tk-comment .tk-admin-actions .tk-admin,
+#tcomment .twikoo .tk-comment .tk-admin-actions > button,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions > button,
+#twikoo .tk-comment .tk-admin-actions > a,
+#twikoo .tk-comment .tk-admin-actions .tk-admin,
+#twikoo .tk-comment .tk-admin-actions > button,
+#twikoo .tk-comment .tk-meta > .tk-actions > button {
+  height: auto !important;
+  min-height: 1.25rem !important;
+  line-height: 1.35 !important;
+  text-decoration: none !important;
+  text-decoration-line: none !important;
+}
+
+#tcomment .twikoo .tk-content,
+#twikoo .tk-content {
+  margin-top: 0.35rem !important;
+  padding-right: var(--tk-list-action-width);
+  color: var(--btn-content) !important;
+  font-size: 1rem !important;
+  line-height: 1.55 !important;
+}
+
+#tcomment .twikoo .tk-extras,
+#twikoo .tk-extras {
+  margin-top: 0.45rem !important;
+  padding-right: var(--tk-list-action-width);
+}
+
+#tcomment .twikoo .tk-replies,
+#twikoo .tk-replies {
+  margin-top: 0.8rem !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  border: 0 !important;
+}
+
+#tcomment .twikoo .tk-replies::before,
+#twikoo .tk-replies::before,
+#tcomment .twikoo .tk-replies .tk-comment::before,
+#twikoo .tk-replies .tk-comment::before {
+  display: none !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment,
+#twikoo .tk-replies .tk-comment {
+  padding-top: 0.35rem !important;
+  padding-bottom: 0.35rem !important;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --tk-list-avatar-size: 2.55rem;
+    --tk-list-reply-avatar-size: 2.1rem;
+    --tk-list-column-gap: 0.65rem;
+    --tk-list-action-width: 5.6rem;
+  }
+
+  #tcomment .twikoo .tk-comment,
+  #twikoo .tk-comment,
+  #tcomment .twikoo .tk-replies .tk-comment,
+  #twikoo .tk-replies .tk-comment {
+    padding: 0.4rem 0 0.85rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-row:not(.actions),
+  #twikoo .tk-comment .tk-row:not(.actions) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0.45rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+  #twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+    width: auto !important;
+    min-width: var(--tk-list-action-width) !important;
+    column-gap: 0.35rem !important;
+  }
+
+  #tcomment .twikoo .tk-content,
+  #twikoo .tk-content,
+  #tcomment .twikoo .tk-extras,
+  #twikoo .tk-extras {
+    padding-right: 0;
+  }
+
+  #tcomment .twikoo .tk-replies,
+  #twikoo .tk-replies {
+    margin-top: 0.65rem !important;
+  }
+}
+
 .twikoo .code-block {
   pre {
     @apply !rounded-xl;
@@ -838,8 +1401,7 @@ Make the emoji component display correctly when there are too many emoji packs
 }
 
 .tk-action-count,
-.tk-comments-count,
-.tk-extra-text {
+.tk-comments-count {
   color: var(--tk-count-text) !important;
 }
 
@@ -869,4 +1431,965 @@ Make the emoji component display correctly when there are too many emoji packs
 .el-loading-spinner .el-loading-text,
 .el-loading-spinner i {
   color: var(--primary) !important;
+}
+
+/* Final list-style comment layout */
+#tcomment .twikoo .tk-comments,
+#twikoo .tk-comments {
+  gap: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment,
+#twikoo .tk-comment,
+html.dark #tcomment .twikoo .tk-comment,
+html.dark #twikoo .tk-comment,
+#tcomment .twikoo .tk-replies .tk-comment,
+#twikoo .tk-replies .tk-comment,
+html.dark #tcomment .twikoo .tk-replies .tk-comment,
+html.dark #twikoo .tk-replies .tk-comment {
+  position: relative !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: var(--tk-list-column-gap) !important;
+  margin: 0 !important;
+  padding: 0.35rem 0 0.9rem !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#tcomment .twikoo .tk-comment > .tk-avatar,
+#twikoo .tk-comment > .tk-avatar {
+  flex: 0 0 var(--tk-list-avatar-size) !important;
+  width: var(--tk-list-avatar-size) !important;
+  min-width: var(--tk-list-avatar-size) !important;
+  height: var(--tk-list-avatar-size) !important;
+  min-height: var(--tk-list-avatar-size) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--line-divider) !important;
+  box-shadow: none !important;
+  line-height: 0 !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment > .tk-avatar,
+#twikoo .tk-replies .tk-comment > .tk-avatar {
+  flex-basis: var(--tk-list-reply-avatar-size) !important;
+  width: var(--tk-list-reply-avatar-size) !important;
+  min-width: var(--tk-list-reply-avatar-size) !important;
+  height: var(--tk-list-reply-avatar-size) !important;
+  min-height: var(--tk-list-reply-avatar-size) !important;
+}
+
+#tcomment .twikoo .tk-comment > .tk-avatar::before,
+#tcomment .twikoo .tk-comment > .tk-avatar::after,
+#twikoo .tk-comment > .tk-avatar::before,
+#twikoo .tk-comment > .tk-avatar::after {
+  display: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-avatar-img,
+#twikoo .tk-comment .tk-avatar-img,
+#tcomment .twikoo .tk-comment .tk-avatar img,
+#twikoo .tk-comment .tk-avatar img {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-main,
+#twikoo .tk-comment .tk-main {
+  position: relative !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions),
+#twikoo .tk-comment .tk-row:not(.actions) {
+  position: relative !important;
+  display: block !important;
+  min-height: 1.65rem !important;
+  padding-right: var(--tk-list-action-width) !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) .tk-meta,
+#twikoo .tk-comment .tk-row:not(.actions) .tk-meta {
+  display: flex !important;
+  align-items: baseline !important;
+  flex-wrap: wrap !important;
+  gap: 0.15rem 0.55rem !important;
+  min-width: 0 !important;
+  line-height: 1.35 !important;
+}
+
+#tcomment .twikoo .tk-nick,
+#tcomment .twikoo .tk-nick-link,
+#twikoo .tk-nick,
+#twikoo .tk-nick-link {
+  color: var(--primary) !important;
+  font-size: 1rem !important;
+  font-weight: 650 !important;
+  line-height: 1.35 !important;
+  text-decoration: none !important;
+}
+
+#tcomment .twikoo .tk-meta .tk-time,
+#twikoo .tk-meta .tk-time {
+  color: var(--content-meta) !important;
+  font-size: 0.92rem !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+  opacity: 0.68 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+#twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+  position: absolute !important;
+  top: 0.02rem !important;
+  right: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex-wrap: nowrap !important;
+  width: var(--tk-list-action-width) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 1.5rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  column-gap: 0.48rem !important;
+  row-gap: 0 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action > :not(.tk-admin-actions),
+#twikoo .tk-comment .tk-action > :not(.tk-admin-actions) {
+  flex: 0 0 auto !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions,
+#twikoo .tk-comment .tk-admin-actions,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions,
+#twikoo .tk-comment .tk-meta > .tk-actions {
+  position: absolute !important;
+  top: auto !important;
+  right: 0 !important;
+  inset-inline-end: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex: none !important;
+  width: max-content !important;
+  max-width: var(--tk-list-action-width) !important;
+  min-height: 1.2rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0.45rem !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+  text-align: right !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-admin-actions > a,
+#tcomment .twikoo .tk-comment .tk-admin-actions .tk-admin,
+#tcomment .twikoo .tk-comment .tk-admin-actions > button,
+#tcomment .twikoo .tk-comment .tk-meta > .tk-actions > button,
+#twikoo .tk-comment .tk-admin-actions > a,
+#twikoo .tk-comment .tk-admin-actions .tk-admin,
+#twikoo .tk-comment .tk-admin-actions > button,
+#twikoo .tk-comment .tk-meta > .tk-actions > button {
+  height: auto !important;
+  min-height: 1.2rem !important;
+  padding: 0 !important;
+  color: var(--primary) !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  opacity: 0.88 !important;
+  text-decoration: none !important;
+  text-decoration-line: none !important;
+}
+
+#tcomment .twikoo .tk-action-icon,
+#twikoo .tk-action-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 auto !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--primary) !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-action-icon svg,
+#twikoo .tk-action-icon svg {
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+}
+
+#tcomment .twikoo .tk-action-count,
+#twikoo .tk-action-count {
+  color: var(--tk-comment-title) !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+#tcomment .twikoo .tk-content,
+#twikoo .tk-content {
+  margin-top: 0.35rem !important;
+  padding-right: var(--tk-list-action-width) !important;
+  color: var(--tk-comment-title) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.55 !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-content,
+#twikoo .tk-replies .tk-content {
+  margin-top: 0.42rem !important;
+  font-weight: 600 !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment .tk-content > span:first-of-type,
+#twikoo .tk-replies .tk-comment .tk-content > span:first-of-type {
+  display: block !important;
+  margin-bottom: 0.35rem !important;
+  color: var(--content-meta) !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
+#tcomment .twikoo .tk-extras,
+#twikoo .tk-extras {
+  margin-top: 0.38rem !important;
+  padding-right: var(--tk-list-action-width) !important;
+  color: var(--content-meta) !important;
+  opacity: 0.7 !important;
+}
+
+#tcomment .twikoo .tk-extra,
+#twikoo .tk-extra {
+  color: inherit !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+}
+
+#tcomment .twikoo .tk-extra-text,
+#twikoo .tk-extra-text {
+  color: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+}
+
+#tcomment .twikoo .tk-replies,
+#twikoo .tk-replies {
+  margin: 0.7rem 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment,
+#twikoo .tk-replies .tk-comment {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.55rem !important;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --tk-list-avatar-size: 2.45rem;
+    --tk-list-reply-avatar-size: 2rem;
+    --tk-list-column-gap: 0.62rem;
+    --tk-list-action-width: 5.65rem;
+  }
+
+  #tcomment .twikoo .tk-comment,
+  #twikoo .tk-comment,
+  #tcomment .twikoo .tk-replies .tk-comment,
+  #twikoo .tk-replies .tk-comment {
+    padding: 0.25rem 0 0.72rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-row:not(.actions),
+  #twikoo .tk-comment .tk-row:not(.actions) {
+    min-height: 1.45rem !important;
+    padding-right: var(--tk-list-action-width) !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+  #twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+    width: var(--tk-list-action-width) !important;
+    column-gap: 0.35rem !important;
+  }
+
+  #tcomment .twikoo .tk-nick,
+  #tcomment .twikoo .tk-nick-link,
+  #twikoo .tk-nick,
+  #twikoo .tk-nick-link {
+    font-size: 0.95rem !important;
+  }
+
+  #tcomment .twikoo .tk-meta .tk-time,
+  #twikoo .tk-meta .tk-time,
+  #tcomment .twikoo .tk-extra,
+  #twikoo .tk-extra {
+    font-size: 0.82rem !important;
+  }
+
+  #tcomment .twikoo .tk-content,
+  #twikoo .tk-content,
+  #tcomment .twikoo .tk-extras,
+  #twikoo .tk-extras {
+    padding-right: 0 !important;
+  }
+
+  #tcomment .twikoo .tk-content,
+  #twikoo .tk-content {
+    font-size: 0.96rem !important;
+    line-height: 1.5 !important;
+  }
+
+  #tcomment .twikoo .tk-admin-actions > a,
+  #tcomment .twikoo .tk-admin-actions .tk-admin,
+  #tcomment .twikoo .tk-admin-actions > button,
+  #tcomment .twikoo .tk-meta > .tk-actions > button,
+  #twikoo .tk-admin-actions > a,
+  #twikoo .tk-admin-actions .tk-admin,
+  #twikoo .tk-admin-actions > button,
+  #twikoo .tk-meta > .tk-actions > button {
+    font-size: 0.78rem !important;
+  }
+
+  #tcomment .twikoo .tk-action-icon,
+  #twikoo .tk-action-icon {
+    width: 1.12rem !important;
+    height: 1.12rem !important;
+  }
+
+  #tcomment .twikoo .tk-action-icon svg,
+  #twikoo .tk-action-icon svg {
+    width: 1.02rem !important;
+    height: 1.02rem !important;
+  }
+
+  #tcomment .twikoo .tk-action-count,
+  #twikoo .tk-action-count {
+    font-size: 0.82rem !important;
+  }
+}
+
+/* List layout cleanup */
+#tcomment .twikoo .tk-comment > .tk-avatar,
+#twikoo .tk-comment > .tk-avatar,
+#tcomment .twikoo .tk-comment .tk-avatar-img,
+#twikoo .tk-comment .tk-avatar-img,
+#tcomment .twikoo .tk-comment .tk-avatar img,
+#twikoo .tk-comment .tk-avatar img {
+  border-radius: var(--tk-radius-avatar) !important;
+}
+
+#tcomment .twikoo .tk-comment > .tk-avatar,
+#twikoo .tk-comment > .tk-avatar {
+  background: transparent !important;
+}
+
+#tcomment .twikoo .tk-action-link,
+#twikoo .tk-action-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.18rem !important;
+  margin: 0 !important;
+  color: var(--primary) !important;
+  text-decoration: none !important;
+}
+
+#tcomment .twikoo .tk-action-link .tk-action-icon-solid,
+#twikoo .tk-action-link .tk-action-icon-solid {
+  display: none !important;
+}
+
+#tcomment .twikoo .tk-action-link.tk-liked > .tk-action-icon:not(.tk-action-icon-solid),
+#tcomment .twikoo .tk-action-link:hover > .tk-action-icon:not(.tk-action-icon-solid),
+#twikoo .tk-action-link.tk-liked > .tk-action-icon:not(.tk-action-icon-solid),
+#twikoo .tk-action-link:hover > .tk-action-icon:not(.tk-action-icon-solid) {
+  display: none !important;
+}
+
+#tcomment .twikoo .tk-action-link.tk-liked > .tk-action-icon-solid,
+#tcomment .twikoo .tk-action-link:hover > .tk-action-icon-solid,
+#twikoo .tk-action-link.tk-liked > .tk-action-icon-solid,
+#twikoo .tk-action-link:hover > .tk-action-icon-solid {
+  display: inline-flex !important;
+}
+
+#tcomment .twikoo .tk-action-link:active,
+#tcomment .twikoo .tk-action-link:active .tk-action-icon,
+#twikoo .tk-action-link:active,
+#twikoo .tk-action-link:active .tk-action-icon {
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-extras,
+#twikoo .tk-comment .tk-extras {
+  padding-right: 0 !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  display: flex !important;
+  justify-content: flex-end !important;
+  margin-top: 0.12rem !important;
+  min-height: 1.2rem !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line > .tk-admin-actions,
+#twikoo .tk-admin-actions-line > .tk-admin-actions {
+  position: static !important;
+  inset: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: auto !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0.45rem !important;
+  line-height: 1.35 !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line > .tk-admin-actions > a,
+#tcomment .twikoo .tk-admin-actions-line > .tk-admin-actions .tk-admin,
+#tcomment .twikoo .tk-admin-actions-line > .tk-admin-actions > button,
+#twikoo .tk-admin-actions-line > .tk-admin-actions > a,
+#twikoo .tk-admin-actions-line > .tk-admin-actions .tk-admin,
+#twikoo .tk-admin-actions-line > .tk-admin-actions > button {
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--primary) !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  text-decoration: none !important;
+  transform: none !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-admin-actions-line,
+  #twikoo .tk-admin-actions-line {
+    justify-content: flex-start !important;
+  }
+}
+
+/* Final compact spacing and action alignment */
+#tcomment .twikoo .tk-comment,
+#twikoo .tk-comment,
+html.dark #tcomment .twikoo .tk-comment,
+html.dark #twikoo .tk-comment,
+#tcomment .twikoo .tk-replies .tk-comment,
+#twikoo .tk-replies .tk-comment,
+html.dark #tcomment .twikoo .tk-replies .tk-comment,
+html.dark #twikoo .tk-replies .tk-comment {
+  padding: 0.25rem 0 0.72rem !important;
+}
+
+#tcomment .twikoo .tk-replies,
+#twikoo .tk-replies {
+  margin-top: 0.55rem !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment,
+#twikoo .tk-replies .tk-comment {
+  padding-top: 0.18rem !important;
+  padding-bottom: 0.42rem !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  margin-top: 0.08rem !important;
+  min-height: 1.1rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+#twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+  align-items: center !important;
+  column-gap: 0.42rem !important;
+  min-height: 1.2rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link,
+#twikoo .tk-comment .tk-action-link {
+  display: inline-grid !important;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.12rem !important;
+  height: 1.2rem !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-icon,
+#twikoo .tk-comment .tk-action-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1.08rem !important;
+  height: 1.08rem !important;
+  line-height: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-icon svg,
+#twikoo .tk-comment .tk-action-icon svg {
+  display: block !important;
+  width: 1.08rem !important;
+  height: 1.08rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-count,
+#twikoo .tk-comment .tk-action-count {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 1.08rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-icon.tk-action-icon-solid,
+#twikoo .tk-comment .tk-action-icon.tk-action-icon-solid {
+  display: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link.tk-liked > .tk-action-icon:not(.tk-action-icon-solid),
+#tcomment .twikoo .tk-comment .tk-action-link:hover > .tk-action-icon:not(.tk-action-icon-solid),
+#twikoo .tk-comment .tk-action-link.tk-liked > .tk-action-icon:not(.tk-action-icon-solid),
+#twikoo .tk-comment .tk-action-link:hover > .tk-action-icon:not(.tk-action-icon-solid) {
+  display: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link.tk-liked > .tk-action-icon.tk-action-icon-solid,
+#tcomment .twikoo .tk-comment .tk-action-link:hover > .tk-action-icon.tk-action-icon-solid,
+#twikoo .tk-comment .tk-action-link.tk-liked > .tk-action-icon.tk-action-icon-solid,
+#twikoo .tk-comment .tk-action-link:hover > .tk-action-icon.tk-action-icon-solid {
+  display: inline-flex !important;
+}
+
+/* Compact comment rhythm */
+#tcomment .twikoo .tk-comment,
+#twikoo .tk-comment,
+html.dark #tcomment .twikoo .tk-comment,
+html.dark #twikoo .tk-comment,
+#tcomment .twikoo .tk-replies .tk-comment,
+#twikoo .tk-replies .tk-comment,
+html.dark #tcomment .twikoo .tk-replies .tk-comment,
+html.dark #twikoo .tk-replies .tk-comment {
+  padding-top: 0.16rem !important;
+  padding-bottom: 0.46rem !important;
+}
+
+#tcomment .twikoo .tk-content,
+#twikoo .tk-content {
+  margin-top: 0.22rem !important;
+  line-height: 1.45 !important;
+}
+
+#tcomment .twikoo .tk-extras,
+#twikoo .tk-extras {
+  margin-top: 0.22rem !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  margin-top: 0.02rem !important;
+  min-height: 1rem !important;
+  line-height: 1.2 !important;
+}
+
+#tcomment .twikoo .tk-replies,
+#twikoo .tk-replies {
+  margin-top: 0.3rem !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment,
+#twikoo .tk-replies .tk-comment {
+  padding-top: 0.12rem !important;
+  padding-bottom: 0.28rem !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-content,
+#twikoo .tk-replies .tk-content {
+  margin-top: 0.18rem !important;
+}
+
+#tcomment .twikoo .tk-replies .tk-comment .tk-content > span:first-of-type,
+#twikoo .tk-replies .tk-comment .tk-content > span:first-of-type {
+  margin-bottom: 0.16rem !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-comment,
+  #twikoo .tk-comment,
+  html.dark #tcomment .twikoo .tk-comment,
+  html.dark #twikoo .tk-comment,
+  #tcomment .twikoo .tk-replies .tk-comment,
+  #twikoo .tk-replies .tk-comment,
+  html.dark #tcomment .twikoo .tk-replies .tk-comment,
+  html.dark #twikoo .tk-replies .tk-comment {
+    padding-top: 0.12rem !important;
+    padding-bottom: 0.38rem !important;
+  }
+
+  #tcomment .twikoo .tk-content,
+  #twikoo .tk-content,
+  #tcomment .twikoo .tk-extras,
+  #twikoo .tk-extras {
+    margin-top: 0.18rem !important;
+  }
+
+  #tcomment .twikoo .tk-admin-actions-line,
+  #twikoo .tk-admin-actions-line {
+    margin-top: 0 !important;
+    min-height: 0.95rem !important;
+  }
+
+  #tcomment .twikoo .tk-replies,
+  #twikoo .tk-replies {
+    margin-top: 0.22rem !important;
+  }
+}
+
+/* Tighten extras rows and action icon/count pairs */
+#tcomment .twikoo .tk-extras,
+#twikoo .tk-extras {
+  margin-top: 0.12rem !important;
+  column-gap: 0.55rem !important;
+  row-gap: 0 !important;
+  line-height: 1.25 !important;
+}
+
+#tcomment .twikoo .tk-extra,
+#twikoo .tk-extra,
+#tcomment .twikoo .tk-extra-text,
+#twikoo .tk-extra-text {
+  line-height: 1.25 !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  margin-top: 0 !important;
+  min-height: 0.9rem !important;
+  line-height: 1.15 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+#twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+  column-gap: 0.32rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link,
+#twikoo .tk-comment .tk-action-link {
+  gap: 0.06rem !important;
+  height: 1.1rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-icon,
+#twikoo .tk-comment .tk-action-icon,
+#tcomment .twikoo .tk-comment .tk-action-icon svg,
+#twikoo .tk-comment .tk-action-icon svg {
+  width: 1.05rem !important;
+  height: 1.05rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-count,
+#twikoo .tk-comment .tk-action-count {
+  height: 1.05rem !important;
+  font-size: 0.84rem !important;
+  line-height: 1 !important;
+  transform: translateY(0.035rem) !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-extras,
+  #twikoo .tk-extras {
+    margin-top: 0.1rem !important;
+    column-gap: 0.45rem !important;
+    row-gap: 0 !important;
+    line-height: 1.2 !important;
+  }
+
+  #tcomment .twikoo .tk-extra,
+  #twikoo .tk-extra,
+  #tcomment .twikoo .tk-extra-text,
+  #twikoo .tk-extra-text {
+    line-height: 1.2 !important;
+  }
+
+  #tcomment .twikoo .tk-admin-actions-line,
+  #twikoo .tk-admin-actions-line {
+    min-height: 0.85rem !important;
+  }
+}
+
+/* Visual spacing polish */
+#tcomment .twikoo .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  margin-top: 0.04rem !important;
+  min-height: 1rem !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line > .tk-admin-actions,
+#twikoo .tk-admin-actions-line > .tk-admin-actions {
+  gap: 0.55rem !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line > .tk-admin-actions > a,
+#tcomment .twikoo .tk-admin-actions-line > .tk-admin-actions .tk-admin,
+#tcomment .twikoo .tk-admin-actions-line > .tk-admin-actions > button,
+#twikoo .tk-admin-actions-line > .tk-admin-actions > a,
+#twikoo .tk-admin-actions-line > .tk-admin-actions .tk-admin,
+#twikoo .tk-admin-actions-line > .tk-admin-actions > button {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 1rem !important;
+  line-height: 1 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+#twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+  column-gap: 0.54rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link,
+#twikoo .tk-comment .tk-action-link {
+  gap: 0.09rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-count,
+#twikoo .tk-comment .tk-action-count {
+  transform: translateY(0.02rem) !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-admin-actions-line,
+  #twikoo .tk-admin-actions-line {
+    margin-top: 0.03rem !important;
+    min-height: 0.95rem !important;
+  }
+
+  #tcomment .twikoo .tk-admin-actions-line > .tk-admin-actions,
+  #twikoo .tk-admin-actions-line > .tk-admin-actions {
+    gap: 0.48rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
+  #twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
+    column-gap: 0.45rem !important;
+  }
+}
+
+/* Give the admin action row its own breathing room */
+#tcomment .twikoo .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  align-items: center !important;
+  margin-top: 0.16rem !important;
+  margin-bottom: 0.18rem !important;
+  min-height: 1rem !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line + .tk-replies,
+#twikoo .tk-admin-actions-line + .tk-replies {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-admin-actions-line,
+  #twikoo .tk-admin-actions-line {
+    margin-top: 0.14rem !important;
+    margin-bottom: 0.16rem !important;
+  }
+}
+
+/* Balance admin row spacing against the info row and replies */
+#tcomment .twikoo .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  margin-top: 0.18rem !important;
+  margin-bottom: 0.18rem !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line + .tk-replies,
+#twikoo .tk-admin-actions-line + .tk-replies {
+  margin-top: 0 !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line + .tk-replies > .tk-comment:first-child,
+#twikoo .tk-admin-actions-line + .tk-replies > .tk-comment:first-child {
+  padding-top: 0 !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-admin-actions-line,
+  #twikoo .tk-admin-actions-line {
+    margin-top: 0.16rem !important;
+    margin-bottom: 0.16rem !important;
+  }
+}
+
+/* Admin row belongs to the info block; leave space before replies */
+#tcomment .twikoo .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  margin-top: 0.04rem !important;
+  margin-bottom: 0.34rem !important;
+  min-height: 0.95rem !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line + .tk-replies,
+#twikoo .tk-admin-actions-line + .tk-replies {
+  margin-top: 0 !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line + .tk-replies > .tk-comment:first-child,
+#twikoo .tk-admin-actions-line + .tk-replies > .tk-comment:first-child {
+  padding-top: 0 !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-admin-actions-line,
+  #twikoo .tk-admin-actions-line {
+    margin-top: 0.03rem !important;
+    margin-bottom: 0.3rem !important;
+    min-height: 0.9rem !important;
+  }
+}
+
+/* Final admin row spacing: use padding so adjacent margins cannot collapse */
+#tcomment .twikoo .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  box-sizing: content-box !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0.28rem !important;
+  padding-bottom: 0.18rem !important;
+  min-height: 1rem !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line + .tk-replies,
+#twikoo .tk-admin-actions-line + .tk-replies {
+  margin-top: 0 !important;
+}
+
+#tcomment .twikoo .tk-admin-actions-line + .tk-replies > .tk-comment:first-child,
+#twikoo .tk-admin-actions-line + .tk-replies > .tk-comment:first-child {
+  padding-top: 0 !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .twikoo .tk-admin-actions-line,
+  #twikoo .tk-admin-actions-line {
+    padding-top: 0.24rem !important;
+    padding-bottom: 0.16rem !important;
+    min-height: 0.95rem !important;
+  }
+}
+
+/* Authoritative admin row spacing: target the actual injected node directly */
+#tcomment .tk-admin-actions-line,
+#twikoo .tk-admin-actions-line {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  box-sizing: border-box !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.32rem 0 0.34rem !important;
+  line-height: 1 !important;
+}
+
+#tcomment .tk-admin-actions-line > .tk-admin-actions,
+#twikoo .tk-admin-actions-line > .tk-admin-actions {
+  position: static !important;
+  inset: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: auto !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0.55rem !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
+#tcomment .tk-admin-actions-line > .tk-admin-actions > a,
+#tcomment .tk-admin-actions-line > .tk-admin-actions .tk-admin,
+#tcomment .tk-admin-actions-line > .tk-admin-actions > button,
+#twikoo .tk-admin-actions-line > .tk-admin-actions > a,
+#twikoo .tk-admin-actions-line > .tk-admin-actions .tk-admin,
+#twikoo .tk-admin-actions-line > .tk-admin-actions > button {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 1rem !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--primary) !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  transform: none !important;
+}
+
+#tcomment .tk-admin-actions-line + .tk-replies,
+#twikoo .tk-admin-actions-line + .tk-replies {
+  margin-top: 0 !important;
+}
+
+#tcomment .tk-admin-actions-line + .tk-replies > .tk-comment:first-child,
+#twikoo .tk-admin-actions-line + .tk-replies > .tk-comment:first-child {
+  padding-top: 0 !important;
+}
+
+@media (max-width: 640px) {
+  #tcomment .tk-admin-actions-line,
+  #twikoo .tk-admin-actions-line {
+    padding-top: 0.28rem !important;
+    padding-bottom: 0.3rem !important;
+  }
 }

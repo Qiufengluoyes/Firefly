@@ -117,25 +117,33 @@ const config = {
       : { left: 0, right: window.innerWidth };
     const boundaryLeft = Math.max(margin, boundaryRect.left + margin);
     const boundaryRight = Math.min(window.innerWidth - margin, boundaryRect.right - margin);
+    const offsetX =
+      Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--tk-markdown-popover-offset-x",
+        ),
+      ) || 0;
+    const targetCenter = anchorCenter + offsetX;
 
     popover.style.visibility = "hidden";
     popover.style.left = "0px";
     popover.style.top = "0px";
 
+    popover.style.width = "";
     const popoverRect = popover.getBoundingClientRect();
     const availableWidth = Math.max(0, boundaryRight - boundaryLeft);
-    if (popoverRect.width > availableWidth) {
-      popover.style.width = `${Math.floor(availableWidth)}px`;
+    const centeredAvailableWidth =
+      2 * Math.max(0, Math.min(targetCenter - boundaryLeft, boundaryRight - targetCenter));
+    const maxCenteredWidth = Math.max(0, Math.min(availableWidth, centeredAvailableWidth));
+    if (popoverRect.width > maxCenteredWidth) {
+      popover.style.width = `${Math.floor(maxCenteredWidth)}px`;
     } else {
       popover.style.width = "";
     }
 
     const nextPopoverRect = popover.getBoundingClientRect();
     const popoverWidth = Math.min(nextPopoverRect.width, availableWidth);
-    const maxLeft = boundaryRight - popoverWidth;
-    const preferredLeft =
-      anchorCenter - popoverWidth / 2;
-    const left = Math.max(boundaryLeft, Math.min(preferredLeft, maxLeft));
+    const left = targetCenter - popoverWidth / 2;
 
     let placement = "top";
     let top = triggerRect.top - nextPopoverRect.height - gap;
@@ -148,7 +156,7 @@ const config = {
     const maxArrowOffset = popoverWidth - minArrowOffset;
     const arrowLeft = Math.max(
       minArrowOffset,
-      Math.min(anchorCenter - left, maxArrowOffset),
+      Math.min(targetCenter - left, maxArrowOffset),
     );
     popover.dataset.placement = placement;
     popover.style.left = `${Math.round(left)}px`;
@@ -172,12 +180,17 @@ const config = {
 
     const guideUrl = getMarkdownGuideUrl(trigger);
     const popover = document.createElement("div");
+    const surface = document.createElement("div");
     const urlText = document.createElement("span");
     const visitLink = document.createElement("a");
+    const arrow = document.createElement("span");
 
     popover.className = "tk-markdown-guide-popover";
     popover.setAttribute("role", "dialog");
     popover.setAttribute("aria-label", "Markdown 帮助链接");
+    surface.className = "tk-markdown-guide-surface";
+    arrow.className = "tk-markdown-guide-arrow";
+    arrow.setAttribute("aria-hidden", "true");
 
     urlText.className = "tk-markdown-guide-url";
     urlText.textContent = guideUrl;
@@ -188,7 +201,8 @@ const config = {
     visitLink.rel = "noopener noreferrer";
     visitLink.textContent = "访问";
 
-    popover.append(urlText, visitLink);
+    surface.append(urlText, visitLink);
+    popover.append(surface, arrow);
     document.body.append(popover);
 
     trigger.setAttribute("aria-haspopup", "dialog");
@@ -254,6 +268,85 @@ const config = {
     });
   }
 
+  function moveTwikooAdminActions() {
+    const adminActionGroups = document.querySelectorAll(
+      "#tcomment .tk-comment .tk-meta > .tk-actions, #tcomment .tk-comment .tk-action > .tk-admin-actions, #tcomment .tk-comment .tk-admin-actions-line > .tk-admin-actions, #twikoo .tk-comment .tk-meta > .tk-actions, #twikoo .tk-comment .tk-action > .tk-admin-actions, #twikoo .tk-comment .tk-admin-actions-line > .tk-admin-actions",
+    );
+
+    adminActionGroups.forEach((adminActions) => {
+      const main = adminActions.closest(".tk-main");
+      const row = adminActions.closest(".tk-row");
+      const actionPanel = row ? row.querySelector(".tk-action") : null;
+      const extras = main
+        ? Array.from(main.children).find((child) =>
+            child.classList.contains("tk-extras"),
+          )
+        : null;
+      let adminLine = main
+        ? Array.from(main.children).find((child) =>
+            child.classList.contains("tk-admin-actions-line"),
+          )
+        : null;
+      if (main && !adminLine) {
+        adminLine = document.createElement("div");
+        adminLine.className = "tk-admin-actions-line";
+        if (extras) {
+          extras.after(adminLine);
+        } else {
+          main.append(adminLine);
+        }
+      }
+      const target = adminLine || actionPanel;
+      if (!target) return;
+
+      adminActions.classList.add("tk-admin-actions");
+      adminActions.setAttribute("aria-label", "评论管理操作");
+      if (adminActions.parentElement !== target) {
+        target.append(adminActions);
+      }
+    });
+  }
+
+  function bindTwikooAdminActionsLayout() {
+    const commentEl = document.getElementById("tcomment");
+    if (!commentEl) return;
+
+    moveTwikooAdminActions();
+
+    if (window.fireflyTwikooAdminActionsObserver) {
+      window.fireflyTwikooAdminActionsObserver.disconnect();
+    }
+    if (window.fireflyTwikooAdminActionsTimer) {
+      window.clearInterval(window.fireflyTwikooAdminActionsTimer);
+    }
+
+    const observer = new MutationObserver(() => {
+      requestAnimationFrame(moveTwikooAdminActions);
+    });
+    observer.observe(commentEl, {
+      childList: true,
+      subtree: true,
+    });
+    window.fireflyTwikooAdminActionsObserver = observer;
+
+    let syncCount = 0;
+    window.fireflyTwikooAdminActionsTimer = window.setInterval(() => {
+      moveTwikooAdminActions();
+      syncCount += 1;
+      if (syncCount >= 20) {
+        window.clearInterval(window.fireflyTwikooAdminActionsTimer);
+        window.fireflyTwikooAdminActionsTimer = null;
+      }
+    }, 250);
+  }
+
+  function scheduleTwikooAdminActionsLayout() {
+    requestAnimationFrame(moveTwikooAdminActions);
+    setTimeout(moveTwikooAdminActions, 300);
+    setTimeout(moveTwikooAdminActions, 1000);
+    setTimeout(moveTwikooAdminActions, 2500);
+  }
+
   // 初始化 Twikoo
   function initTwikoo() {
     if (typeof twikoo !== "undefined") {
@@ -269,6 +362,7 @@ const config = {
           .then(() => {
             console.log("[Twikoo] 初始化完成");
             bindMarkdownGuidePopover();
+            bindTwikooAdminActionsLayout();
           })
           .catch((error) => {
             console.error("[Twikoo] 初始化失败:", error);
@@ -281,18 +375,23 @@ const config = {
   }
 
   // 页面加载时初始化
-  document.addEventListener("DOMContentLoaded", initTwikoo);
+  document.addEventListener("DOMContentLoaded", function () {
+    initTwikoo();
+    scheduleTwikooAdminActionsLayout();
+  });
 
   // Swup 页面切换后重新初始化
   if (window.swup && window.swup.hooks) {
     window.swup.hooks.on("content:replace", function () {
       setTimeout(initTwikoo, 200);
+      setTimeout(scheduleTwikooAdminActionsLayout, 500);
     });
   } else {
     document.addEventListener("swup:enable", function () {
       if (window.swup && window.swup.hooks) {
         window.swup.hooks.on("content:replace", function () {
           setTimeout(initTwikoo, 200);
+          setTimeout(scheduleTwikooAdminActionsLayout, 500);
         });
       }
     });
@@ -304,6 +403,7 @@ const config = {
     if (commentEl) {
       console.log("[Twikoo] 通过自定义事件重新初始化");
       initTwikoo();
+      scheduleTwikooAdminActionsLayout();
     }
   });
 </script>
