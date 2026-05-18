@@ -1,5 +1,6 @@
 ---
 import { commentConfig } from "@/config/commentConfig";
+import { icons as mdiIcons } from "@iconify-json/mdi";
 
 interface Props {
 	path: string;
@@ -10,6 +11,9 @@ const config = {
 	el: "#tcomment",
 	path: Astro.props.path,
 };
+const mdiChevronDownBody =
+	mdiIcons.icons["chevron-down"]?.body ??
+	'<path fill="currentColor" d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6z"/>';
 ---
 
 <div id="tcomment"></div>
@@ -17,7 +21,7 @@ const config = {
   src="https://s4.zstatic.net/npm/twikoo@1.7.9/dist/twikoo.min.js"
   integrity="sha384-uS5XTM0hprJZj0R184twNRV12L55VagOlT/XQaj1uAebA0RtO7diEr+dE9TBn5N2"
   crossorigin="anonymous"></script>
-<script is:inline define:vars={{ config }}>
+<script is:inline define:vars={{ config, mdiChevronDownBody }}>
   // 获取当前页面路径
   function getCurrentPath() {
     const pathname = window.location.pathname;
@@ -42,6 +46,8 @@ const config = {
   const MARKDOWN_POPOVER_SELECTOR = ".tk-markdown-guide-popover";
   const MARKDOWN_POPOVER_OPEN_CLASS = "is-open";
   const MARKDOWN_POPOVER_CLOSING_CLASS = "is-closing";
+  const TWIKOO_EXPAND_SELECTOR =
+    "#tcomment .tk-expand-wrap .tk-expand, #tcomment .tk-collapse-wrap .tk-expand, #twikoo .tk-expand-wrap .tk-expand, #twikoo .tk-collapse-wrap .tk-expand";
 
   function getClosestElement(target, selector) {
     return target instanceof Element ? target.closest(selector) : null;
@@ -304,11 +310,44 @@ const config = {
     });
   }
 
+  function syncTwikooExpandButtons() {
+    const buttons = document.querySelectorAll(TWIKOO_EXPAND_SELECTOR);
+
+    buttons.forEach((button) => {
+      const firstIcon = Array.from(button.children).find((child) =>
+        child.classList.contains("tk-expand-icon"),
+      );
+      const icon =
+        firstIcon ||
+        document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+      if (!firstIcon) {
+        icon.classList.add("tk-expand-icon");
+        icon.setAttribute("aria-hidden", "true");
+        icon.setAttribute("viewBox", "0 0 24 24");
+        icon.setAttribute("focusable", "false");
+        button.prepend(icon);
+      }
+
+      if (icon.dataset.icon !== "mdi:chevron-down") {
+        icon.innerHTML = mdiChevronDownBody;
+        icon.dataset.icon = "mdi:chevron-down";
+      }
+
+      button.classList.add("tk-expand-with-icon");
+    });
+  }
+
+  function syncTwikooCommentLayout() {
+    moveTwikooAdminActions();
+    syncTwikooExpandButtons();
+  }
+
   function bindTwikooAdminActionsLayout() {
     const commentEl = document.getElementById("tcomment");
     if (!commentEl) return;
 
-    moveTwikooAdminActions();
+    syncTwikooCommentLayout();
 
     if (window.fireflyTwikooAdminActionsObserver) {
       window.fireflyTwikooAdminActionsObserver.disconnect();
@@ -318,7 +357,7 @@ const config = {
     }
 
     const observer = new MutationObserver(() => {
-      requestAnimationFrame(moveTwikooAdminActions);
+      requestAnimationFrame(syncTwikooCommentLayout);
     });
     observer.observe(commentEl, {
       childList: true,
@@ -328,7 +367,7 @@ const config = {
 
     let syncCount = 0;
     window.fireflyTwikooAdminActionsTimer = window.setInterval(() => {
-      moveTwikooAdminActions();
+      syncTwikooCommentLayout();
       syncCount += 1;
       if (syncCount >= 20) {
         window.clearInterval(window.fireflyTwikooAdminActionsTimer);
@@ -338,10 +377,10 @@ const config = {
   }
 
   function scheduleTwikooAdminActionsLayout() {
-    requestAnimationFrame(moveTwikooAdminActions);
-    setTimeout(moveTwikooAdminActions, 300);
-    setTimeout(moveTwikooAdminActions, 1000);
-    setTimeout(moveTwikooAdminActions, 2500);
+    requestAnimationFrame(syncTwikooCommentLayout);
+    setTimeout(syncTwikooCommentLayout, 300);
+    setTimeout(syncTwikooCommentLayout, 1000);
+    setTimeout(syncTwikooCommentLayout, 2500);
   }
 
   // 初始化 Twikoo

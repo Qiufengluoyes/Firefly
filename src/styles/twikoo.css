@@ -699,8 +699,116 @@ html.dark #twikoo .tk-sort-item.__active {
 
 .tk-expand-wrap .tk-expand,
 .tk-collapse-wrap .tk-expand {
-  @apply border-[1px] border-[var(--tk-border-control)] rounded-[var(--tk-radius-control)] mt-1 bg-[var(--btn-regular-bg)] text-[var(--btn-content)] hover:text-[var(--primary)] hover:bg-[var(--btn-regular-bg-hover)];
-  border-width: var(--tk-line-width) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.32rem !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 1.65rem !important;
+  margin: 0 !important;
+  padding: 0.1rem 0.42rem !important;
+  border: 0 !important;
+  border-radius: var(--tk-radius-action) !important;
+  background: transparent !important;
+  color: var(--primary) !important;
+  font-size: 1rem !important;
+  font-weight: 650 !important;
+  line-height: 1.45 !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  transition:
+    color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.tk-expand-wrap,
+.tk-collapse-wrap {
+  position: relative;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin-top: 0.16rem !important;
+  box-sizing: border-box !important;
+}
+
+.tk-expand-wrap::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 2.1rem;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--card-bg) 88%);
+  opacity: 0.72;
+}
+
+.tk-expand-wrap .tk-expand-icon,
+.tk-collapse-wrap .tk-expand-icon {
+  display: block !important;
+  width: 1em !important;
+  height: 1em !important;
+  flex: 0 0 1em !important;
+  color: currentColor !important;
+  transform: rotate(0deg);
+  transform-origin: 50% 50%;
+  transition: none;
+  animation: tk-expand-chevron-open 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tk-expand-wrap .tk-expand-icon path,
+.tk-collapse-wrap .tk-expand-icon path {
+  fill: currentColor !important;
+}
+
+.tk-collapse-wrap .tk-expand-icon {
+  transform: rotate(180deg);
+  animation-name: tk-expand-chevron-close;
+}
+
+.tk-expand-wrap .tk-expand:hover,
+.tk-expand-wrap .tk-expand:focus-visible,
+.tk-collapse-wrap .tk-expand:hover,
+.tk-collapse-wrap .tk-expand:focus-visible {
+  background: transparent !important;
+  color: var(--primary) !important;
+  filter: none !important;
+  opacity: 0.86;
+  text-shadow: none !important;
+}
+
+.tk-expand-wrap .tk-expand:hover .tk-expand-icon,
+.tk-expand-wrap .tk-expand:focus-visible .tk-expand-icon {
+  transform: rotate(0deg);
+}
+
+.tk-collapse-wrap .tk-expand:hover .tk-expand-icon,
+.tk-collapse-wrap .tk-expand:focus-visible .tk-expand-icon {
+  transform: rotate(180deg);
+}
+
+@keyframes tk-expand-chevron-open {
+  from {
+    opacity: 0.72;
+    transform: rotate(180deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes tk-expand-chevron-close {
+  from {
+    opacity: 0.72;
+    transform: rotate(0deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(180deg);
+  }
 }
 
 /* by @SirTamago
@@ -900,7 +1008,7 @@ html.dark #twikoo .tk-replies .tk-comment {
   min-height: 1.2rem !important;
   margin: 0 !important;
   padding: 0 !important;
-  column-gap: 0.54rem !important;
+  column-gap: 0.68rem !important;
   row-gap: 0 !important;
   line-height: 1 !important;
   white-space: nowrap !important;
@@ -1185,11 +1293,67 @@ html.dark #twikoo .tk-replies .tk-comment {
   display: none !important;
 }
 
+#tcomment .twikoo .tk-comment .tk-content:has(.tk-submit),
+#twikoo .tk-comment .tk-content:has(.tk-submit) {
+  padding-right: 0 !important;
+}
+
+#tcomment .tk-admin-actions-line:has(+ .tk-submit),
+#twikoo .tk-admin-actions-line:has(+ .tk-submit) {
+  padding-bottom: 0.14rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-submit,
+#twikoo .tk-comment .tk-submit {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-top: 0.16rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-submit .tk-row,
+#tcomment .twikoo .tk-comment .tk-submit .tk-col,
+#tcomment .twikoo .tk-comment .tk-submit .tk-meta-input,
+#tcomment .twikoo .tk-comment .tk-submit .tk-input,
+#tcomment .twikoo .tk-comment .tk-submit textarea,
+#twikoo .tk-comment .tk-submit .tk-row,
+#twikoo .tk-comment .tk-submit .tk-col,
+#twikoo .tk-comment .tk-submit .tk-meta-input,
+#twikoo .tk-comment .tk-submit .tk-input,
+#twikoo .tk-comment .tk-submit textarea {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-submit .tk-row:not(.actions),
+#twikoo .tk-comment .tk-submit .tk-row:not(.actions) {
+  display: flex !important;
+  min-height: 0 !important;
+  padding-right: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-submit .tk-row.actions,
+#twikoo .tk-comment .tk-submit .tk-row.actions {
+  padding-right: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-submit .tk-col,
+#twikoo .tk-comment .tk-submit .tk-col {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
 #tcomment .twikoo .tk-replies,
 #twikoo .tk-replies {
   margin: 0.3rem 0 0 !important;
   padding: 0 !important;
   border: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment:has(> .tk-main > .tk-replies),
+#twikoo .tk-comment:has(> .tk-main > .tk-replies) {
+  padding-bottom: 0.18rem !important;
 }
 
 #tcomment .tk-admin-actions-line + .tk-replies,
