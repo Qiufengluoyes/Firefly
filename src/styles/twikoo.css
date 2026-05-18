@@ -867,7 +867,7 @@ html.dark #twikoo .tk-replies .tk-comment {
   align-items: flex-start !important;
   gap: var(--tk-list-column-gap) !important;
   margin: 0 !important;
-  padding: 0.16rem 0 0.46rem !important;
+  padding: 0.16rem 0 0.58rem !important;
   overflow: visible !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -1346,30 +1346,30 @@ html.dark #twikoo .tk-replies .tk-comment {
 
 #tcomment .twikoo .tk-replies,
 #twikoo .tk-replies {
-  margin: 0.3rem 0 0 !important;
+  margin: 0.38rem 0 0 !important;
   padding: 0 !important;
   border: 0 !important;
 }
 
 #tcomment .twikoo .tk-comment:has(> .tk-main > .tk-replies),
 #twikoo .tk-comment:has(> .tk-main > .tk-replies) {
-  padding-bottom: 0.18rem !important;
+  padding-bottom: 0.24rem !important;
 }
 
 #tcomment .tk-admin-actions-line + .tk-replies,
 #twikoo .tk-admin-actions-line + .tk-replies {
-  margin-top: 0 !important;
+  margin-top: 0.1rem !important;
 }
 
 #tcomment .tk-admin-actions-line + .tk-replies > .tk-comment:first-child,
 #twikoo .tk-admin-actions-line + .tk-replies > .tk-comment:first-child {
-  padding-top: 0 !important;
+  padding-top: 0.12rem !important;
 }
 
 #tcomment .twikoo .tk-replies .tk-comment,
 #twikoo .tk-replies .tk-comment {
   padding-top: 0.12rem !important;
-  padding-bottom: 0.28rem !important;
+  padding-bottom: 0.34rem !important;
 }
 
 @media (max-width: 640px) {
@@ -1389,7 +1389,18 @@ html.dark #twikoo .tk-replies .tk-comment {
   html.dark #tcomment .twikoo .tk-replies .tk-comment,
   html.dark #twikoo .tk-replies .tk-comment {
     padding-top: 0.12rem !important;
-    padding-bottom: 0.38rem !important;
+    padding-bottom: 0.52rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment:has(> .tk-main > .tk-replies),
+  #twikoo .tk-comment:has(> .tk-main > .tk-replies) {
+    padding-bottom: 0.24rem !important;
+  }
+
+  #tcomment .twikoo .tk-replies .tk-comment,
+  #twikoo .tk-replies .tk-comment {
+    padding-top: 0.12rem !important;
+    padding-bottom: 0.32rem !important;
   }
 
   #tcomment .twikoo .tk-comment .tk-row:not(.actions),
@@ -1464,6 +1475,6 @@ html.dark #twikoo .tk-replies .tk-comment {
 
   #tcomment .twikoo .tk-replies,
   #twikoo .tk-replies {
-    margin-top: 0.22rem !important;
+    margin-top: 0.32rem !important;
   }
 }
