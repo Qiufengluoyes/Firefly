@@ -1,21 +1,26 @@
 :root {
-  --tk-text: #000;
-  --tk-input-text: #000;
+  --tk-text: var(--tk-prose-body);
+  --tk-input-text: var(--tk-prose-body);
   --tk-count-text: #000;
+  --tk-accent: color-mix(in oklch, var(--primary) 68%, var(--btn-content) 32%);
+  --tk-prose-body: var(--tw-prose-body, #374151);
+  --tk-meta-text: var(--content-meta);
+  --tk-placeholder-text: color-mix(in oklch, var(--tk-prose-body) 42%, var(--card-bg));
   --tk-border-subtle: var(--line-divider);
   --tk-border-control: var(--line-divider);
   --tk-border-accent: var(--line-divider);
-  --tk-sort-border: color-mix(in oklch, var(--primary) 24%, transparent);
+  --tk-sort-border: color-mix(in oklch, var(--tk-accent) 24%, transparent);
   --tk-panel-muted: color-mix(in oklch, var(--btn-plain-bg-hover) 18%, var(--card-bg));
   --tk-control-label-bg: color-mix(in oklch, var(--btn-regular-bg) 82%, var(--primary) 18%);
+  --tk-control-label-color: var(--btn-content);
   --tk-markdown-color: var(--content-meta);
-  --tk-markdown-hover-color: var(--primary);
+  --tk-markdown-hover-color: var(--tk-accent);
   --tk-markdown-popover-offset-x: -6px;
   --tk-markdown-visit-width: 3.5rem;
   --tk-markdown-visit-bg: var(--btn-regular-bg);
   --tk-markdown-visit-bg-hover: var(--btn-regular-bg-hover);
-  --tk-comment-text: rgba(0, 0, 0, 0.88);
-  --tk-comment-title: rgba(0, 0, 0, 0.92);
+  --tk-comment-text: var(--tk-prose-body);
+  --tk-comment-title: var(--tk-prose-body);
   --tk-list-avatar-size: 3rem;
   --tk-list-reply-avatar-size: 2.35rem;
   --tk-list-column-gap: 0.85rem;
@@ -32,11 +37,17 @@
 }
 
 html.dark {
-  --tk-text: #fff;
-  --tk-input-text: #fff;
+  --tk-text: var(--tk-prose-body);
+  --tk-input-text: var(--tk-prose-body);
   --tk-count-text: #fff;
-  --tk-comment-text: rgba(255, 255, 255, 0.9);
-  --tk-comment-title: rgba(255, 255, 255, 0.94);
+  --tk-accent: color-mix(in oklch, var(--primary) 68%, var(--btn-content) 32%);
+  --tk-prose-body: var(--tw-prose-body, #d1d5db);
+  --tk-meta-text: var(--content-meta);
+  --tk-placeholder-text: color-mix(in oklch, var(--tk-prose-body) 46%, var(--card-bg));
+  --tk-control-label-bg: color-mix(in oklch, var(--btn-regular-bg) 82%, var(--primary) 18%);
+  --tk-control-label-color: var(--btn-content);
+  --tk-comment-text: var(--tk-prose-body);
+  --tk-comment-title: var(--tk-prose-body);
   --code-block-text: #d1d5db; /* 在深色模式下使用更亮的颜色 */
 }
 
@@ -58,11 +69,16 @@ html.dark {
       textarea {
         @apply rounded-[var(--tk-radius-panel)] py-4 px-6 !min-h-[150px] focus:border-[var(--tk-border-control)]
                 border-[var(--tk-border-control)] bg-[var(--card-bg)] text-[var(--tk-input-text)]
-                placeholder:text-[var(--content-meta)] transition-all duration-300
+                placeholder:text-[var(--tk-placeholder-text)] transition-all duration-300
                 focus:ring-1 focus:ring-[var(--tk-border-control)] focus:ring-opacity-35;
         border-width: var(--tk-line-width) !important;
         color: var(--tk-input-text) !important;
         resize: vertical;
+
+        &::placeholder {
+          color: var(--tk-placeholder-text) !important;
+          opacity: 1 !important;
+        }
       }
     }
   }
@@ -100,9 +116,10 @@ html.dark {
     border-width: var(--tk-line-width) !important;
 
     .el-input-group__prepend {
-      @apply !bg-[var(--tk-control-label-bg)] !text-[var(--btn-content)] px-4 font-medium text-sm
+      @apply !bg-[var(--tk-control-label-bg)] px-4 font-medium text-sm
              border-r border-[var(--tk-border-control)] flex items-center justify-center min-w-[80px] flex-shrink-0
              rounded-none;
+      color: var(--tk-control-label-color) !important;
       align-self: stretch !important;
       height: auto !important;
       min-height: inherit;
@@ -112,15 +129,17 @@ html.dark {
     }
 
     input {
-      @apply px-4 bg-transparent text-[var(--btn-content)] placeholder:text-[var(--content-meta)]
+      @apply px-4 bg-transparent text-[var(--tk-input-text)] placeholder:text-[var(--tk-placeholder-text)]
              transition-all duration-200 flex-1
              rounded-r-[var(--tk-radius-control)] rounded-l-none;
       border: 0 !important;
       box-shadow: none !important;
+      color: var(--tk-input-text) !important;
       min-height: inherit;
 
       &::placeholder {
-        @apply text-[var(--content-meta)] opacity-70;
+        color: var(--tk-placeholder-text) !important;
+        opacity: 1 !important;
       }
 
       &:focus {
@@ -158,9 +177,9 @@ html.dark {
   .tk-send,
   .tk-cancel {
     @apply rounded-[var(--tk-radius-control)] px-6 py-2 h-11 font-medium transition-all duration-200
-           !bg-[var(--btn-regular-bg)] hover:!bg-[var(--btn-regular-bg-hover)]
-           active:!bg-[var(--btn-regular-bg-active)] disabled:!bg-[var(--btn-regular-bg)]
-           !text-[var(--btn-content)] disabled:!text-[var(--content-meta)]
+           !bg-[var(--btn-plain-bg-hover)] hover:!bg-[var(--btn-plain-bg-hover)]
+           active:!bg-[var(--btn-plain-bg-active)] disabled:!bg-[var(--btn-plain-bg-hover)]
+           !text-[var(--tk-accent)] disabled:!text-[var(--tk-meta-text)]
            shadow-none;
   }
 }
@@ -176,9 +195,9 @@ html.dark {
   line-height: 1 !important;
   text-align: center !important;
   font-size: 0.95rem !important;
-  background: var(--btn-regular-bg) !important;
-  color: var(--btn-content) !important;
-  border: var(--tk-line-width) solid var(--tk-border-control) !important;
+  background: var(--btn-plain-bg-hover) !important;
+  color: var(--tk-accent) !important;
+  border: var(--tk-line-width) solid var(--tk-sort-border) !important;
   border-radius: var(--tk-radius-control) !important;
   padding: 0 1.5rem !important;
   height: 2.75rem !important;
@@ -264,8 +283,9 @@ html.dark {
 .tk-preview:hover,
 .tk-send:hover,
 .tk-cancel:hover {
-  background: var(--btn-regular-bg-hover) !important;
-  border-color: var(--tk-border-control) !important;
+  background: var(--btn-plain-bg-hover) !important;
+  border-color: var(--tk-sort-border) !important;
+  color: var(--tk-accent) !important;
   transform: none !important;
   box-shadow: none !important;
 }
@@ -273,7 +293,7 @@ html.dark {
 .tk-preview:active,
 .tk-send:active,
 .tk-cancel:active {
-  background: var(--btn-regular-bg-active) !important;
+  background: var(--btn-plain-bg-active) !important;
   transform: none !important;
 }
 
@@ -281,8 +301,9 @@ html.dark {
 .tk-preview:disabled,
 .tk-send:disabled,
 .tk-cancel:disabled {
-  background: var(--btn-regular-bg) !important;
-  color: var(--content-meta) !important;
+  background: var(--btn-plain-bg-hover) !important;
+  border-color: var(--tk-border-control) !important;
+  color: var(--tk-meta-text) !important;
   opacity: 0.68 !important;
   transform: none !important;
   box-shadow: none !important;
@@ -449,7 +470,7 @@ html.dark {
 
 .tk-markdown-guide-visit:hover {
   background: var(--tk-markdown-visit-bg-hover) !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -506,7 +527,7 @@ html.dark {
 
 #tcomment .twikoo .tk-comments-title .__comments svg,
 #twikoo .tk-comments-title .__comments svg {
-  @apply fill-[var(--primary)];
+  fill: var(--tk-accent) !important;
 }
 
 #tcomment .twikoo .tk-comments-actions,
@@ -551,7 +572,7 @@ html.dark {
   border: 0 !important;
   border-radius: var(--tk-radius-action) !important;
   background: transparent !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
   font-size: 0.875rem !important;
   font-weight: 600 !important;
   line-height: 1.25rem !important;
@@ -567,7 +588,7 @@ html.dark {
 #tcomment .twikoo .tk-sort-item:hover,
 #twikoo .tk-sort-item:hover {
   background: var(--btn-plain-bg-hover) !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
 }
 
 #tcomment .twikoo .tk-sort-item:active,
@@ -578,13 +599,13 @@ html.dark {
 #tcomment .twikoo .tk-sort-item.__active,
 #twikoo .tk-sort-item.__active {
   background: var(--btn-plain-bg-hover) !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
   box-shadow: inset 0 0 0 var(--tk-line-width) var(--tk-sort-border) !important;
 }
 
 html.dark #tcomment .twikoo .tk-sort-item.__active,
 html.dark #twikoo .tk-sort-item.__active {
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
 }
 
 #tcomment .twikoo .tk-comments-actions > .tk-icon.__comments,
@@ -598,7 +619,7 @@ html.dark #twikoo .tk-sort-item.__active {
   margin: 0 !important;
   padding: 0 !important;
   border-radius: var(--tk-radius-action) !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
   cursor: pointer;
   transition:
     color 0.2s ease,
@@ -646,12 +667,12 @@ html.dark #twikoo .tk-sort-item.__active {
 
 .tk-nick,
 .tk-nick-link {
-  @apply font-medium text-[var(--primary)];
-  color: var(--primary) !important;
+  @apply font-medium;
+  color: var(--tk-accent) !important;
 }
 
 .tk-nick-link:hover {
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
 }
 
 /* Content & Preview */
@@ -665,7 +686,8 @@ html.dark #twikoo .tk-sort-item.__active {
   }
 
   a {
-    @apply underline text-[var(--primary)] font-medium;
+    @apply underline font-medium;
+    color: var(--tk-accent) !important;
   }
 
   .tk-ruser {
@@ -677,7 +699,7 @@ html.dark #twikoo .tk-sort-item.__active {
   }
 
   li {
-    @apply before:content-["•"] before:text-[var(--primary)];
+    @apply before:content-["•"] before:text-[var(--tk-accent)];
   }
 }
 
@@ -711,7 +733,7 @@ html.dark #twikoo .tk-sort-item.__active {
   border: 0 !important;
   border-radius: var(--tk-radius-action) !important;
   background: transparent !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
   font-size: 1rem !important;
   font-weight: 650 !important;
   line-height: 1.45 !important;
@@ -773,7 +795,7 @@ html.dark #twikoo .tk-sort-item.__active {
 .tk-collapse-wrap .tk-expand:hover,
 .tk-collapse-wrap .tk-expand:focus-visible {
   background: transparent !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
   filter: none !important;
   opacity: 0.86;
   text-shadow: none !important;
@@ -834,16 +856,16 @@ Make the emoji component display correctly when there are too many emoji packs
 .el-loading-spinner {
   display: flex !important;
   justify-content: center !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
 }
 
 .el-loading-spinner .path {
-  stroke: var(--primary) !important;
+  stroke: var(--tk-accent) !important;
 }
 
 .el-loading-spinner .el-loading-text,
 .el-loading-spinner i {
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
 }
 
 /* Final list-style comment layout */
@@ -965,7 +987,7 @@ html.dark #twikoo .tk-replies .tk-comment {
 #tcomment .twikoo .tk-nick-link,
 #twikoo .tk-nick,
 #twikoo .tk-nick-link {
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
   font-size: 1rem !important;
   font-weight: 650 !important;
   line-height: 1.35 !important;
@@ -974,7 +996,7 @@ html.dark #twikoo .tk-replies .tk-comment {
 
 #tcomment .twikoo .tk-meta .tk-time,
 #twikoo .tk-meta .tk-time {
-  color: var(--content-meta) !important;
+  color: var(--tk-meta-text) !important;
   font-size: 0.92rem !important;
   font-weight: 500 !important;
   line-height: 1.35 !important;
@@ -990,7 +1012,7 @@ html.dark #twikoo .tk-replies .tk-comment {
 
 #tcomment .twikoo .tk-meta .tk-tag-green,
 #twikoo .tk-meta .tk-tag-green {
-  @apply bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)] dark:text-[var(--deep-text)];
+  @apply bg-[var(--btn-regular-bg)] dark:bg-[var(--tk-accent)] dark:text-[var(--deep-text)];
 }
 
 #tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
@@ -1030,7 +1052,7 @@ html.dark #twikoo .tk-replies .tk-comment {
   height: 1.1rem !important;
   margin: 0 !important;
   padding: 0 !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
   line-height: 1 !important;
   text-decoration: none !important;
   transform: none !important;
@@ -1053,7 +1075,7 @@ html.dark #twikoo .tk-replies .tk-comment {
   height: 1.05rem !important;
   margin: 0 !important;
   padding: 0 !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
   line-height: 0 !important;
   transform: none !important;
 }
@@ -1109,7 +1131,7 @@ html.dark #twikoo .tk-replies .tk-comment {
 #twikoo .tk-content {
   margin-top: 0.22rem !important;
   padding-right: var(--tk-list-action-width) !important;
-  color: var(--tk-comment-title) !important;
+  color: var(--tk-comment-text) !important;
   font-size: 1rem !important;
   font-weight: 600 !important;
   line-height: 1.45 !important;
@@ -1125,7 +1147,7 @@ html.dark #twikoo .tk-replies .tk-comment {
 #twikoo .tk-replies .tk-comment .tk-content > span:first-of-type {
   display: block !important;
   margin-bottom: 0.16rem !important;
-  color: var(--content-meta) !important;
+  color: var(--tk-meta-text) !important;
   font-size: 0.86rem !important;
   font-weight: 600 !important;
   line-height: 1.4 !important;
@@ -1141,7 +1163,7 @@ html.dark #twikoo .tk-replies .tk-comment {
   min-width: 0;
   margin-top: 0.12rem !important;
   padding-right: 0 !important;
-  color: var(--content-meta) !important;
+  color: var(--tk-meta-text) !important;
   line-height: 1.25 !important;
   opacity: 0.7 !important;
 }
@@ -1172,6 +1194,26 @@ html.dark #twikoo .tk-replies .tk-comment {
 #tcomment .twikoo .tk-extra svg,
 #twikoo .tk-extra svg {
   fill: currentColor !important;
+}
+
+#tcomment .twikoo .tk-footer,
+#tcomment .tk-footer,
+#twikoo .tk-footer,
+#tcomment .twikoo .tk-powered-by,
+#twikoo .tk-powered-by {
+  color: var(--tk-meta-text) !important;
+  opacity: 0.7 !important;
+  text-decoration: none !important;
+}
+
+#tcomment .twikoo .tk-footer a,
+#tcomment .tk-footer a,
+#twikoo .tk-footer a,
+#tcomment .twikoo .tk-powered-by a,
+#twikoo .tk-powered-by a {
+  color: inherit !important;
+  opacity: 1 !important;
+  text-decoration: none !important;
 }
 
 #tcomment .twikoo .tk-admin-actions-line,
@@ -1227,7 +1269,7 @@ html.dark #twikoo .tk-replies .tk-comment {
   padding: 0 !important;
   border: 0 !important;
   background: transparent !important;
-  color: var(--primary) !important;
+  color: var(--tk-accent) !important;
   font-size: 0.86rem !important;
   font-weight: 600 !important;
   line-height: 1 !important;
