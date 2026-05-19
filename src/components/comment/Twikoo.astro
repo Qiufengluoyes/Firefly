@@ -338,9 +338,121 @@ const mdiChevronDownBody =
     });
   }
 
+  function getActionPanelLinks(actionLink) {
+    const actionPanel = actionLink.closest(".tk-action");
+    if (!actionPanel) return [];
+
+    return Array.from(actionPanel.children).filter(
+      (child) =>
+        child.matches?.(".tk-action-link") &&
+        !child.closest(".tk-admin-actions"),
+    );
+  }
+
+  function shouldHideActionCount(actionLink) {
+    const label = [
+      actionLink.getAttribute("aria-label"),
+      actionLink.getAttribute("title"),
+      actionLink.getAttribute("data-title"),
+    ]
+      .filter(Boolean)
+      .join(" ");
+    if (/点踩|反对|dislike|thumb-?down|\bdown\b/i.test(label)) return true;
+    if (/删除|隐藏|置顶|取消|管理|delete|trash|hide|pin|admin/i.test(label)) {
+      return false;
+    }
+
+    const classText = [actionLink, ...actionLink.querySelectorAll("[class]")]
+      .map((element) => element.getAttribute("class") || "")
+      .join(" ");
+    if (/dislike|thumb-?down|\bdown\b/i.test(classText)) return true;
+    if (/delete|trash|remove|admin/i.test(classText)) return false;
+
+    const actionLinks = getActionPanelLinks(actionLink);
+    const actionIndex = actionLinks.indexOf(actionLink);
+
+    return actionLinks.length >= 3 && actionIndex === actionLinks.length - 2;
+  }
+
+  function shouldShowZeroActionCount(actionLink) {
+    const actionPanel = actionLink.closest(".tk-action");
+    if (!actionPanel || actionLink.closest(".tk-admin-actions")) return false;
+    if (shouldHideActionCount(actionLink)) return false;
+
+    const label = [
+      actionLink.getAttribute("aria-label"),
+      actionLink.getAttribute("title"),
+      actionLink.getAttribute("data-title"),
+    ]
+      .filter(Boolean)
+      .join(" ");
+    if (/删除|隐藏|置顶|取消|管理|delete|trash|hide|pin|admin/i.test(label)) {
+      return false;
+    }
+
+    const classText = [actionLink, ...actionLink.querySelectorAll("[class]")]
+      .map((element) => element.getAttribute("class") || "")
+      .join(" ");
+    if (/delete|trash|remove|admin/i.test(classText)) return false;
+    if (/like|reply|comment|vote|thumb|up/i.test(classText)) return true;
+
+    const actionLinks = getActionPanelLinks(actionLink);
+    const actionIndex = actionLinks.indexOf(actionLink);
+
+    return (
+      actionLinks.length >= 3 &&
+      (actionIndex === actionLinks.length - 3 ||
+        actionIndex === actionLinks.length - 1)
+    );
+  }
+
+  function syncTwikooActionCounts() {
+    const actionLinks = document.querySelectorAll(
+      "#tcomment .tk-comment .tk-row:not(.actions) > .tk-action .tk-action-link, #twikoo .tk-comment .tk-row:not(.actions) > .tk-action .tk-action-link",
+    );
+
+    actionLinks.forEach((actionLink) => {
+      const zeroCount = Array.from(actionLink.children).find((child) =>
+        child.classList?.contains("tk-action-zero-count"),
+      );
+      const realCount = Array.from(actionLink.children).find((child) =>
+        child.classList?.contains("tk-action-count"),
+      );
+      const hasVisibleCount =
+        realCount && realCount.textContent.trim().length > 0;
+      const hideActionCount = shouldHideActionCount(actionLink);
+
+      realCount?.classList.toggle("tk-action-empty-count", !hasVisibleCount);
+
+      if (hideActionCount) {
+        zeroCount?.remove();
+        actionLink.classList.add("tk-action-without-count", "tk-action-countless");
+        return;
+      }
+
+      actionLink.classList.remove("tk-action-countless");
+
+      if (hasVisibleCount || !shouldShowZeroActionCount(actionLink)) {
+        zeroCount?.remove();
+        actionLink.classList.remove("tk-action-without-count");
+        return;
+      }
+
+      actionLink.classList.remove("tk-action-without-count");
+      if (!zeroCount) {
+        const count = document.createElement("span");
+        count.className = "tk-action-zero-count";
+        count.setAttribute("aria-hidden", "true");
+        count.textContent = "0";
+        actionLink.append(count);
+      }
+    });
+  }
+
   function syncTwikooCommentLayout() {
     moveTwikooAdminActions();
     syncTwikooExpandButtons();
+    syncTwikooActionCounts();
   }
 
   function bindTwikooAdminActionsLayout() {

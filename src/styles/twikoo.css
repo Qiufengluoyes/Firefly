@@ -1030,7 +1030,7 @@ html.dark #twikoo .tk-replies .tk-comment {
   min-height: 1.2rem !important;
   margin: 0 !important;
   padding: 0 !important;
-  column-gap: 0.68rem !important;
+  column-gap: clamp(0.56rem, 1.1vw, 0.78rem) !important;
   row-gap: 0 !important;
   line-height: 1 !important;
   white-space: nowrap !important;
@@ -1043,19 +1043,48 @@ html.dark #twikoo .tk-replies .tk-comment {
 
 #tcomment .twikoo .tk-comment .tk-action-link,
 #twikoo .tk-comment .tk-action-link {
-  display: inline-grid !important;
-  grid-auto-flow: column !important;
-  grid-auto-columns: max-content !important;
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 0.09rem !important;
-  height: 1.1rem !important;
+  gap: clamp(0.12rem, 0.42vw, 0.18rem) !important;
+  width: auto !important;
+  min-width: 1.55rem !important;
+  height: 1.12rem !important;
   margin: 0 !important;
   padding: 0 !important;
   color: var(--tk-accent) !important;
   line-height: 1 !important;
   text-decoration: none !important;
   transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link:has(.tk-action-count),
+#tcomment .twikoo .tk-comment .tk-action-link:has(.tk-action-zero-count),
+#twikoo .tk-comment .tk-action-link:has(.tk-action-count),
+#twikoo .tk-comment .tk-action-link:has(.tk-action-zero-count) {
+  min-width: 1.55rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link.tk-action-without-count:has(.tk-action-count),
+#twikoo .tk-comment .tk-action-link.tk-action-without-count:has(.tk-action-count) {
+  min-width: 1.55rem !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link.tk-action-without-count,
+#twikoo .tk-comment .tk-action-link.tk-action-without-count {
+  margin-right: 0 !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link.tk-action-countless,
+#twikoo .tk-comment .tk-action-link.tk-action-countless {
+  min-width: 1.55rem !important;
+  gap: 0 !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-link.tk-action-countless .tk-action-count,
+#twikoo .tk-comment .tk-action-link.tk-action-countless .tk-action-count {
+  display: none !important;
 }
 
 #tcomment .twikoo .tk-comment .tk-action-link:active,
@@ -1088,10 +1117,13 @@ html.dark #twikoo .tk-replies .tk-comment {
 }
 
 #tcomment .twikoo .tk-comment .tk-action-count,
-#twikoo .tk-comment .tk-action-count {
+#tcomment .twikoo .tk-comment .tk-action-zero-count,
+#twikoo .tk-comment .tk-action-count,
+#twikoo .tk-comment .tk-action-zero-count {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  min-width: 0.46em !important;
   height: 1.05rem !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -1099,7 +1131,14 @@ html.dark #twikoo .tk-replies .tk-comment {
   font-size: 0.84rem !important;
   font-weight: 600 !important;
   line-height: 1 !important;
-  transform: translateY(0.02rem) !important;
+  font-variant-numeric: tabular-nums !important;
+  letter-spacing: 0 !important;
+  transform: none !important;
+}
+
+#tcomment .twikoo .tk-comment .tk-action-count.tk-action-empty-count,
+#twikoo .tk-comment .tk-action-count.tk-action-empty-count {
+  display: none !important;
 }
 
 #tcomment .twikoo .tk-comment .tk-action-icon.tk-action-icon-solid,
@@ -1424,7 +1463,7 @@ html.dark #twikoo .tk-replies .tk-comment {
     --tk-list-avatar-size: 2.45rem;
     --tk-list-reply-avatar-size: 2rem;
     --tk-list-column-gap: 0.62rem;
-    --tk-list-action-width: 5.65rem;
+    --tk-list-action-width: 6.50rem;
   }
 
   #tcomment .twikoo .tk-comment,
@@ -1459,7 +1498,49 @@ html.dark #twikoo .tk-replies .tk-comment {
   #tcomment .twikoo .tk-comment .tk-row:not(.actions) > .tk-action,
   #twikoo .tk-comment .tk-row:not(.actions) > .tk-action {
     width: var(--tk-list-action-width) !important;
-    column-gap: 0.45rem !important;
+    column-gap: 0.24rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-action-link,
+  #twikoo .tk-comment .tk-action-link {
+    gap: 0.08rem !important;
+    min-width: 1.36rem !important;
+    height: 1rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-action-link:has(.tk-action-count),
+  #tcomment .twikoo .tk-comment .tk-action-link:has(.tk-action-zero-count),
+  #twikoo .tk-comment .tk-action-link:has(.tk-action-count),
+  #twikoo .tk-comment .tk-action-link:has(.tk-action-zero-count) {
+    min-width: 1.36rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-action-link.tk-action-without-count,
+  #twikoo .tk-comment .tk-action-link.tk-action-without-count {
+    margin-right: 0 !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-action-link.tk-action-countless,
+  #twikoo .tk-comment .tk-action-link.tk-action-countless {
+    min-width: 1.36rem !important;
+    transform: none !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-action-icon,
+  #twikoo .tk-comment .tk-action-icon,
+  #tcomment .twikoo .tk-comment .tk-action-icon svg,
+  #twikoo .tk-comment .tk-action-icon svg {
+    width: 0.98rem !important;
+    height: 0.98rem !important;
+  }
+
+  #tcomment .twikoo .tk-comment .tk-action-count,
+  #tcomment .twikoo .tk-comment .tk-action-zero-count,
+  #twikoo .tk-comment .tk-action-count,
+  #twikoo .tk-comment .tk-action-zero-count {
+    min-width: 0.42em !important;
+    height: 0.98rem !important;
+    font-size: 0.78rem !important;
   }
 
   #tcomment .twikoo .tk-comment .tk-submit,
