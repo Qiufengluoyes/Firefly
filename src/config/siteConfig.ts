@@ -53,7 +53,7 @@ export const siteConfig: SiteConfig = {
 	favicon: [
 		{
 			// 图标文件路径
-			src: "/favicon/favicon1.png",
+			src: "/favicon/avatar-rtx1-squircle-256px.webp",
 			// 可选，指定主题 'light' | 'dark'
 			// theme: "light",
 			// 可选，图标大小
@@ -70,7 +70,7 @@ export const siteConfig: SiteConfig = {
 		// { type: "image", value: "https://example.com/logo.png", alt: "Firefly Logo" }
 		logo: {
 			type: "image",
-			value: "/favicon/favicon.png",
+			value: "/favicon/avatar-rtx1-squircle-256px.webp",
 			alt: "Logo",
 		},
 		// 导航栏标题
