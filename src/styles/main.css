@@ -170,7 +170,6 @@ html.is-scroll-to-top-animating.is-leaving {
     .is-theme-transitioning:not(.use-view-transition) body:has(#banner-wrapper) #navbar > div,
     .is-theme-transitioning:not(.use-view-transition) body:has(#banner-wrapper) #navbar[data-transparent-mode] > div {
         transition: none !important;
-        backdrop-filter: none !important;
     }
     
     /* 导航栏相关浮动面板的过渡禁用 */
@@ -182,20 +181,16 @@ html.is-scroll-to-top-animating.is-leaving {
     .is-theme-transitioning #mobile-toc-panel,
     .is-theme-transitioning #search-panel {
         transition: none !important;
-        backdrop-filter: none !important;
     }
 
     .is-theme-transitioning #navbar #display-setting,
-    .is-theme-transitioning #navbar :is(#theme-mode-panel, #wallpaper-mode-panel) {
+    .is-theme-transitioning #navbar :is(#theme-mode-panel, #wallpaper-mode-panel) > .float-panel {
         -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
         backdrop-filter: var(--navbar-glass-filter) !important;
-        background:
-            var(--navbar-glass-tint),
-            var(--navbar-glass-veil),
-            var(--navbar-control-panel-bg) !important;
+        background: var(--navbar-control-panel-bg) !important;
     }
 
-    .is-theme-transitioning #navbar :is(#theme-mode-panel, #wallpaper-mode-panel) > .float-panel {
+    .is-theme-transitioning #navbar :is(#theme-mode-panel, #wallpaper-mode-panel) {
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
         background: transparent !important;
@@ -253,10 +248,10 @@ html.is-scroll-to-top-animating.is-leaving {
  
     
     .wallpaper-transparent #navbar > div {
-    @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
-    border: 0 !important;
-    border-radius: var(--radius-large) !important;
-}
+        @apply bg-transparent;
+        border: 0 !important;
+        border-radius: var(--radius-large) !important;
+    }
     
     .wallpaper-transparent .btn-card {
         @apply bg-[var(--card-bg-transparent)];

@@ -36,26 +36,20 @@
 }
 
 #navbar>div {
-    --navbar-glass-bg: rgba(255, 255, 255, 0.64);
-    --navbar-glass-border: rgba(255, 255, 255, 0.38);
+    --navbar-glass-bg: rgba(251, 251, 253, 0.8);
+    --navbar-control-panel-bg: rgba(251, 251, 253, 0.82);
+    --navbar-glass-border: rgba(0, 0, 0, 0.08);
     --navbar-glass-shadow:
-        0 14px 34px rgba(0, 0, 0, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.45);
-    --navbar-glass-filter: saturate(180%) blur(max(var(--navbar-glass-blur, 28px), 24px));
-    --navbar-glass-stabilizer: saturate(170%) blur(max(var(--navbar-glass-blur, 28px), 22px));
-    --navbar-glass-tint: linear-gradient(color-mix(in srgb, var(--primary) 4%, transparent), color-mix(in srgb, var(--primary) 4%, transparent));
-    --navbar-glass-veil:
-        linear-gradient(135deg,
-            rgba(255, 255, 255, 0.22),
-            rgba(255, 255, 255, 0.06) 42%,
-            rgba(255, 255, 255, 0.12));
-    --navbar-control-panel-bg: rgba(255, 255, 255, 0.72);
-    --navbar-glass-inner-veil:
-        inset 0 1px 0 rgba(255, 255, 255, 0.34),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+        0 8px 24px rgba(0, 0, 0, 0.08);
+    --navbar-glass-panel-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        0 18px 45px rgba(0, 0, 0, 0.14);
+    --navbar-glass-filter: saturate(180%) blur(20px);
+    --navbar-glass-inner-veil: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
     width: calc(100% - var(--navbar-floating-inline-offset) - var(--navbar-floating-inline-offset));
     margin-top: var(--navbar-floating-offset);
-    background: var(--card-bg);
+    background: transparent !important;
     border: 0 !important;
     border-radius: var(--radius-large);
     box-shadow: var(--navbar-glass-shadow);
@@ -64,10 +58,12 @@
     isolation: isolate;
     position: relative;
     transform: translate3d(0, 0, 0);
-    transition-property: transform, background-color, border-color, box-shadow;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    transition-property: transform, box-shadow;
     transition-duration: var(--duration-medium);
     transition-timing-function: var(--ease-standard);
-    will-change: transform, background-color, border-color, box-shadow;
+    will-change: transform;
 }
 
 #navbar {
@@ -91,12 +87,12 @@
     z-index: 0;
     pointer-events: none;
     border-radius: inherit;
-    opacity: 0;
-    background: rgba(255, 255, 255, 0.015);
-    -webkit-backdrop-filter: var(--navbar-glass-stabilizer);
-    backdrop-filter: var(--navbar-glass-stabilizer);
+    opacity: 1;
+    background: var(--navbar-glass-bg);
+    -webkit-backdrop-filter: var(--navbar-glass-filter);
+    backdrop-filter: var(--navbar-glass-filter);
     transform: translate3d(0, 0, 0);
-    transition: opacity var(--duration-medium) var(--ease-standard);
+    transition: opacity 180ms var(--ease-standard);
     backface-visibility: hidden;
     will-change: opacity;
 }
@@ -115,7 +111,7 @@
     z-index: 2;
 }
 
-/* Chromium backdrop-filter can flicker while scrolling; keep glass surfaces on stable compositor layers. */
+/* Chromium backdrop-filter can flicker while scrolling; keep every glass surface on a stable layer. */
 @supports (-webkit-backdrop-filter: blur(1px)) {
     #navbar-wrapper,
     #navbar,
@@ -129,11 +125,9 @@
     #navbar>div::before,
     #navbar :is(#display-setting, #search-panel, #nav-menu-panel, .navbar-dropdown-menu),
     #navbar :is(#theme-mode-panel, #wallpaper-mode-panel) {
-        -webkit-transform: translateZ(0);
+        -webkit-transform: translate3d(0, 0, 0);
         -webkit-backface-visibility: hidden;
-        -webkit-perspective: 1000px;
         backface-visibility: hidden;
-        transform-style: preserve-3d;
     }
 
     #navbar>div::before {
@@ -142,319 +136,106 @@
 }
 
 :root.dark #navbar>div {
-    --navbar-glass-bg: rgba(16, 16, 20, 0.62);
-    --navbar-glass-border: rgba(255, 255, 255, 0.14);
+    --navbar-glass-bg: rgba(22, 22, 23, 0.8);
+    --navbar-control-panel-bg: rgba(22, 22, 23, 0.82);
+    --navbar-glass-border: rgba(255, 255, 255, 0.12);
     --navbar-glass-shadow:
-        0 14px 34px rgba(0, 0, 0, 0.34),
-        inset 0 1px 0 rgba(255, 255, 255, 0.10);
-    --navbar-glass-tint: linear-gradient(color-mix(in srgb, var(--primary) 3%, transparent), color-mix(in srgb, var(--primary) 3%, transparent));
-    --navbar-glass-veil:
-        linear-gradient(135deg,
-            rgba(255, 255, 255, 0.055),
-            rgba(255, 255, 255, 0.012) 42%,
-            rgba(255, 255, 255, 0.035));
-    --navbar-control-panel-bg: rgba(16, 16, 20, 0.72);
-    --navbar-glass-inner-veil:
-        inset 0 1px 0 rgba(255, 255, 255, 0.07),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+        inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+        0 8px 24px rgba(0, 0, 0, 0.18);
+    --navbar-glass-panel-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 18px 45px rgba(0, 0, 0, 0.34);
+    --navbar-glass-inner-veil: inset 0 -1px 0 rgba(255, 255, 255, 0.12);
 }
 
-#navbar[data-enable-blur="true"]>div,
+#navbar[data-transparent-mode="semi"]>div::before,
+#navbar[data-transparent-mode="semifull"].scrolled>div::before,
+body.wallpaper-transparent #navbar>div::before {
+    opacity: 1;
+}
+
+#navbar[data-transparent-mode="semi"]>div,
+#navbar[data-transparent-mode="semifull"].scrolled>div,
 body.wallpaper-transparent #navbar>div {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    background: transparent !important;
-}
-
-#navbar[data-enable-blur="true"]>div::before,
-body.wallpaper-transparent #navbar>div::before {
-    opacity: 1;
-}
-
-#banner-wrapper~* #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div::before,
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div::before,
-#banner-wrapper~* #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
-body.wallpaper-transparent #navbar>div::before {
-    opacity: 1;
+    box-shadow: var(--navbar-glass-shadow) !important;
 }
 
 #navbar[data-transparent-mode="full"]>div::before,
 #navbar[data-transparent-mode="semifull"]:not(.scrolled)>div::before {
-    opacity: 0.001;
+    opacity: 0;
 }
 
-/* ============================================
- * 桌面端 - 亮色主题 - Banner模式
- * 适用: 桌面端(≥1024px) + Banner模式 + 亮色主题
- * 遵循: transparentMode, enableBlur 配置
- * ============================================ */
-@media (min-width: 1024px) {
-
-    /* "semi" */
-    #banner-wrapper~* #navbar[data-transparent-mode="semi"]>div,
-    body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"]>div {
-        -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
-        backdrop-filter: var(--navbar-glass-filter) !important;
-        background: var(--navbar-glass-bg) !important;
-        border: 0 !important;
-        border-radius: var(--radius-large) !important;
-        box-shadow: var(--navbar-glass-shadow) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    /* "full" */
-    #banner-wrapper~* #navbar[data-transparent-mode="full"]>div,
-    body:has(#banner-wrapper) #navbar[data-transparent-mode="full"]>div {
-        backdrop-filter: none !important;
-        background: transparent !important;
-        border: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    /* "semifull" (static) */
-    #banner-wrapper~* #navbar[data-transparent-mode="semifull"]>div,
-    body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"]>div {
-        backdrop-filter: none !important;
-        background: transparent !important;
-        border: 0 !important;
-        border-radius: var(--radius-large) !important;
-        box-shadow: none !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    /* "semifull" (scrolled) */
-    #banner-wrapper~* #navbar[data-transparent-mode="semifull"].scrolled>div,
-    body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"].scrolled>div {
-        -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
-        backdrop-filter: var(--navbar-glass-filter) !important;
-        background: var(--navbar-glass-bg) !important;
-        border: 0 !important;
-        border-radius: var(--radius-large) !important;
-        box-shadow: var(--navbar-glass-shadow) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
+#navbar[data-transparent-mode="full"]>div,
+#navbar[data-transparent-mode="semifull"]:not(.scrolled)>div {
+    box-shadow: none !important;
 }
 
-/* ============================================
- * 移动端 - 亮色主题 - Banner模式
- * 适用: 移动端(≤1023px) + Banner模式 + 亮色主题
- * ============================================ */
-@media (max-width: 1023px) {
-
-    /* "semi" */
-    #banner-wrapper~* #navbar[data-transparent-mode="semi"]>div,
-    body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"]>div {
-        -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
-        backdrop-filter: var(--navbar-glass-filter) !important;
-        background: var(--navbar-glass-bg) !important;
-        border: 0 !important;
-        border-radius: var(--radius-large) !important;
-        box-shadow: var(--navbar-glass-shadow) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    /* "full" */
-    #banner-wrapper~* #navbar[data-transparent-mode="full"]>div,
-    body:has(#banner-wrapper) #navbar[data-transparent-mode="full"]>div {
-        backdrop-filter: none !important;
-        background: transparent !important;
-        border: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    /* "semifull" (static) */
-    #banner-wrapper~* #navbar[data-transparent-mode="semifull"]>div,
-    body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"]>div {
-        backdrop-filter: none !important;
-        background: transparent !important;
-        border: 0 !important;
-        border-radius: var(--radius-large) !important;
-        box-shadow: none !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    /* "semifull" (scrolled) */
-    #banner-wrapper~* #navbar[data-transparent-mode="semifull"].scrolled>div,
-    body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"].scrolled>div {
-        -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
-        backdrop-filter: var(--navbar-glass-filter) !important;
-        background: var(--navbar-glass-bg) !important;
-        border: 0 !important;
-        border-radius: var(--radius-large) !important;
-        box-shadow: var(--navbar-glass-shadow) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-}
-
-/* ============================================
- * 桌面端 - 暗色主题 - Banner模式
- * ============================================ */
-@media (min-width: 1024px) {
-
-    /* "semi" */
-    :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semi"]>div,
-    :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"]>div {
-        background: var(--navbar-glass-bg) !important;
-        border: 0 !important;
-        box-shadow: var(--navbar-glass-shadow) !important;
-    }
-
-    /* "full" */
-    :root.dark #banner-wrapper~* #navbar[data-transparent-mode="full"]>div,
-    :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="full"]>div {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    /* "semifull" (static) */
-    :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semifull"]>div,
-    :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"]>div {
-        background: transparent !important;
-        border: 0 !important;
-        box-shadow: none !important;
-    }
-
-    /* "semifull" (scrolled) */
-    :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semifull"].scrolled>div,
-    :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"].scrolled>div {
-        background: var(--navbar-glass-bg) !important;
-        border: 0 !important;
-        box-shadow: var(--navbar-glass-shadow) !important;
-    }
-}
-
-/* ============================================
- * 移动端 - 暗色主题 - Banner模式
- * ============================================ */
-@media (max-width: 1023px) {
-
-    /* "semi" */
-    :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semi"]>div,
-    :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"]>div {
-        background: var(--navbar-glass-bg) !important;
-        border: 0 !important;
-        box-shadow: var(--navbar-glass-shadow) !important;
-    }
-
-    /* "full" */
-    :root.dark #banner-wrapper~* #navbar[data-transparent-mode="full"]>div,
-    :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="full"]>div {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    /* "semifull" (static) */
-    :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semifull"]>div,
-    :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"]>div {
-        background: transparent !important;
-        border: 0 !important;
-        box-shadow: none !important;
-    }
-
-    /* "semifull" (scrolled) */
-    :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semifull"].scrolled>div,
-    :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"].scrolled>div {
-        background: var(--navbar-glass-bg) !important;
-        border: 0 !important;
-        box-shadow: var(--navbar-glass-shadow) !important;
-    }
-}
-
-body.wallpaper-transparent #navbar>div {
-    background: var(--navbar-glass-bg) !important;
-    border: 0 !important;
-    box-shadow: var(--navbar-glass-shadow) !important;
-}
-
-
-/* ============================================
- * 关闭毛玻璃模糊效果 - Banner模式
- * ============================================ */
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur="false"]>div,
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur="false"].scrolled>div {
+body:not(.wallpaper-transparent) #navbar[data-enable-blur="false"]>div::before,
+#navbar[data-transparent-mode="full"]>div::before,
+#navbar[data-transparent-mode="semifull"]:not(.scrolled)>div::before {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
 }
-
-body:has(#banner-wrapper) #navbar[data-transparent-mode="full"][data-enable-blur="false"]>div,
-body:has(#banner-wrapper) #navbar[data-transparent-mode="full"][data-enable-blur="false"].scrolled>div {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-}
-
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="false"]>div,
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="false"].scrolled>div {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-}
-
 
 /* 调整下拉菜单和浮动面板的背景透明度 */
 /* 亮色主题 */
-#banner-wrapper~* .dropdown-content,
-#banner-wrapper~* .float-panel,
-body:has(#banner-wrapper) .dropdown-content,
-body:has(#banner-wrapper) .float-panel,
-body.wallpaper-transparent .dropdown-content,
-body.wallpaper-transparent .float-panel {
-    -webkit-backdrop-filter: saturate(180%) blur(24px) !important;
-    backdrop-filter: saturate(180%) blur(24px) !important;
-    background: rgba(255, 255, 255, 0.72) !important;
+#banner-wrapper~* #navbar .dropdown-content,
+#banner-wrapper~* #navbar .float-panel,
+body:has(#banner-wrapper) #navbar .dropdown-content,
+body:has(#banner-wrapper) #navbar .float-panel,
+body.wallpaper-transparent #navbar .dropdown-content,
+body.wallpaper-transparent #navbar .float-panel {
+    -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
+    backdrop-filter: var(--navbar-glass-filter) !important;
+    background: var(--navbar-control-panel-bg, rgba(251, 251, 253, 0.82)) !important;
     box-shadow: var(--navbar-glass-shadow, var(--shadow-md)) !important;
-    border: 1px solid rgba(255, 255, 255, 0.36) !important;
+    border: 1px solid var(--navbar-glass-border, rgba(0, 0, 0, 0.08)) !important;
 }
 
 /* 暗色主题 */
-:root.dark #banner-wrapper~* .dropdown-content,
-:root.dark #banner-wrapper~* .float-panel,
-:root.dark body:has(#banner-wrapper) .dropdown-content,
-:root.dark body:has(#banner-wrapper) .float-panel,
-:root.dark body.wallpaper-transparent .dropdown-content,
-:root.dark body.wallpaper-transparent .float-panel {
-    -webkit-backdrop-filter: saturate(180%) blur(24px) !important;
-    backdrop-filter: saturate(180%) blur(24px) !important;
-    background: rgba(16, 16, 20, 0.72) !important;
-    box-shadow: var(--navbar-glass-shadow, var(--shadow-md)) !important;
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-}
-
-/* Keep navbar blur on its own glass layer so child panels can blur the page backdrop too. */
-#banner-wrapper~* #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div,
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div,
-#banner-wrapper~* #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div,
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div,
-body.wallpaper-transparent #navbar>div {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    background: transparent !important;
-}
-
-#banner-wrapper~* #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div::before,
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-enable-blur="true"]>div::before,
-#banner-wrapper~* #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
-body:has(#banner-wrapper) #navbar[data-transparent-mode="semifull"][data-enable-blur="true"].scrolled>div::before,
-body.wallpaper-transparent #navbar>div::before {
-    opacity: 1;
-    background: var(--navbar-glass-tint), var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
+:root.dark #banner-wrapper~* #navbar .dropdown-content,
+:root.dark #banner-wrapper~* #navbar .float-panel,
+:root.dark body:has(#banner-wrapper) #navbar .dropdown-content,
+:root.dark body:has(#banner-wrapper) #navbar .float-panel,
+:root.dark body.wallpaper-transparent #navbar .dropdown-content,
+:root.dark body.wallpaper-transparent #navbar .float-panel {
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
-    box-shadow: var(--navbar-glass-inner-veil);
+    background: var(--navbar-control-panel-bg, rgba(22, 22, 23, 0.82)) !important;
+    box-shadow: var(--navbar-glass-shadow, var(--shadow-md)) !important;
+    border: 1px solid var(--navbar-glass-border, rgba(255, 255, 255, 0.12)) !important;
 }
 
 /* Navbar panels use the same blur strength and glass color as the navbar itself. */
-#navbar :is(#display-setting, #search-panel, #nav-menu-panel) {
+#navbar :is(#display-setting, #search-panel, #nav-menu-panel, .navbar-dropdown-menu) {
     -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
     backdrop-filter: var(--navbar-glass-filter) !important;
-    background: var(--navbar-glass-tint), var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
+    background: var(--navbar-control-panel-bg) !important;
     border: 1px solid var(--navbar-glass-border) !important;
-    box-shadow: var(--navbar-glass-shadow), var(--navbar-glass-inner-veil) !important;
+    box-shadow: var(--navbar-glass-panel-shadow) !important;
+    background-clip: padding-box;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    transition-property: opacity, transform, visibility !important;
+    will-change: opacity, transform;
+}
+
+#navbar :is(#theme-mode-panel, #wallpaper-mode-panel) {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+
+#navbar :is(#theme-mode-panel, #wallpaper-mode-panel)>.float-panel {
+    -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
+    backdrop-filter: var(--navbar-glass-filter) !important;
+    background: var(--navbar-control-panel-bg) !important;
+    border: 1px solid var(--navbar-glass-border) !important;
+    border-radius: var(--radius-large) !important;
+    box-shadow: var(--navbar-glass-panel-shadow) !important;
     background-clip: padding-box;
     overflow: hidden !important;
     transform: translate3d(0, 0, 0);
@@ -463,23 +244,8 @@ body.wallpaper-transparent #navbar>div::before {
     will-change: opacity, transform;
 }
 
-/* Theme/color control panels stay glassy even while theme switching disables generic float-panel blur. */
-#navbar #display-setting {
-    background:
-        var(--navbar-glass-tint),
-        var(--navbar-glass-veil),
-        var(--navbar-control-panel-bg) !important;
-}
-
-/* Desktop link dropdowns keep padding as hover hit-area; glass starts below it. */
 #navbar .navbar-dropdown-menu {
-    -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
-    backdrop-filter: var(--navbar-glass-filter) !important;
-    background: var(--navbar-glass-tint), var(--navbar-glass-veil), var(--navbar-glass-bg) !important;
-    border: 1px solid var(--navbar-glass-border) !important;
     border-radius: var(--radius-large) !important;
-    box-shadow: var(--navbar-glass-shadow), var(--navbar-glass-inner-veil) !important;
-    background-clip: padding-box;
     overflow: visible;
     transition-property: opacity, visibility !important;
     transition-duration: 140ms, 0ms !important;
@@ -529,29 +295,9 @@ body.wallpaper-transparent #navbar>div::before {
     transition-property: color, background-color, border-color, box-shadow !important;
 }
 
-#navbar :is(#theme-mode-panel, #wallpaper-mode-panel) {
-    -webkit-backdrop-filter: var(--navbar-glass-filter) !important;
-    backdrop-filter: var(--navbar-glass-filter) !important;
-    background:
-        var(--navbar-glass-tint),
-        var(--navbar-glass-veil),
-        var(--navbar-control-panel-bg) !important;
-    border: 1px solid var(--navbar-glass-border) !important;
+#navbar :is(#display-setting, #search-panel, #nav-menu-panel) {
     border-radius: var(--radius-large);
-    box-shadow: var(--navbar-glass-shadow), var(--navbar-glass-inner-veil) !important;
-    background-clip: padding-box;
-    overflow: hidden !important;
-    transform: translateZ(0);
-    transition-property: opacity, transform, visibility !important;
-    will-change: opacity, transform;
-}
-
-#navbar :is(#theme-mode-panel, #wallpaper-mode-panel)>.float-panel {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
+    overflow: hidden;
 }
 
 /* Navbar buttons: keep accent text, replace hover fill with a fading accent outline. */
